@@ -3,6 +3,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id 'idea'
+    id "org.sonarqube" version "3.1.1"
     id 'jacoco'
     id "org.sonarqube" version "3.5.0.2730"
 }
@@ -55,9 +56,9 @@ bootJar {
 
 sonarqube {
   properties {
-    property "sonar.projectKey", "TODO"
-    property "sonar.organization", "TODO"
-    property "sonar.host.url", "TODO"
+    property "sonar.projectKey", "sopra-fs23-group-4_sopra-fs23-group-04-client"
+    property "sonar.organization", "sopra-fs23-group-4"
+    property "sonar.host.url", "https://sonarcloud.io"
   }
 }
 
