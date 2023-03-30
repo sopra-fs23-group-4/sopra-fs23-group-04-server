@@ -1,7 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.rest.dto;
 
-public class UserPostDTO {
-
+public class UserLoginDTO {
   private String password;
 
   private String username;

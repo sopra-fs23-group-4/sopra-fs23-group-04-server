@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 
 /**
  * Internal User Representation
@@ -19,61 +20,85 @@ import java.io.Serializable;
 @Table(name = "USER")
 public class User implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  @Id
-  @GeneratedValue
-  private Long id;
+    @Id
+    @GeneratedValue
+    private Long id;
 
-  @Column(nullable = false)
-  private String name;
+    @Column(nullable = false, unique = true)
+    private String username;
 
-  @Column(nullable = false, unique = true)
-  private String username;
+    @Column(nullable = false, unique = true)
+    private String token;
 
-  @Column(nullable = false, unique = true)
-  private String token;
+    @Column(nullable = false)
+    private UserStatus status;
 
-  @Column(nullable = false)
-  private UserStatus status;
+    @Column(nullable = false)
+    private String password;
 
-  public Long getId() {
-    return id;
+    @Column(nullable = false)
+    private LocalDate creation_date;
+    @Column
+    private String Quote;
+
+  public String getQuote() {
+    return Quote;
   }
 
-  public void setId(Long id) {
-    this.id = id;
+  public void setQuote(String quote) {
+    Quote = quote;
   }
 
-  public String getName() {
-    return name;
-  }
+  public LocalDate getCreation_date() {
+        return creation_date;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setCreation_date(LocalDate creationDate) {
+        this.creation_date = creationDate;
+    }
 
-  public String getUsername() {
-    return username;
-  }
 
-  public void setUsername(String username) {
-    this.username = username;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public String getToken() {
-    return token;
-  }
 
-  public void setToken(String token) {
-    this.token = token;
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  public UserStatus getStatus() {
-    return status;
-  }
 
-  public void setStatus(UserStatus status) {
-    this.status = status;
-  }
+
+    public String getUsername() {
+        return username;
+    }
+    public void setPassword(String password){
+        this.password=password;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
 }
