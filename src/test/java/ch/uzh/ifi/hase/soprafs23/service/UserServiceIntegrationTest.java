@@ -11,6 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -42,6 +44,8 @@ public class UserServiceIntegrationTest {
     User testUser = new User();
 
     testUser.setUsername("testUsername");
+    testUser.setPassword("alpha");
+    testUser.setCreation_date(LocalDate.EPOCH);
 
     // when
     User createdUser = userService.createUser(testUser);
@@ -51,7 +55,7 @@ public class UserServiceIntegrationTest {
 
     assertEquals(testUser.getUsername(), createdUser.getUsername());
     assertNotNull(createdUser.getToken());
-    assertEquals(UserStatus.OFFLINE, createdUser.getStatus());
+    assertEquals(UserStatus.ONLINE, createdUser.getStatus());
   }
 
   @Test
@@ -59,6 +63,8 @@ public class UserServiceIntegrationTest {
     assertNull(userRepository.findByUsername("testUsername"));
 
     User testUser = new User();
+    testUser.setPassword("alpha");
+    testUser.setCreation_date(LocalDate.EPOCH);
 
     testUser.setUsername("testUsername");
     User createdUser = userService.createUser(testUser);
