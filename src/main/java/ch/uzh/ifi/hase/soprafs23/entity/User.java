@@ -49,7 +49,6 @@ public class User implements Serializable {
 
     private int rank;
 
-
     private int accumulatedScore;
 
 
