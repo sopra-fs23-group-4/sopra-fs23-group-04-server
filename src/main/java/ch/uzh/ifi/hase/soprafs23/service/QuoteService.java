@@ -1,7 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
-import ch.uzh.ifi.hase.soprafs23.entity.Quote;
+import ch.uzh.ifi.hase.soprafs23.entity.QuoteHolder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -14,9 +14,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.Objects;
 
 @Service
 @Transactional
@@ -24,34 +24,55 @@ public class QuoteService {
   String apiKey="rpmvnuWnHglloTTHc7O7ug==8RuxI4PTjhoVUFng";
   private final Logger log = LoggerFactory.getLogger(QuoteService.class);
 
-  public Quote getQuote(QuoteCategory quoteCategory) throws IOException {
+  public QuoteHolder generateQuote(QuoteCategory quoteCategory) throws IOException {
 
     URL url = new URL(quoteCategory.url);
     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
     connection.setRequestProperty("accept", "application/json");
     connection.setRequestProperty("X-Api-Key", apiKey);
+    try {
 
-    InputStream responseStream = connection.getInputStream();
-    ObjectMapper mapper = new ObjectMapper();
+      InputStream responseStream = connection.getInputStream();
+
+      ObjectMapper mapper = new ObjectMapper();
+
+      JsonNode jsonResponse = mapper.readTree(responseStream);
+
+      System.out.println(jsonResponse.toString());
+
+      //verifyNotError(jsonResponse, quoteCategory);
+
+      QuoteHolder quoteHolder = new QuoteHolder();
+      quoteHolder.setQuote(jsonResponse.get(0).get(quoteCategory.fieldName).asText());
+
+      quoteHolder.setType(quoteCategory.fieldName);
+
+      return quoteHolder;}
+
+    catch (IOException ioException){
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The api key is wrong");
+    }
 
 
-    JsonNode root = mapper.readTree(responseStream);
-    verifyNotError(root);
 
 
-    System.out.println(root.path("fact").asText());
-    return null;
+
 
   }
 
-  private void verifyNotError(JsonNode root) {
-    Iterator<String> fieldNames = root.fieldNames();
+  private void verifyNotError(JsonNode jsonResponse, QuoteCategory quoteCategory) {
+    Iterator<String> fieldNames = jsonResponse.fieldNames();
+    boolean isValid=false;
 
     while(fieldNames.hasNext()) {
       String fieldName = fieldNames.next();
-      if (fieldName.toLowerCase().strip()=="error" || fieldName.toLowerCase().strip()== "message"){
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A "+ fieldName+ " The text: "+ root.get(fieldName).asText());
+      if (Objects.equals(fieldName, quoteCategory.fieldName)){
+        isValid=true;
       }
     }
+    if (!isValid){
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A "+ fieldNames.toString()+ " The text: ");
+    }
   }
+
 }
