@@ -45,7 +45,7 @@ public class UserService {
     newUser.setToken(UUID.randomUUID().toString());
     newUser.setStatus(UserStatus.ONLINE);
     checkIfUserExists(newUser);
-    newUser.setCreation_date(LocalDate.now());
+    newUser.setCreationDate(LocalDate.now());
     // saves the given entity but data is only persisted in the database once
     // flush() is called
     newUser = userRepository.save(newUser);
@@ -60,7 +60,7 @@ public class UserService {
         String notExist="The username doesn't exist";
         String wrongPassword="wrong password";
 
-        if (userByUsername==null){
+        if (userByUsername == null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,notExist);
         }
         if (!Objects.equals(userLogin.getPassword(), userByUsername.getPassword())){

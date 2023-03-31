@@ -70,7 +70,7 @@ public class UserController {
     public UserGetDTO logInUser(@RequestBody UserLoginDTO userLoginDTO,HttpServletResponse response){
         User userCredentials =DTOMapper.INSTANCE.convertUserLoginPostDTOtoEntity(userLoginDTO);
 
-        User user =userService.logIn(userCredentials);
+        User user = userService.logIn(userCredentials);
 
         response.addHeader("Authorization", user.getToken());
 
