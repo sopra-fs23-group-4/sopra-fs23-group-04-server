@@ -21,7 +21,7 @@ public class UserRepositoryIntegrationTest {
   @Autowired
   private UserRepository userRepository;
 
-  /*@Test
+  @Test
   public void findByName_success() {
     // given
     User user = new User();
@@ -31,11 +31,11 @@ public class UserRepositoryIntegrationTest {
     user.setCreation_date(LocalDate.now());
     user.setPassword("abc");
     user.setToken("1");
-    User found=userRepository.findByUsername(user.getUsername());
+
 
     entityManager.persist(user);
     entityManager.flush();
-
+    User found=userRepository.findByUsername(user.getUsername());
     // when
 
 
@@ -44,5 +44,5 @@ public class UserRepositoryIntegrationTest {
     assertEquals(found.getUsername(), user.getUsername());
     assertEquals(found.getToken(), user.getToken());
     assertEquals(found.getStatus(), user.getStatus());
-  }*/
+  }
 }
