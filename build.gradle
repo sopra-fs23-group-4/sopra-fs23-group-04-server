@@ -82,4 +82,9 @@ if (secretPropsFile.exists()) {
     }
 }
 
+wrapper {
+  gradleVersion = '8.1'
+  distributionType = Wrapper.DistributionType.ALL
+}
+
 defaultTasks 'bootJar', 'build'
