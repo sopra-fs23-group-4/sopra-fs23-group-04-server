@@ -64,16 +64,16 @@ public class UserController {
     return DTOMapper.INSTANCE.convertEntityToUserGetDTO(createdUser);
   }
 
-    @PostMapping("/login")
-    @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
-    public UserGetDTO logInUser(@RequestBody UserLoginDTO userLoginDTO,HttpServletResponse response){
-        User userCredentials =DTOMapper.INSTANCE.convertUserLoginPostDTOtoEntity(userLoginDTO);
+@PostMapping("/login")
+@ResponseStatus(HttpStatus.CREATED)
+@ResponseBody
+public UserGetDTO logInUser(@RequestBody UserLoginDTO userLoginDTO,HttpServletResponse response){
+    User userCredentials =DTOMapper.INSTANCE.convertUserLoginPostDTOtoEntity(userLoginDTO);
 
-        User user =userService.logIn(userCredentials);
+    User user =userService.logIn(userCredentials);
 
-        response.addHeader("Authorization", user.getToken());
+    response.addHeader("Authorization", user.getToken());
 
-        return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
-    }
+    return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+}
 }

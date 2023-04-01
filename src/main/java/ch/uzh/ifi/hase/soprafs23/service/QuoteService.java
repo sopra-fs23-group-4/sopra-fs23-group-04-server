@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.Objects;
@@ -26,37 +27,35 @@ public class QuoteService {
 
   public QuoteHolder generateQuote(QuoteCategory quoteCategory) throws IOException {
 
-    URL url = new URL(quoteCategory.url);
-    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-    connection.setRequestProperty("accept", "application/json");
-    connection.setRequestProperty("X-Api-Key", apiKey);
-    try {
+      try {
+          URL url = new URL(quoteCategory.url);
+          HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+          connection.setRequestProperty("accept", "application/json");
+          connection.setRequestProperty("X-Api-Key", apiKey);
 
-      InputStream responseStream = connection.getInputStream();
-
-      ObjectMapper mapper = new ObjectMapper();
-
-      JsonNode jsonResponse = mapper.readTree(responseStream);
-
-      System.out.println(jsonResponse.toString());
-
-      //verifyNotError(jsonResponse, quoteCategory);
-
-      QuoteHolder quoteHolder = new QuoteHolder();
-      quoteHolder.setQuote(jsonResponse.get(0).get(quoteCategory.fieldName).asText());
-
-      quoteHolder.setType(quoteCategory.fieldName);
-
-      return quoteHolder;}
-
-    catch (IOException ioException){
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The api key is wrong");
-    }
+          InputStream responseStream = connection.getInputStream();
+          ObjectMapper mapper = new ObjectMapper();
+          JsonNode jsonResponse = mapper.readTree(responseStream);
+          System.out.println(jsonResponse.toString());
 
 
 
 
+          return quoteCategory.extractJsonData.jsonToQuoteHolder(jsonResponse,quoteCategory);
 
+
+      } catch (MalformedURLException e) {
+          System.err.println("Error: Invalid URL for quote category: " + quoteCategory.categoryName);
+          e.printStackTrace();
+      } catch (IOException e) {
+          System.err.println("Error: Problem connecting to the API for quote category: " + quoteCategory.categoryName);
+          e.printStackTrace();
+      }
+      catch (Error e){
+          System.err.println("Something went wrong " + quoteCategory.categoryName);
+          e.printStackTrace();
+      }
+      return null;
 
   }
 
