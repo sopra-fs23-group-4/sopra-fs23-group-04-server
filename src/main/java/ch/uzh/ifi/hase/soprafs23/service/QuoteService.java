@@ -22,7 +22,7 @@ import java.util.Objects;
 @Service
 @Transactional
 public class QuoteService {
-  String apiKey="rpmvnuWnHglloTTHc7O7ug==8RuxI4PTjhoVUFng";
+  String apiKey="rpmvnuWnHglloTTHc7O7ug==8RuxI4PTjhoVUFngff";
   private final Logger log = LoggerFactory.getLogger(QuoteService.class);
 
   public QuoteHolder generateQuote(QuoteCategory quoteCategory) throws IOException {
@@ -38,9 +38,6 @@ public class QuoteService {
           JsonNode jsonResponse = mapper.readTree(responseStream);
           System.out.println(jsonResponse.toString());
 
-
-
-
           return quoteCategory.extractJsonData.jsonToQuoteHolder(jsonResponse,quoteCategory);
 
 
@@ -49,7 +46,7 @@ public class QuoteService {
           e.printStackTrace();
       } catch (IOException e) {
           System.err.println("Error: Problem connecting to the API for quote category: " + quoteCategory.categoryName);
-          e.printStackTrace();
+          throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,"The server has an issue with the api key");
       }
       catch (Error e){
           System.err.println("Something went wrong " + quoteCategory.categoryName);
