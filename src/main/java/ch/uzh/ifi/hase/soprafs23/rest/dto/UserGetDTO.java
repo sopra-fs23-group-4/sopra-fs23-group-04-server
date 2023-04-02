@@ -10,7 +10,6 @@ public class UserGetDTO {
   private Long id;
   private String username;
   private UserStatus status;
-
   private LocalDate creation_date;
   public LocalDate getCreation_date() {
     return creation_date;

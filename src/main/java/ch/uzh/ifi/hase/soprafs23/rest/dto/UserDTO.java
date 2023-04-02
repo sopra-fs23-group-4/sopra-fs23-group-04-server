@@ -37,7 +37,6 @@ public class UserDTO {
         return id;
     }
 
-
     public String getUsername() {
         return username;
     }
@@ -45,7 +44,6 @@ public class UserDTO {
     public String getStatus() {
         return status;
     }
-
 
     public String getToken() {
         return token;
