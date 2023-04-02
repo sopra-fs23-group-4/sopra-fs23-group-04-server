@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.rest.mapper;
 
+import ch.uzh.ifi.hase.soprafs23.entity.QuoteHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.*;
 import org.mapstruct.*;
@@ -48,5 +49,8 @@ public interface DTOMapper {
     @Mapping(source = "token", target = "token")
     // @Mapping(source = "profile_picture",target = "profile_picture")
     User convertUserPutDTOToEntity(UserPutDTO userPutDTO);
+
+  @Mapping(source = "quote", target = "quote")
+  QuoteGetDTO convertEntityToQuoteGetDTO(QuoteHolder quoteHolder);
 
 }
