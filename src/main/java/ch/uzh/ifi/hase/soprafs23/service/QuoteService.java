@@ -1,7 +1,8 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
-import ch.uzh.ifi.hase.soprafs23.entity.QuoteHolder;
+import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteCategoriesHolder;
+import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -25,7 +27,7 @@ public class QuoteService {
   String apiKey="rpmvnuWnHglloTTHc7O7ug==8RuxI4PTjhoVUFngff";
   private final Logger log = LoggerFactory.getLogger(QuoteService.class);
 
-  public QuoteHolder generateQuote(QuoteCategory quoteCategory) throws IOException {
+  public QuoteHolder generateQuote(QuoteCategory quoteCategory)  {
 
       try {
           URL url = new URL(quoteCategory.url);
@@ -67,8 +69,16 @@ public class QuoteService {
       }
     }
     if (!isValid){
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A "+ fieldNames.toString()+ " The text: ");
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A "+ fieldNames+ " The text: ");
     }
+  }
+  public QuoteCategoriesHolder getCategories(){
+      List<String> categories=QuoteCategory.getAllCategoryNames();
+
+      QuoteCategoriesHolder quoteCategoriesHolder= new QuoteCategoriesHolder();
+      quoteCategoriesHolder.setCategories(categories);
+
+      return  quoteCategoriesHolder;
   }
 
 }

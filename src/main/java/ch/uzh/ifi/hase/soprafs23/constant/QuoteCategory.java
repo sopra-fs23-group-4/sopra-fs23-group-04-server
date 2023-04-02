@@ -6,6 +6,10 @@ import ch.uzh.ifi.hase.soprafs23.constant.extractJsonData.ExtractJsonElementConv
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public enum QuoteCategory {
 
 
@@ -61,12 +65,23 @@ public enum QuoteCategory {
     }
 
     public static QuoteCategory getQuoteByType(String categoryName) {
-    for (QuoteCategory quoteCategory : QuoteCategory.values()) {
-      if (quoteCategory.categoryName.equalsIgnoreCase(categoryName)) {
-        return quoteCategory;
-      }
-    }
-    throw new ResponseStatusException(HttpStatus.NOT_FOUND,"The category" + categoryName + " doens't exist");
+        for (QuoteCategory quoteCategory : QuoteCategory.values()) {
+          if (quoteCategory.categoryName.equalsIgnoreCase(categoryName)) {
+            return quoteCategory;
+          }
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND,"The category" + categoryName + " doens't exist");
+  }
+
+  public static List<String> getAllCategoryNames(){
+        List<String> categories=new ArrayList<>();
+
+        for (QuoteCategory quoteCategory: QuoteCategory.values()){
+            categories.add(quoteCategory.categoryName);
+        }
+        Collections.sort(categories);
+
+        return categories;
   }
 
 

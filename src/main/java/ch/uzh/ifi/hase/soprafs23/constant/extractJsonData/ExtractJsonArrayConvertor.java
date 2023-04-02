@@ -1,7 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.constant.extractJsonData;
 
 import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
-import ch.uzh.ifi.hase.soprafs23.entity.QuoteHolder;
+import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class ExtractJsonArrayConvertor implements ExtractJsonData {

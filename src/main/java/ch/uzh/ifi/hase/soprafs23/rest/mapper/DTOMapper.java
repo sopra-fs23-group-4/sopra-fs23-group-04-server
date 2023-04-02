@@ -1,8 +1,11 @@
 package ch.uzh.ifi.hase.soprafs23.rest.mapper;
 
-import ch.uzh.ifi.hase.soprafs23.entity.QuoteHolder;
+import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteCategoriesHolder;
+import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.*;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.quote.QuoteCategoriesGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.quote.QuoteGetDTO;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -44,5 +47,8 @@ public interface DTOMapper {
 
   @Mapping(source = "quote", target = "quote")
   QuoteGetDTO convertEntityToQuoteGetDTO(QuoteHolder quoteHolder);
+
+  @Mapping(source ="categories", target = "categories")
+    QuoteCategoriesGetDTO convertEntityToQuoteCategoriesGetDTO(QuoteCategoriesHolder quoteCategory);
 
 }
