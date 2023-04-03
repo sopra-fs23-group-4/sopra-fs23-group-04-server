@@ -77,7 +77,7 @@ public class UserService {
 
     }
 
-    public void editUser (Long userId, User editedUser) {
+    public User editUser (Long userId, User editedUser) {
 
         User userDB = userRepository.findById(userId).orElse(null);
 
@@ -91,6 +91,8 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,wrongPassword);
         }
         changeProfile(userDB, editedUser);
+
+        return userDB;
     }
 
     /**
