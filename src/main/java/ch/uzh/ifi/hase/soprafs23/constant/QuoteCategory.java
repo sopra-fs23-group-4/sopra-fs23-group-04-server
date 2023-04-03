@@ -18,14 +18,10 @@ public enum QuoteCategory {
     JOKE("https://api.api-ninjas.com/v1/jokes?limit=1","joke","joke"),
 
 
-    BUSINESS(baseUrlQuote("business"), "business", "quote"),
     CAR(baseUrlQuote("car"), "car", "quote"),
     COMPUTERS(baseUrlQuote("computers"), "computers", "quote"),
     COOL(baseUrlQuote("cool"), "cool", "quote"),
     COURAGE(baseUrlQuote("courage"), "courage", "quote"),
-    DAD(baseUrlQuote("dad"), "dad", "quote"),
-    DATING(baseUrlQuote("dating"), "dating", "quote"),
-    DEATH(baseUrlQuote("death"), "death", "quote"),
     FRIENDSHIP(baseUrlQuote("friendship"), "friendship", "quote"),
     FUNNY(baseUrlQuote("funny"), "funny", "quote"),
     FUTURE(baseUrlQuote("future"), "future", "quote"),
@@ -37,7 +33,6 @@ public enum QuoteCategory {
     JEALOUSY(baseUrlQuote("jealousy"), "jealousy", "quote"),
     LIFE(baseUrlQuote("life"), "life", "quote"),
     LOVE(baseUrlQuote("love"), "love", "quote"),
-    MONEY(baseUrlQuote("money"), "money", "quote"),
     MOVIES(baseUrlQuote("movies"), "movies", "quote"),
     SUCCESS(baseUrlQuote("success"), "success", "quote");
 
@@ -64,7 +59,7 @@ public enum QuoteCategory {
         return "https://api.api-ninjas.com/v1/quotes?category=" + category;
     }
 
-    public static QuoteCategory getQuoteByType(String categoryName) {
+    public static QuoteCategory getQuoteByCategory(String categoryName) {
         for (QuoteCategory quoteCategory : QuoteCategory.values()) {
           if (quoteCategory.categoryName.equalsIgnoreCase(categoryName)) {
             return quoteCategory;
@@ -83,6 +78,8 @@ public enum QuoteCategory {
 
         return categories;
   }
+
+
 
 
 
