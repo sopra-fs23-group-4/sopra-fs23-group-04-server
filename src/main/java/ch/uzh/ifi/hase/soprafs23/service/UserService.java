@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.service;
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
+import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,7 @@ public class UserService {
     private final UserRepository userRepository;
     @Autowired
     public UserService(@Qualifier("userRepository") UserRepository userRepository) {
-    this.userRepository = userRepository;
+        this.userRepository = userRepository;
     }
 
     public List<User> getUsers() {
@@ -44,20 +45,20 @@ public class UserService {
     int token = 1;
 
     public User createUser(User newUser) {
-    //newUser.setToken(UUID.randomUUID().toString());
-    newUser.setToken(Integer.toString(token));
-    token++;
-    newUser.setStatus(UserStatus.ONLINE);
-    checkIfUserExists(newUser);
-    checkIfUsernameValid(newUser);
-    newUser.setCreation_date(LocalDate.now());
-    // saves the given entity but data is only persisted in the database once
-    // flush() is called
-    newUser = userRepository.save(newUser);
-    userRepository.flush();
+        //newUser.setToken(UUID.randomUUID().toString());
+        newUser.setToken(Integer.toString(token));
+        token++;
+        newUser.setStatus(UserStatus.ONLINE);
+        checkIfUserExists(newUser);
+        checkIfUsernameValid(newUser);
+        newUser.setCreation_date(LocalDate.now());
+        // saves the given entity but data is only persisted in the database once
+        // flush() is called
+        newUser = userRepository.save(newUser);
+        userRepository.flush();
 
-    log.debug("Created Information for User: {}", newUser);
-    return newUser;
+        log.debug("Created Information for User: {}", newUser);
+        return newUser;
     }
 
     public User logIn(User userLogin){
@@ -77,7 +78,7 @@ public class UserService {
 
     }
 
-    public void editUser (Long userId, User editedUser) {
+    public User editUser (Long userId, User editedUser) {
 
         User userDB = userRepository.findById(userId).orElse(null);
 
@@ -91,6 +92,8 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,wrongPassword);
         }
         changeProfile(userDB, editedUser);
+
+        return userDB;
     }
 
     /**
@@ -137,6 +140,7 @@ public class UserService {
         if (!Objects.equals(newPassword, null)) {
             userDB.setPassword(newPassword);
         }
+        userRepository.save(userDB);
     }
 
 }
