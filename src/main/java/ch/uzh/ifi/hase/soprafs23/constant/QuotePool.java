@@ -6,7 +6,6 @@ public enum QuotePool {
 
     public final String url;
 
-
     QuotePool(String url) {
         this.url = url;
     }

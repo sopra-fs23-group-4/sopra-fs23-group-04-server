@@ -44,8 +44,8 @@ public class User implements Serializable {
     @Column
     private String quote;
 
-    @Lob
-    private byte[] profilePicture;
+    @Column
+    private String profilePictureUrl;
 
     private int rank;
 
@@ -103,9 +103,9 @@ public class User implements Serializable {
       this.quote = quote;
     }
 
-    public byte[] getProfilePicture() { return profilePicture; }
+    public String getProfilePictureUrl() { return profilePictureUrl; }
 
-    public void setProfilePicture(byte[] profilePicture) { this.profilePicture = profilePicture; }
+    public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
 
     public int getRank() { return rank; }
 

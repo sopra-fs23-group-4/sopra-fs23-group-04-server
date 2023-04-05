@@ -8,6 +8,12 @@ import ch.uzh.ifi.hase.soprafs23.rest.dto.UserPostDTO;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Base64;
+
 /**
  * DTOMapper
  * This class is responsible for generating classes that will automatically
@@ -22,27 +28,29 @@ import org.mapstruct.factory.Mappers;
 @Mapper
 public interface DTOMapper {
 
-  DTOMapper INSTANCE = Mappers.getMapper(DTOMapper.class);
+    DTOMapper INSTANCE = Mappers.getMapper(DTOMapper.class);
 
-  @Mapping(source = "password", target = "password")
-  @Mapping(source = "username", target = "username")
-  User convertUserPostDTOtoEntity(UserPostDTO userPostDTO);
+    @Mapping(source = "password", target = "password")
+    @Mapping(source = "username", target = "username")
+    User convertUserPostDTOtoEntity(UserPostDTO userPostDTO);
 
-  @Mapping(source = "password", target = "password")
-  @Mapping(source = "username", target = "username")
-  User convertUserLoginPostDTOtoEntity(UserLoginDTO userLoginDTO);
+    @Mapping(source = "password", target = "password")
+    @Mapping(source = "username", target = "username")
+    User convertUserLoginPostDTOtoEntity(UserLoginDTO userLoginDTO);
 
-  @Mapping(source = "id", target = "id")
-  @Mapping(source = "username", target = "username")
-  @Mapping(source = "status", target = "status")
-  @Mapping(source = "creationDate",target = "creationDate")
-  UserGetDTO convertEntityToUserGetDTO(User user);
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "status", target = "status")
+    @Mapping(source = "creationDate",target = "creationDate")
+    @Mapping(source = "profilePictureUrl", target = "profilePictureUrl")
+    UserGetDTO convertEntityToUserGetDTO(User user);
 
-  @Mapping(source = "id", target = "id")
-  @Mapping(source = "username", target = "username")
-  @Mapping(source = "status", target = "status")
-  @Mapping(source = "creationDate",target = "creationDate")
-  @Mapping(source = "token", target = "token")
-  UserDTO convertEntityToUserDTO(User user);
+
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "username", target = "username")
+    @Mapping(source = "status", target = "status")
+    @Mapping(source = "creationDate",target = "creationDate")
+    @Mapping(source = "token", target = "token")
+    UserDTO convertEntityToUserDTO(User user);
 
 }

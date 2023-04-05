@@ -6,6 +6,8 @@ import ch.uzh.ifi.hase.soprafs23.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.UserPostDTO;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -37,7 +39,7 @@ public class DTOMapperTest {
     user.setUsername("firstname@lastname");
     user.setStatus(UserStatus.OFFLINE);
     user.setToken("1");
-
+    user.setProfilePictureUrl("https://example.com/test-profile-picture.jpg");
     // MAP -> Create UserGetDTO
     UserGetDTO userGetDTO = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
 

@@ -17,6 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -49,6 +51,7 @@ public class UserControllerTest {
     User user = new User();
     user.setUsername("firstname@lastname");
     user.setStatus(UserStatus.OFFLINE);
+    user.setProfilePictureUrl("https://example.com/test-profile-picture.jpg");
 
     List<User> allUsers = Collections.singletonList(user);
 
@@ -74,7 +77,7 @@ public class UserControllerTest {
     user.setUsername("testUsername");
     user.setToken("1");
     user.setStatus(UserStatus.ONLINE);
-
+    user.setProfilePictureUrl("https://example.com/test-profile-picture.jpg");
     UserPostDTO userPostDTO = new UserPostDTO();
     userPostDTO.setPassword("Test User");
     userPostDTO.setUsername("testUsername");
