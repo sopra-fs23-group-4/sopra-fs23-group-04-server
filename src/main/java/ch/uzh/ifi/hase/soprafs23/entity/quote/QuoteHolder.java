@@ -1,9 +1,12 @@
 package ch.uzh.ifi.hase.soprafs23.entity.quote;
 
 public class QuoteHolder {
-    public String getQuote() {
-    return quote;
-    }
+
+    private String quote;
+    private String type;
+
+
+    public String getQuote() { return quote; }
 
     public void setQuote(String quote) {
     this.quote = quote;
@@ -17,6 +20,4 @@ public class QuoteHolder {
     this.type = type;
     }
 
-    private String quote;
-    private String type;
 }
