@@ -58,7 +58,7 @@ public enum QuoteCategory {
         this.url = url;
         this.categoryName = categoryName;
         this.fieldName = fieldName;
-        this.extractJsonData=extractJsonData;
+        this.extractJsonData = extractJsonData;
     }
     private static String baseUrlQuote(String category) {
         return "https://api.api-ninjas.com/v1/quotes?category=" + category;
@@ -74,7 +74,7 @@ public enum QuoteCategory {
   }
 
   public static List<String> getAllCategoryNames(){
-        List<String> categories=new ArrayList<>();
+        List<String> categories = new ArrayList<>();
 
         for (QuoteCategory quoteCategory: QuoteCategory.values()){
             categories.add(quoteCategory.categoryName);

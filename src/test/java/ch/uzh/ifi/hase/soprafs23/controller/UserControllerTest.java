@@ -18,17 +18,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willThrow;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -47,12 +43,13 @@ public class UserControllerTest {
     @MockBean
     private UserService userService;
 
-    @Test
-    public void givenUsers_whenGetUsers_thenReturnJsonArray() throws Exception {
-        // given
-        User user = new User();
-        user.setUsername("firstname@lastname");
-        user.setStatus(UserStatus.OFFLINE);
+  @Test
+  public void givenUsers_whenGetUsers_thenReturnJsonArray() throws Exception {
+    // given
+    User user = new User();
+    user.setUsername("firstname@lastname");
+    user.setStatus(UserStatus.OFFLINE);
+    user.setProfilePictureUrl("https://example.com/test-profile-picture.jpg");
 
         List<User> allUsers = Collections.singletonList(user);
 
@@ -70,18 +67,19 @@ public class UserControllerTest {
             .andExpect(jsonPath("$[0].status", is(user.getStatus().toString())));
     }
 
-    @Test
-    public void createUser_validInput_userCreated() throws Exception {
-        // given
-        User user = new User();
-        user.setId(1L);
-        user.setUsername("testUsername");
-        user.setToken("1");
-        user.setStatus(UserStatus.ONLINE);
+  @Test
+  public void createUser_validInput_userCreated() throws Exception {
+    // given
+    User user = new User();
+    user.setId(1L);
+    user.setUsername("testUsername");
+    user.setToken("1");
+    user.setStatus(UserStatus.ONLINE);
+    user.setProfilePictureUrl("https://example.com/test-profile-picture.jpg");
 
-        UserPostDTO userPostDTO = new UserPostDTO();
-        userPostDTO.setPassword("Test User");
-        userPostDTO.setUsername("testUsername");
+    UserPostDTO userPostDTO = new UserPostDTO();
+    userPostDTO.setPassword("Test User");
+    userPostDTO.setUsername("testUsername");
 
         given(userService.createUser(Mockito.any())).willReturn(user);
 

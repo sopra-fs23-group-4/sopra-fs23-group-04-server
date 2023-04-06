@@ -14,28 +14,30 @@ import java.util.List;
 
 @RestController
 public class QuoteController {
-  private final QuoteService quoteService;
-  QuoteController(QuoteService quoteService){
+    private final QuoteService quoteService;
+    QuoteController(QuoteService quoteService){
     this.quoteService= quoteService;
-  }
+    }
 
-  @GetMapping(value = "/quotes/{category}")
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public QuoteGetDTO getQuote(@PathVariable("category") String category) throws Exception {
-    QuoteCategory quoteCategory=QuoteCategory.getQuoteByType(category);
+    @GetMapping(value = "/quotes/{category}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public QuoteGetDTO getQuote(@PathVariable("category") String category) throws Exception {
 
-    QuoteHolder quoteHolder= quoteService.generateQuote(quoteCategory);
+        QuoteCategory quoteCategory = QuoteCategory.getQuoteByType(category);
 
-    return DTOMapper.INSTANCE.convertEntityToQuoteGetDTO(quoteHolder);
-  }
+        QuoteHolder quoteHolder = quoteService.generateQuote(quoteCategory);
+
+        return DTOMapper.INSTANCE.convertEntityToQuoteGetDTO(quoteHolder);
+    }
+
     @GetMapping(value="/quotes")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public QuoteCategoriesGetDTO getQuoteCategories(){
-      QuoteCategoriesHolder quoteCategories = quoteService.getCategories();
+          QuoteCategoriesHolder quoteCategories = quoteService.getCategories();
 
-      return DTOMapper.INSTANCE.convertEntityToQuoteCategoriesGetDTO(quoteCategories);
+          return DTOMapper.INSTANCE.convertEntityToQuoteCategoriesGetDTO(quoteCategories);
     }
 
 }

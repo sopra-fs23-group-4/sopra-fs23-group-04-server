@@ -24,61 +24,63 @@ import java.util.Objects;
 @Service
 @Transactional
 public class QuoteService {
-  String apiKey="rpmvnuWnHglloTTHc7O7ug==8RuxI4PTjhoVUFngff";
-  private final Logger log = LoggerFactory.getLogger(QuoteService.class);
+    String apiKey="rpmvnuWnHglloTTHc7O7ug==8RuxI4PTjhoVUFngff";
 
-  public QuoteHolder generateQuote(QuoteCategory quoteCategory)  {
+    private final Logger log = LoggerFactory.getLogger(QuoteService.class);
 
-      try {
-          URL url = new URL(quoteCategory.url);
-          HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-          connection.setRequestProperty("accept", "application/json");
-          connection.setRequestProperty("X-Api-Key", apiKey);
+    public QuoteHolder generateQuote(QuoteCategory quoteCategory)  {
 
-          InputStream responseStream = connection.getInputStream();
-          ObjectMapper mapper = new ObjectMapper();
-          JsonNode jsonResponse = mapper.readTree(responseStream);
-          System.out.println(jsonResponse.toString());
+        try {
+            URL url = new URL(quoteCategory.url);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("accept", "application/json");
+            connection.setRequestProperty("X-Api-Key", apiKey);
 
-          return quoteCategory.extractJsonData.jsonToQuoteHolder(jsonResponse,quoteCategory);
+            InputStream responseStream = connection.getInputStream();
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonResponse = mapper.readTree(responseStream);
+            System.out.println(jsonResponse.toString());
+
+            return quoteCategory.extractJsonData.jsonToQuoteHolder(jsonResponse,quoteCategory);
 
 
-      } catch (MalformedURLException e) {
-          System.err.println("Error: Invalid URL for quote category: " + quoteCategory.categoryName);
-          e.printStackTrace();
-      } catch (IOException e) {
-          System.err.println("Error: Problem connecting to the API for quote category: " + quoteCategory.categoryName);
-          throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,"The server has an issue with the api key");
-      }
-      catch (Error e){
-          System.err.println("Something went wrong " + quoteCategory.categoryName);
-          e.printStackTrace();
-      }
-      return null;
+        } catch (MalformedURLException e) {
+            System.err.println("Error: Invalid URL for quote category: " + quoteCategory.categoryName);
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("Error: Problem connecting to the API for quote category: " + quoteCategory.categoryName);
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,"The server has an issue with the api key");
+        } catch (Error e){
+            System.err.println("Something went wrong " + quoteCategory.categoryName);
+            e.printStackTrace();
+        }
+        return null;
 
-  }
-
-  private void verifyNotError(JsonNode jsonResponse, QuoteCategory quoteCategory) {
-    Iterator<String> fieldNames = jsonResponse.fieldNames();
-    boolean isValid=false;
-
-    while(fieldNames.hasNext()) {
-      String fieldName = fieldNames.next();
-      if (Objects.equals(fieldName, quoteCategory.fieldName)){
-        isValid=true;
-      }
     }
-    if (!isValid){
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A "+ fieldNames+ " The text: ");
+
+    private void verifyNotError(JsonNode jsonResponse, QuoteCategory quoteCategory) {
+
+        Iterator<String> fieldNames = jsonResponse.fieldNames();
+        boolean isValid = false;
+
+        while (fieldNames.hasNext()) {
+            String fieldName = fieldNames.next();
+            if (Objects.equals(fieldName, quoteCategory.fieldName)){
+                isValid = true;
+            }
+        }
+        if (!isValid){
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A " + fieldNames + " The text: ");
+        }
     }
-  }
-  public QuoteCategoriesHolder getCategories(){
-      List<String> categories=QuoteCategory.getAllCategoryNames();
 
-      QuoteCategoriesHolder quoteCategoriesHolder= new QuoteCategoriesHolder();
-      quoteCategoriesHolder.setCategories(categories);
+    public QuoteCategoriesHolder getCategories(){
+        List<String> categories = QuoteCategory.getAllCategoryNames();
 
-      return  quoteCategoriesHolder;
-  }
+        QuoteCategoriesHolder quoteCategoriesHolder = new QuoteCategoriesHolder();
+        quoteCategoriesHolder.setCategories(categories);
+
+        return  quoteCategoriesHolder;
+    }
 
 }
