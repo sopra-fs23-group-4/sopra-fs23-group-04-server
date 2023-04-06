@@ -1,8 +1,8 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
-import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteCategoriesHolder;
-import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
+import ch.uzh.ifi.hase.soprafs23.exceptions.entity.quote.QuoteCategoriesHolder;
+import ch.uzh.ifi.hase.soprafs23.exceptions.entity.quote.QuoteHolder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -24,7 +24,7 @@ import java.util.Objects;
 @Service
 @Transactional
 public class QuoteService {
-  String apiKey="rpmvnuWnHglloTTHc7O7ug==8RuxI4PTjhoVUFng";
+  private final String apiKey="Jcn3zBSrMNcsCeGm5rSm5zUabLibdT4xZiliT2rX";
   private final Logger log = LoggerFactory.getLogger(QuoteService.class);
 
   public QuoteHolder generateQuote(String category)  {

@@ -1,8 +1,8 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
-import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteCategoriesHolder;
-import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
+import ch.uzh.ifi.hase.soprafs23.exceptions.entity.quote.QuoteCategoriesHolder;
+import ch.uzh.ifi.hase.soprafs23.exceptions.entity.quote.QuoteHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

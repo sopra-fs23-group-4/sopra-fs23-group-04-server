@@ -1,8 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
-import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
-import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteCategoriesHolder;
-import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
+import ch.uzh.ifi.hase.soprafs23.exceptions.entity.quote.QuoteCategoriesHolder;
+import ch.uzh.ifi.hase.soprafs23.exceptions.entity.quote.QuoteHolder;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.quote.QuoteCategoriesGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.quote.QuoteGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.DTOMapper;

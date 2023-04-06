@@ -1,7 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.constant;
 
 import ch.uzh.ifi.hase.soprafs23.constant.extractJsonData.ExtractJsonElementConvertor;
-import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
+import ch.uzh.ifi.hase.soprafs23.exceptions.entity.quote.QuoteHolder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
