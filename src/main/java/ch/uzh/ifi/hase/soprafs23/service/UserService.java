@@ -3,7 +3,6 @@ package ch.uzh.ifi.hase.soprafs23.service;
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
-import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+
 
 /**
  * User Service
@@ -33,13 +31,14 @@ public class UserService {
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
+
     @Autowired
     public UserService(@Qualifier("userRepository") UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     public List<User> getUsers() {
-    return this.userRepository.findAll();
+        return this.userRepository.findAll();
     }
 
     int token = 1;
@@ -51,7 +50,9 @@ public class UserService {
         newUser.setStatus(UserStatus.ONLINE);
         checkIfUserExists(newUser);
         checkIfUsernameValid(newUser);
-        newUser.setCreation_date(LocalDate.now());
+        newUser.setCreationDate((LocalDate.now()));
+        newUser.setProfilePictureUrl("https://storage.googleapis.com/sorpa-fs23-gr-leetfive-server.appspot.com/DefaultProfilePicture100x100.jpg");
+
         // saves the given entity but data is only persisted in the database once
         // flush() is called
         newUser = userRepository.save(newUser);
@@ -59,14 +60,15 @@ public class UserService {
 
         log.debug("Created Information for User: {}", newUser);
         return newUser;
+
     }
 
     public User logIn(User userLogin){
-        User userByUsername =userRepository.findByUsername(userLogin.getUsername());
-        String notExist="The username doesn't exist";
-        String wrongPassword="wrong password";
+        User userByUsername = userRepository.findByUsername(userLogin.getUsername());
+        String notExist = "This username doesn't exist";
+        String wrongPassword = "The password you tipped in is incorrect";
 
-        if (userByUsername==null){
+        if (userByUsername == null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,notExist);
         }
         if (!Objects.equals(userLogin.getPassword(), userByUsername.getPassword())){
@@ -82,10 +84,10 @@ public class UserService {
 
         User userDB = userRepository.findById(userId).orElse(null);
 
-        String notExist="The user doesn't exist!";
-        String wrongPassword="You are not authorized to edit this profile!";
+        String notExist = "The user doesn't exist!";
+        String wrongPassword = "You are not authorized to edit this profile!";
 
-        if (userDB==null){
+        if (userDB == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, notExist);
         }
         if (!userDB.getToken().equals(editedUser.getToken())){

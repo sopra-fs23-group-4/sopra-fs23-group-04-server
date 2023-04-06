@@ -26,7 +26,7 @@ public class UserController {
     private final UserService userService;
 
     UserController(UserService userService) {
-    this.userService = userService;
+      this.userService = userService;
     }
     Logger log = LoggerFactory.getLogger(UserController.class);
 
@@ -49,15 +49,15 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public UserGetDTO createUser(@RequestBody UserPostDTO userPostDTO, HttpServletResponse response) {
-    // convert API user to internal representation
-    User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+        // convert API user to internal representation
+        User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
 
-    // create user
-    User createdUser = userService.createUser(userInput);
+        // create user
+        User createdUser = userService.createUser(userInput);
 
-    response.addHeader("Authorization", createdUser.getToken());
-    log.info("The user " + createdUser.getUsername()+ " with id "+ createdUser.getId()+ " has been created.");
-    // convert internal representation of user back to API
+        response.addHeader("Authorization", createdUser.getToken());
+        log.info("The user " + createdUser.getUsername() + " with id " + createdUser.getId() + " has been created.");
+        // convert internal representation of user back to API
         return DTOMapper.INSTANCE.convertEntityToUserGetDTO(createdUser);
     }
 
@@ -65,9 +65,9 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public UserGetDTO logInUser(@RequestBody UserLoginDTO userLoginDTO,HttpServletResponse response){
-        User userCredentials =DTOMapper.INSTANCE.convertUserLoginPostDTOtoEntity(userLoginDTO);
+        User userCredentials = DTOMapper.INSTANCE.convertUserLoginPostDTOtoEntity(userLoginDTO);
 
-        User user =userService.logIn(userCredentials);
+        User user = userService.logIn(userCredentials);
 
         response.addHeader("Authorization", user.getToken());
         response.addHeader("Authorization", user.getToken());

@@ -28,7 +28,7 @@ public class UserRepositoryIntegrationTest {
 
     user.setUsername("firstname@lastname");
     user.setStatus(UserStatus.OFFLINE);
-    user.setCreation_date(LocalDate.now());
+    user.setCreationDate(LocalDate.now());
     user.setPassword("abc");
     user.setToken("1");
 

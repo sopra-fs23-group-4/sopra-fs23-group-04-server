@@ -36,13 +36,15 @@ public interface DTOMapper {
     @Mapping(source = "id", target = "id")
     @Mapping(source = "username", target = "username")
     @Mapping(source = "status", target = "status")
-    @Mapping(source = "creation_date",target = "creation_date")
+    @Mapping(source = "creationDate",target = "creationDate")
+    @Mapping(source = "profilePictureUrl", target = "profilePictureUrl")
     UserGetDTO convertEntityToUserGetDTO(User user);
+
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "username", target = "username")
     @Mapping(source = "status", target = "status")
-    @Mapping(source = "creation_date",target = "creation_date")
+    @Mapping(source = "creationDate",target = "creationDate")
     @Mapping(source = "token", target = "token")
     UserDTO convertEntityToUserDTO(User user);
 
@@ -50,13 +52,13 @@ public interface DTOMapper {
     @Mapping(source = "password", target = "password")
     @Mapping(source = "quote", target = "quote")
     @Mapping(source = "token", target = "token")
-    // @Mapping(source = "profile_picture",target = "profile_picture")
+    @Mapping(source = "profilePictureUrl",target = "profilePictureUrl")
     User convertUserPutDTOToEntity(UserPutDTO userPutDTO);
 
-  @Mapping(source = "quote", target = "quote")
-  QuoteGetDTO convertEntityToQuoteGetDTO(QuoteHolder quoteHolder);
+    @Mapping(source = "quote", target = "quote")
+    QuoteGetDTO convertEntityToQuoteGetDTO(QuoteHolder quoteHolder);
 
-  @Mapping(source ="categories", target = "categories")
+    @Mapping(source ="categories", target = "categories")
     QuoteCategoriesGetDTO convertEntityToQuoteCategoriesGetDTO(QuoteCategoriesHolder quoteCategory);
 
 }

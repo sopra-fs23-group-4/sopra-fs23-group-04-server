@@ -45,7 +45,7 @@ public class UserServiceIntegrationTest {
 
     testUser.setUsername("testUsername");
     testUser.setPassword("alpha");
-    testUser.setCreation_date(LocalDate.EPOCH);
+    testUser.setCreationDate(LocalDate.EPOCH);
 
     // when
     User createdUser = userService.createUser(testUser);
@@ -64,7 +64,7 @@ public class UserServiceIntegrationTest {
 
     User testUser = new User();
     testUser.setPassword("alpha");
-    testUser.setCreation_date(LocalDate.EPOCH);
+    testUser.setCreationDate(LocalDate.EPOCH);
 
     testUser.setUsername("testUsername");
     User createdUser = userService.createUser(testUser);

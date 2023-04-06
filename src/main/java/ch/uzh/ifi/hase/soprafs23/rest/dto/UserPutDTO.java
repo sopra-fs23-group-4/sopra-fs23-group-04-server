@@ -1,16 +1,21 @@
 package ch.uzh.ifi.hase.soprafs23.rest.dto;
 
 public class UserPutDTO {
-    private String token;
+
     private Long userId;
+    private String token;
     private String username;
     private String password;
     private String quote;
-    private Byte[] profile_picture;
+    private String profilePictureUrl;
+
 
     public UserPutDTO() {
     }
 
+    public Long getUserId() { return userId; }
+
+    public void setUserId(Long userId) { this.userId = userId; }
     public String getToken() {
         return token;
     }
@@ -43,7 +48,9 @@ public class UserPutDTO {
         this.quote = quote;
     }
 
-    public Byte[] getPicture() {
-        return profile_picture;
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
     }
+
+    public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
 }

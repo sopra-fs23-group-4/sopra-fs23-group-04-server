@@ -39,43 +39,34 @@ public class User implements Serializable {
     private String password;
 
     @Column(nullable = false)
-    private LocalDate creation_date;
+    private LocalDate creationDate;
+
     @Column
-    private String Quote;
+    private String quote;
 
-  public String getQuote() {
-    return Quote;
-  }
+    @Column
+    private String profilePictureUrl;
 
-  public void setQuote(String quote) {
-    Quote = quote;
-  }
+    private int rank;
 
-  public LocalDate getCreation_date() {
-        return creation_date;
-    }
+    private int accumulatedScore;
 
-    public void setCreation_date(LocalDate creationDate) {
-        this.creation_date = creationDate;
-    }
 
 
     public Long getId() {
         return id;
     }
 
-
     public void setId(Long id) {
         this.id = id;
     }
 
-
-
     public String getUsername() {
         return username;
     }
+
     public void setPassword(String password){
-        this.password=password;
+        this.password = password;
     }
 
     public String getPassword() {
@@ -98,7 +89,30 @@ public class User implements Serializable {
         return status;
     }
 
-    public void setStatus(UserStatus status) {
-        this.status = status;
+    public void setStatus(UserStatus status) { this.status = status; }
+
+    public LocalDate getCreationDate() {
+      return creationDate;
     }
-}
+
+    public void setCreationDate(LocalDate creationDate) { this.creationDate = creationDate; }
+
+    public String getQuote() {return quote;}
+
+    public void setQuote(String quote) {
+      this.quote = quote;
+    }
+
+    public String getProfilePictureUrl() { return profilePictureUrl; }
+
+    public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
+
+    public int getRank() { return rank; }
+
+    public void setRank(int rank) { this.rank = rank; }
+
+    public int getAccumulatedScore() { return accumulatedScore; }
+
+    public void setAccumulatedScore(int accumulatedScore) { this.accumulatedScore = accumulatedScore; }
+
+  }
