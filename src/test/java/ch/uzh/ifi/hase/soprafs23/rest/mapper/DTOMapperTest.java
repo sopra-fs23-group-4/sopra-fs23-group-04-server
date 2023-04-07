@@ -1,12 +1,14 @@
 package ch.uzh.ifi.hase.soprafs23.rest.mapper;
 
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
-import ch.uzh.ifi.hase.soprafs23.exceptions.entity.User;
+import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.UserPutDTO;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.Mapping;
+
+import java.nio.charset.StandardCharsets;
 
 import java.nio.charset.StandardCharsets;
 
@@ -42,6 +44,9 @@ public class DTOMapperTest {
     user.setStatus(UserStatus.OFFLINE);
     user.setToken("1");
     user.setProfilePictureUrl("https://example.com/test-profile-picture.jpg");
+    user.setQuote("My penis was in the Guinness book of records!" +
+                "\n" +
+                "Until the librarian told me to take it out.");
     // MAP -> Create UserGetDTO
     UserGetDTO userGetDTO = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
 

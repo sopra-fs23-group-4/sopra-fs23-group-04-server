@@ -11,7 +11,7 @@ public class UserDTO {
     private LocalDate creationDate;
     private String quote;
     private String profilePictureUrl;
-    private int accumulatedScore;
+
 
 
 
@@ -43,8 +43,5 @@ public class UserDTO {
 
     public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
 
-    public int getAccumulatedScore() { return accumulatedScore; }
-
-    public void setAccumulatedScore(int accumulatedScore) { this.accumulatedScore = accumulatedScore; }
 
 }

@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs23.exceptions.entity;
+package ch.uzh.ifi.hase.soprafs23.entity;
 
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 
@@ -47,9 +47,6 @@ public class User implements Serializable {
     @Column
     private String profilePictureUrl;
 
-    private int rank;
-
-    private int accumulatedScore;
 
 
 
@@ -107,12 +104,5 @@ public class User implements Serializable {
 
     public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
 
-    public int getRank() { return rank; }
-
-    public void setRank(int rank) { this.rank = rank; }
-
-    public int getAccumulatedScore() { return accumulatedScore; }
-
-    public void setAccumulatedScore(int accumulatedScore) { this.accumulatedScore = accumulatedScore; }
 
   }

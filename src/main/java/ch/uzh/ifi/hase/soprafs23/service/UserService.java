@@ -1,7 +1,8 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
-import ch.uzh.ifi.hase.soprafs23.exceptions.entity.User;
+import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,9 +33,12 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final QuoteService quoteService;
+
     @Autowired
-    public UserService(@Qualifier("userRepository") UserRepository userRepository) {
+    public UserService(@Qualifier("userRepository") UserRepository userRepository, QuoteService quoteService) {
         this.userRepository = userRepository;
+        this.quoteService = quoteService;
     }
 
     public List<User> getUsers() {
@@ -52,6 +56,7 @@ public class UserService {
         checkIfUsernameValid(newUser);
         newUser.setCreationDate((LocalDate.now()));
         newUser.setProfilePictureUrl("https://storage.googleapis.com/sorpa-fs23-gr-leetfive-server.appspot.com/DefaultProfilePicture100x100.jpg");
+        newUser.setQuote(quoteService.generateQuote(QuoteCategory.DADJOKE).getQuote());
 
         // saves the given entity but data is only persisted in the database once
         // flush() is called
@@ -78,6 +83,18 @@ public class UserService {
         userByUsername.setStatus(UserStatus.ONLINE);
         return userByUsername;
 
+    }
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    }
+
+    public User getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+        }
+        return user;
     }
 
     public User editUser (Long userId, User editedUser) {
@@ -118,7 +135,7 @@ public class UserService {
         }
     }
 
-    private void checkIfUsernameValid(User userToBeCreated) {
+    void checkIfUsernameValid(User userToBeCreated) {
         String baseErrorMessage = "The username provided is not valid. Please choose a single word!";
         if (userToBeCreated.getUsername().contains(" ")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,

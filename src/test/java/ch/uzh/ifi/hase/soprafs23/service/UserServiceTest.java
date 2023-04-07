@@ -1,7 +1,9 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
-import ch.uzh.ifi.hase.soprafs23.exceptions.entity.User;
+import ch.uzh.ifi.hase.soprafs23.entity.User;
+import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,13 +12,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,6 +36,9 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    @Mock // Add this annotation to mock the QuoteService
+    private QuoteService quoteService;
 
     private User testUser;
 
@@ -47,6 +56,9 @@ public class UserServiceTest {
         // when -> any object is being save in the userRepository -> return the dummy
         // testUser
         when(userRepository.save(Mockito.any())).thenReturn(testUser);
+
+        // Add this line to return a predefined quote when the generateQuote method is called
+        when(quoteService.generateQuote(QuoteCategory.DADJOKE)).thenReturn(new QuoteHolder());
     }
 
     @Test
@@ -100,6 +112,7 @@ public class UserServiceTest {
         editedUser.setUsername("new-username");
         editedUser.setPassword("new-password");
         editedUser.setToken("valid-token");
+        editedUser.setQuote("new-quote"); // Add a new quote for the edited user
 
         // When
         User resultUser = userService.editUser(1L, editedUser);
@@ -109,6 +122,7 @@ public class UserServiceTest {
         assertEquals(editedUser.getUsername(), resultUser.getUsername());
         assertEquals(editedUser.getPassword(), resultUser.getPassword());
         assertEquals(editedUser.getToken(), resultUser.getToken());
+        assertEquals(editedUser.getQuote(), resultUser.getQuote()); // Verify that the saved user has the new quote
     }
 
     @Test
@@ -137,6 +151,145 @@ public class UserServiceTest {
 
         // Then (expect exception)
         assertThrows(ResponseStatusException.class, () -> userService.editUser(1L, editedUser));
+    }
+
+    @Test
+    public void logIn_validInputs_success() {
+        // Given
+        when(userRepository.findByUsername(anyString())).thenReturn(testUser);
+
+        // When
+        User loggedInUser = userService.logIn(testUser);
+
+        // Then
+        assertEquals(testUser.getId(), loggedInUser.getId());
+        assertEquals(testUser.getUsername(), loggedInUser.getUsername());
+        assertEquals(testUser.getPassword(), loggedInUser.getPassword());
+        assertEquals(UserStatus.ONLINE, loggedInUser.getStatus());
+    }
+
+    @Test
+    public void logIn_usernameDoesNotExist_throwsException() {
+        // Given
+        when(userRepository.findByUsername(anyString())).thenReturn(null);
+
+        // Then
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> userService.logIn(testUser));
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        assertTrue(exception.getReason().contains("This username doesn't exist"));
+    }
+
+    @Test
+    public void logIn_incorrectPassword_throwsException() {
+        // Given
+        when(userRepository.findByUsername(anyString())).thenReturn(testUser);
+
+        // Create a user object with incorrect password
+        User userWithIncorrectPassword = new User();
+        userWithIncorrectPassword.setUsername(testUser.getUsername());
+        userWithIncorrectPassword.setPassword("incorrect-password");
+
+        // Then
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> userService.logIn(userWithIncorrectPassword));
+        assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
+        assertTrue(exception.getReason().contains("The password you tipped in is incorrect"));
+    }
+    @Test
+    public void getUsers_usersExistInRepository_success() {
+        // Given
+        User anotherTestUser = new User();
+        anotherTestUser.setId(2L);
+        anotherTestUser.setUsername("anotherUsername");
+        anotherTestUser.setPassword("anotherPassword");
+        anotherTestUser.setToken("another-valid-token");
+
+        List<User> expectedUsers = Arrays.asList(testUser, anotherTestUser);
+        when(userRepository.findAll()).thenReturn(expectedUsers);
+
+        // When
+        List<User> actualUsers = userService.getUsers();
+
+        // Then
+        assertEquals(expectedUsers, actualUsers);
+    }
+
+    @Test
+    public void checkIfUsernameValid_validUsername_noExceptionThrown() {
+        // Given
+        User validUser = new User();
+        validUser.setUsername("validUsername");
+
+        // When
+        userService.checkIfUsernameValid(validUser);
+
+        // Then
+        // No exception should be thrown, so no need to add any assertions
+    }
+
+    @Test
+    public void checkIfUsernameValid_invalidUsername_throwsException() {
+        // Given
+        User invalidUser = new User();
+        invalidUser.setUsername("invalid username"); // Contains space
+
+        // Then
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> userService.checkIfUsernameValid(invalidUser));
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        assertTrue(exception.getReason().contains("The username provided is not valid. Please choose a single word!"));
+    }
+
+    @Test
+    public void getUserById_validId_returnsUser() {
+        // Given
+        Long userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+
+        // When
+        User retrievedUser = userService.getUserById(userId);
+
+        // Then
+        assertNotNull(retrievedUser);
+        assertEquals(testUser.getId(), retrievedUser.getId());
+        assertEquals(testUser.getUsername(), retrievedUser.getUsername());
+    }
+
+    @Test
+    public void getUserById_invalidId_throwsResponseStatusException() {
+        // Given
+        Long userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Then
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> userService.getUserById(userId));
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+        assertTrue(exception.getReason().contains("User not found"));
+    }
+
+    @Test
+    public void getUserByUsername_validUsername_returnsUser() {
+        // Given
+        String username = "username";
+        when(userRepository.findByUsername(username)).thenReturn(testUser);
+
+        // When
+        User retrievedUser = userService.getUserByUsername(username);
+
+        // Then
+        assertNotNull(retrievedUser);
+        assertEquals(testUser.getId(), retrievedUser.getId());
+        assertEquals(testUser.getUsername(), retrievedUser.getUsername());
+    }
+
+    @Test
+    public void getUserByUsername_invalidUsername_throwsResponseStatusException() {
+        // Given
+        String username = "nonExistingUsername";
+        when(userRepository.findByUsername(username)).thenReturn(null);
+
+        // Then
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> userService.getUserByUsername(username));
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+        assertTrue(exception.getReason().contains("User not found"));
     }
 
 }

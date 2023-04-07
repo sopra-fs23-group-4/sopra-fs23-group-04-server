@@ -1,7 +1,8 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
-import ch.uzh.ifi.hase.soprafs23.exceptions.entity.User;
+import ch.uzh.ifi.hase.soprafs23.entity.User;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.UserLoginDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.UserPostDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.UserPutDTO;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
@@ -24,9 +25,9 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * UserControllerTest
@@ -50,6 +51,9 @@ public class UserControllerTest {
     user.setUsername("firstname@lastname");
     user.setStatus(UserStatus.OFFLINE);
     user.setProfilePictureUrl("https://example.com/test-profile-picture.jpg");
+    user.setQuote("My penis was in the Guinness book of records!" +
+              "\n" +
+              "Until the librarian told me to take it out.");
 
         List<User> allUsers = Collections.singletonList(user);
 
@@ -76,6 +80,10 @@ public class UserControllerTest {
     user.setToken("1");
     user.setStatus(UserStatus.ONLINE);
     user.setProfilePictureUrl("https://example.com/test-profile-picture.jpg");
+    user.setQuote("My penis was in the Guinness book of records!" +
+              "\n" +
+              "Until the librarian told me to take it out.");
+
 
     UserPostDTO userPostDTO = new UserPostDTO();
     userPostDTO.setPassword("Test User");
@@ -95,6 +103,61 @@ public class UserControllerTest {
             .andExpect(jsonPath("$.username", is(user.getUsername())))
             .andExpect(jsonPath("$.status", is(user.getStatus().toString())));
     }
+
+    @Test
+    public void logInUser_validInput_userLoggedIn() throws Exception {
+        // given
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("testUsername");
+        user.setToken("1");
+        user.setStatus(UserStatus.ONLINE);
+        user.setProfilePictureUrl("https://example.com/test-profile-picture.jpg");
+        user.setQuote("My penis was in the Guinness book of records!" +
+                "\n" +
+                "Until the librarian told me to take it out.");
+
+        UserLoginDTO userLoginDTO = new UserLoginDTO();
+        userLoginDTO.setUsername("testUsername");
+        userLoginDTO.setPassword("testPassword");
+
+        given(userService.logIn(Mockito.any())).willReturn(user);
+
+        // when/then -> do the request + validate the result
+        MockHttpServletRequestBuilder postRequest = post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(userLoginDTO));
+
+        // then
+        mockMvc.perform(postRequest)
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", is(user.getId().intValue())))
+                .andExpect(jsonPath("$.username", is(user.getUsername())))
+                .andExpect(jsonPath("$.status", is(user.getStatus().toString())))
+                .andExpect(header().string("Authorization", user.getToken()));
+    }
+
+    @Test
+    public void logInUser_invalidInput_userNotLoggedIn() throws Exception {
+        // given
+        UserLoginDTO userLoginDTO = new UserLoginDTO();
+        userLoginDTO.setUsername("invalidUsername");
+        userLoginDTO.setPassword("invalidPassword");
+
+        // tell the method to throw an exception when userService.logIn() is called with invalid input
+        given(userService.logIn(Mockito.any())).willThrow(new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+
+        // when
+        MockHttpServletRequestBuilder postRequest = post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(userLoginDTO));
+
+        // then
+        mockMvc.perform(postRequest)
+                .andExpect(status().isUnauthorized());
+    }
+
+
 
     @Test
     public void editUser_validInput_userEdited () throws Exception {
@@ -137,6 +200,65 @@ public class UserControllerTest {
         mockMvc.perform(putRequest)
                 .andExpect(status().isNotFound());
     }
+    @Test
+    public void getUserByID_correctInput_returnUser() throws Exception {
+        // given
+        long userId = 1L;
+        User user = new User();
+        user.setId(userId);
+        user.setUsername("testUsername");
+
+        given(userService.getUserById(userId)).willReturn(user);
+
+        // when
+        MockHttpServletRequestBuilder getRequest = get("/users/{userId}", userId)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        // then
+        mockMvc.perform(getRequest)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(user.getId().intValue())))
+                .andExpect(jsonPath("$.username", is(user.getUsername())));
+    }
+    @Test
+    public void getUserByUsername_correctInput_returnUser() throws Exception {
+        // given
+        String username = "testUsername";
+        User user = new User();
+        user.setId(1L);
+        user.setUsername(username);
+
+        given(userService.getUserByUsername(username)).willReturn(user);
+
+        // when
+        MockHttpServletRequestBuilder getRequest = get("/users/username/{username}", username)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        // then
+        mockMvc.perform(getRequest)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(user.getId().intValue())))
+                .andExpect(jsonPath("$.username", is(user.getUsername())));
+    }
+
+    @Test
+    public void getUserByUsername_incorrectInput_userNotFound() throws Exception {
+        // given
+        String username = "nonExistingUsername";
+
+        given(userService.getUserByUsername(username)).willThrow(new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        // when
+        MockHttpServletRequestBuilder getRequest = get("/users/username/{username}", username)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        // then
+        mockMvc.perform(getRequest)
+                .andExpect(status().isNotFound());
+    }
+
+
+
 
     /**
     * Helper Method to convert userPostDTO into a JSON string such that the input

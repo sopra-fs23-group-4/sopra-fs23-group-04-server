@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs23.exceptions.entity.quote;
+package ch.uzh.ifi.hase.soprafs23.entity.quote;
 
 import java.util.List;
 
