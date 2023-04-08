@@ -97,7 +97,7 @@ public class UserController {
         return DTOMapper.INSTANCE.convertEntityToUserDTO(user);
     }
 
-    @GetMapping("/users/username/{username}")
+    @GetMapping("/users/{username}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public UserDTO getUserByUsername(@PathVariable("username") String username){
