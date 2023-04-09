@@ -1,8 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.constant;
 
-import ch.uzh.ifi.hase.soprafs23.constant.extractJsonData.ExtractJsonArrayConvertor;
-import ch.uzh.ifi.hase.soprafs23.constant.extractJsonData.ExtractJsonData;
-import ch.uzh.ifi.hase.soprafs23.constant.extractJsonData.ExtractJsonElementConvertor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -83,7 +80,5 @@ public enum QuoteCategory {
 
         return categories;
   }
-
-
 
 }

@@ -28,35 +28,31 @@ public class QuoteService {
 
     private final Logger log = LoggerFactory.getLogger(QuoteService.class);
 
-    public QuoteHolder generateQuote(QuoteCategory quoteCategory)  {
+    private final QuoteApiCaller quoteApiCaller;
 
-        try {
-            URL url = new URL(quoteCategory.url);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestProperty("accept", "application/json");
-            connection.setRequestProperty("X-Api-Key", apiKey);
-
-            InputStream responseStream = connection.getInputStream();
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode jsonResponse = mapper.readTree(responseStream);
-            System.out.println(jsonResponse.toString());
-
-            return quoteCategory.extractJsonData.jsonToQuoteHolder(jsonResponse,quoteCategory);
-
-
-        } catch (MalformedURLException e) {
-            System.err.println("Error: Invalid URL for quote category: " + quoteCategory.categoryName);
-            e.printStackTrace();
-        } catch (IOException e) {
-            System.err.println("Error: Problem connecting to the API for quote category: " + quoteCategory.categoryName);
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,"The server has an issue with the api key");
-        } catch (Error e){
-            System.err.println("Something went wrong " + quoteCategory.categoryName);
-            e.printStackTrace();
-        }
-        return null;
-
+    public QuoteService(QuoteApiCaller quoteApiCaller) {
+        this.quoteApiCaller = quoteApiCaller;
     }
+
+    public QuoteHolder generateQuote(QuoteCategory quoteCategory) {
+        String jsonResponseString = quoteApiCaller.callApi(quoteCategory, apiKey);
+        if (jsonResponseString == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Quote not found for category: " + quoteCategory.categoryName);
+        }
+        System.out.println("jsonResponseString: " + jsonResponseString);
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonResponse = null;
+        try {
+            jsonResponse = mapper.readTree(jsonResponseString);
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading JSON response", e);
+        }
+        System.out.println("jsonResponse: " + jsonResponse);
+
+        return quoteCategory.extractJsonData.jsonToQuoteHolder(jsonResponse, quoteCategory);
+    }
+
 
     private void verifyNotError(JsonNode jsonResponse, QuoteCategory quoteCategory) {
 
