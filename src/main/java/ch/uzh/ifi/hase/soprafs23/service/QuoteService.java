@@ -24,7 +24,7 @@ import java.util.Objects;
 @Service
 @Transactional
 public class QuoteService {
-    String apiKey="rpmvnuWnHglloTTHc7O7ug==8RuxI4PTjhoVUFngff";
+    String apiKey = "rpmvnuWnHglloTTHc7O7ug==8RuxI4PTjhoVUFngff";
 
     private final Logger log = LoggerFactory.getLogger(QuoteService.class);
 

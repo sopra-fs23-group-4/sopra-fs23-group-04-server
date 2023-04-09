@@ -10,8 +10,6 @@ import ch.uzh.ifi.hase.soprafs23.service.QuoteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 public class QuoteController {
     private final QuoteService quoteService;
@@ -24,7 +22,7 @@ public class QuoteController {
     @ResponseBody
     public QuoteGetDTO getQuote(@PathVariable("category") String category) throws Exception {
 
-        QuoteCategory quoteCategory = QuoteCategory.getQuoteByType(category);
+        QuoteCategory quoteCategory = QuoteCategory.getQuoteByCategory(category);
 
         QuoteHolder quoteHolder = quoteService.generateQuote(quoteCategory);
 
@@ -35,6 +33,7 @@ public class QuoteController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public QuoteCategoriesGetDTO getQuoteCategories(){
+
           QuoteCategoriesHolder quoteCategories = quoteService.getCategories();
 
           return DTOMapper.INSTANCE.convertEntityToQuoteCategoriesGetDTO(quoteCategories);

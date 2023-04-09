@@ -64,7 +64,7 @@ public enum QuoteCategory {
         return "https://api.api-ninjas.com/v1/quotes?category=" + category;
     }
 
-    public static QuoteCategory getQuoteByType(String categoryName) {
+    public static QuoteCategory getQuoteByCategory(String categoryName) {
         for (QuoteCategory quoteCategory : QuoteCategory.values()) {
           if (quoteCategory.categoryName.equalsIgnoreCase(categoryName)) {
             return quoteCategory;

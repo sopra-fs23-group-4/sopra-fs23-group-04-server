@@ -3,7 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.entity.quote;
 public class QuoteHolder {
 
     private String quote;
-    private String type;
+    private String category;
 
 
     public String getQuote() { return quote; }
@@ -12,12 +12,10 @@ public class QuoteHolder {
     this.quote = quote;
     }
 
-    public String getType() {
-    return type;
+    public String getCategory() {
+    return category;
     }
 
-    public void setType(String type) {
-    this.type = type;
-    }
+    public void setCategory(String category) { this.category = category; }
 
 }
