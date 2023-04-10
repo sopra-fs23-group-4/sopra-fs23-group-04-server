@@ -56,7 +56,7 @@ public class UserService {
         checkIfUsernameValid(newUser);
         newUser.setCreationDate((LocalDate.now()));
         newUser.setProfilePictureUrl("https://storage.googleapis.com/sorpa-fs23-gr-leetfive-server.appspot.com/DefaultProfilePicture100x100.jpg");
-        newUser.setQuote(quoteService.generateQuote(QuoteCategory.DADJOKE).getQuote());
+        newUser.setQuote("No Quote");
 
         // saves the given entity but data is only persisted in the database once
         // flush() is called

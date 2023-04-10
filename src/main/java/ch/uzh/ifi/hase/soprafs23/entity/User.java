@@ -96,9 +96,7 @@ public class User implements Serializable {
 
     public String getQuote() {return quote;}
 
-    public void setQuote(String quote) {
-      this.quote = quote;
-    }
+    public void setQuote(String quote) { this.quote = quote; }
 
     public String getProfilePictureUrl() { return profilePictureUrl; }
 

@@ -22,9 +22,7 @@ public class QuoteController {
     @ResponseBody
     public QuoteGetDTO getQuote(@PathVariable("category") String category) throws Exception {
 
-        QuoteCategory quoteCategory = QuoteCategory.getQuoteByCategory(category);
-
-        QuoteHolder quoteHolder = quoteService.generateQuote(quoteCategory);
+        QuoteHolder quoteHolder = quoteService.generateQuote(category);
 
         return DTOMapper.INSTANCE.convertEntityToQuoteGetDTO(quoteHolder);
     }

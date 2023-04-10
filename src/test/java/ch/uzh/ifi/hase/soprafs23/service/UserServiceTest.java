@@ -52,13 +52,11 @@ public class UserServiceTest {
         testUser.setUsername("username");
         testUser.setPassword("password");
         testUser.setToken("valid-token");
+        testUser.setQuote("defaultQuote");
 
         // when -> any object is being save in the userRepository -> return the dummy
         // testUser
         when(userRepository.save(Mockito.any())).thenReturn(testUser);
-
-        // Add this line to return a predefined quote when the generateQuote method is called
-        when(quoteService.generateQuote(QuoteCategory.DADJOKE)).thenReturn(new QuoteHolder());
     }
 
     @Test
