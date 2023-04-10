@@ -1,5 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.entity;
 
+import ch.uzh.ifi.hase.soprafs23.constant.GameState;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
@@ -16,6 +18,24 @@ public class Game implements Serializable {
     @Column(unique = true, nullable = false)
     private String pin;
 
+    private GameState gameState;
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setPin(String pin) {
+        this.pin = pin;
+    }
+
+    public GameState getGameState() {
+        return gameState;
+    }
+
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+    }
+
     public Game() {
         // generate a new random pin when creating a new game
         this.pin = generateUniquePin();
@@ -28,6 +48,8 @@ public class Game implements Serializable {
     public String getPin() {
         return pin;
     }
+
+
 
     private String generateUniquePin() {
         Set<String> generatedPins = new HashSet<>();

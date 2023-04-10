@@ -1,6 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.constant;
 
-public enum State {
+public enum GameState {
     INGAME,
     FINISHED;
 
