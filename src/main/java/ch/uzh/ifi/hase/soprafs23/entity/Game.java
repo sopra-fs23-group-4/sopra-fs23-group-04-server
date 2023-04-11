@@ -1,72 +1,74 @@
 package ch.uzh.ifi.hase.soprafs23.entity;
 
-import ch.uzh.ifi.hase.soprafs23.constant.GameState;
+import java.util.List;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
 
-@Entity
-@Table(name = "GAME")
-public class Game implements Serializable {
-    @Id
-    @GeneratedValue
+public class Game {
     private Long id;
-
-    @Column(unique = true, nullable = false)
     private String pin;
+    private List<Player> players;
 
-    private GameState gameState;
-
-    public void setId(Long id) {
-        this.id = id;
+    private boolean hasStarted;
+    private String hostToken;
+    private int numberOfRounds;
+    public String getPin() {
+        return pin;
     }
 
     public void setPin(String pin) {
         this.pin = pin;
     }
 
-    public GameState getGameState() {
-        return gameState;
+    public List<Player> getPlayers() {
+        return players;
     }
 
-    public void setGameState(GameState gameState) {
-        this.gameState = gameState;
+    public void setPlayers(List<Player> players) {
+        this.players = players;
     }
+
+    public String getHostToken() {
+        return hostToken;
+    }
+
+    public void setHostToken(String hostId) {
+        this.hostToken = hostId;
+    }
+
+
+
 
     public Game() {
-        // generate a new random pin when creating a new game
-        this.pin = generateUniquePin();
+
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getPin() {
-        return pin;
-    }
-
-
-
-    private String generateUniquePin() {
-        Set<String> generatedPins = new HashSet<>();
-        Random random = new Random();
-        String pin = "";
-
-        while (generatedPins.size() < Math.pow(10, 6)) {
-            int num = random.nextInt((int) Math.pow(10, 6));
-            pin = String.format("%06d", num);
-
-            if (!generatedPins.contains(pin)) {
-                generatedPins.add(pin);
-                break;
+    public boolean inGame(String token){
+        for (Player player : players){
+            if (player.getToken()==token){
+                return true;
             }
         }
+        return false;
+    }
 
-        return pin;
+    public boolean hasStarted() {
+        return hasStarted;
+    }
+
+    public void setHasStarted(boolean hasStarted) {
+        this.hasStarted = hasStarted;
+    }
+
+    public int getNumberOfRounds() {
+        return numberOfRounds;
+    }
+
+    public void setNumberOfRounds(int numberOfRounds) {
+        this.numberOfRounds = numberOfRounds;
     }
 }
 

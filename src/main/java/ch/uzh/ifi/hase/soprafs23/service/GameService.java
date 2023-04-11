@@ -1,11 +1,10 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import ch.uzh.ifi.hase.soprafs23.constant.GameState;
 import ch.uzh.ifi.hase.soprafs23.entity.Game;
-import ch.uzh.ifi.hase.soprafs23.entity.GameParticipant;
+import ch.uzh.ifi.hase.soprafs23.entity.Player;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
-import ch.uzh.ifi.hase.soprafs23.repository.GameParticipantRepository;
+import ch.uzh.ifi.hase.soprafs23.repository.PlayerRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,53 +14,62 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-
 @Service
 @Transactional
 public class GameService {
-    private final GameRepository gameRepository;
     private final UserRepository userRepository;
-    private final GameParticipantRepository gameParticipantRepository;
+    private final PlayerRepository playerRepository;
+    private int lobbyKey;
+
+
     Logger log = LoggerFactory.getLogger(GameService.class);
 
-    public GameService(@Qualifier("userRepository") UserRepository userRepository, @Qualifier("gameRepository") GameRepository gameRepository, @Qualifier("gameParticipantRepository") GameParticipantRepository gameParticipantRepository){
+
+    public GameService(@Qualifier("userRepository") UserRepository userRepository, @Qualifier("playerRepository")PlayerRepository playerRepository){
         this.userRepository=userRepository;
-        this.gameRepository=gameRepository;
-        this.gameParticipantRepository = gameParticipantRepository;
+        this.playerRepository=playerRepository;
+        this.lobbyKey =0;
     }
 
+    private static void checkIfLobbyForPlayerExists(Player playerToBeCreated) {
+        try {
+            GameRepository.findByLobbyId((int) playerToBeCreated.getLobbyId());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Adding the player failed: " + e.getMessage());
 
-    private void checkIfUserExists(User user){
-        if (userRepository.findByToken(user.getToken()) ==null){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+
+    }
+    public int createLobby(Player playerToHost){
+
+        checkIfPlayerAuthorized(playerToHost);
+        GameRepository.checkIfPlayerAlreadyInGame(playerToHost);
+        lobbyKey++;
+        Game newGame=new Game();
+        newGame.setHostToken(playerToHost.getToken());
+        GameRepository.addGame(lobbyKey,newGame);
+        playerToHost.setLobbyId(lobbyKey);
+        playerRepository.saveAndFlush(playerToHost);
+
+
+        return lobbyKey;
+    }
+
+    private void checkIfPlayerAuthorized(Player player){
+        User foundUser=userRepository.findByToken(player.getToken());
+        if (foundUser==null){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "you are not authorized");
         }
     }
-    private void checkIfUserAlreadyInActiveGame(User user){
-        List<Game> playedGames=gameParticipantRepository.findByUser(user);
-        for (Game game: playedGames){
-            if (game.getGameState()!= GameState.FINISHED){
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Dear user you are already in a game");
-            }
-        }
-    }
+    public void addPlayer(Player playerToJoin){
+        checkIfPlayerAuthorized(playerToJoin);
+        checkIfLobbyForPlayerExists(playerToJoin);
+        GameRepository.checkIfPlayerAlreadyInGame(playerToJoin);
 
-    private String createGame(User hostToken){
-        User host=userRepository.findByToken(hostToken.getToken());
-        checkIfUserExists(host);
-        checkIfUserAlreadyInActiveGame(host);
+        playerRepository.saveAndFlush(playerToJoin);
 
-        Game newGame= new Game();
-        newGame.setGameState(GameState.INGAME);
-        gameRepository.saveAndFlush(newGame);
 
-        GameParticipant newHostParticipant= new GameParticipant();
-        newHostParticipant.setHost(true);
-        newHostParticipant.setGame(newGame);
-        newHostParticipant.setUser(host);
-        gameParticipantRepository.saveAndFlush(newHostParticipant);
-
-        return newGame.getPin();
     }
 
 

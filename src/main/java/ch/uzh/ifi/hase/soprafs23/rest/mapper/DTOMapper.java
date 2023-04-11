@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.rest.mapper;
 
+import ch.uzh.ifi.hase.soprafs23.entity.Player;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteCategoriesHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
@@ -61,4 +62,12 @@ public interface DTOMapper {
     @Mapping(source ="categories", target = "categories")
     QuoteCategoriesGetDTO convertEntityToQuoteCategoriesGetDTO(QuoteCategoriesHolder quoteCategory);
 
+    @Mapping(source ="token", target = "token")
+    Player convertPlayerDTOToEntity(PlayerDTO playerDTO);
+
+    @Mapping(source ="lobbyId", target = "lobbyId")
+    @Mapping(source ="token", target = "token")
+    @Mapping(source = "roundPoints",target = "roundPoints")
+    @Mapping(source="totalPoints", target="totalPoints")
+    PlayerGetDTO convertEntityToPlayerDTO(Player player);
 }

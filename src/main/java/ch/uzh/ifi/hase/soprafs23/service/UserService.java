@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 
 /**
@@ -48,9 +49,7 @@ public class UserService {
     int token = 1;
 
     public User createUser(User newUser) {
-        //newUser.setToken(UUID.randomUUID().toString());
-        newUser.setToken(Integer.toString(token));
-        token++;
+        newUser.setToken(UUID.randomUUID().toString());
         newUser.setStatus(UserStatus.ONLINE);
         checkIfUserExists(newUser);
         checkIfUsernameValid(newUser);
