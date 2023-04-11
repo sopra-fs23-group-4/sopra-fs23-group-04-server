@@ -40,13 +40,7 @@ public class UserServiceIntegrationTest {
     private QuoteService quoteService;
 
     @BeforeEach
-    public void setup() {
-
-    userRepository.deleteAll();
-
-        // Add this line to return a predefined quote when the generateQuote method is called
-        when(quoteService.generateQuote(QuoteCategory.DADJOKE)).thenReturn(new QuoteHolder());
-    }
+    public void setup() { userRepository.deleteAll(); }
 
     @Test
     public void createUser_validInputs_success() {

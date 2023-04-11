@@ -24,11 +24,12 @@ import java.util.Objects;
 @Service
 @Transactional
 public class QuoteService {
-    String apiKey="rpmvnuWnHglloTTHc7O7ug==8RuxI4PTjhoVUFngff";
-
+    private final String apiKey="Jcn3zBSrMNcsCeGm5rSm5zUabLibdT4xZiliT2rX";
     private final Logger log = LoggerFactory.getLogger(QuoteService.class);
 
-    public QuoteHolder generateQuote(QuoteCategory quoteCategory)  {
+    public QuoteHolder generateQuote(String category)  {
+
+        QuoteCategory quoteCategory=QuoteCategory.getQuoteByCategory(category);
 
         try {
             URL url = new URL(quoteCategory.url);
@@ -48,9 +49,10 @@ public class QuoteService {
             System.err.println("Error: Invalid URL for quote category: " + quoteCategory.categoryName);
             e.printStackTrace();
         } catch (IOException e) {
-            System.err.println("Error: Problem connecting to the API for quote category: " + quoteCategory.categoryName);
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,"The server has an issue with the api key");
-        } catch (Error e){
+            System.err.println("Error: Problem connecting to the API for quote category: " + quoteCategory.categoryName+ "possible reasons could be wrong api or no internet access");
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,"The server has an issue with the api key or not able to connect to api");
+        }
+        catch (Error e){
             System.err.println("Something went wrong " + quoteCategory.categoryName);
             e.printStackTrace();
         }
@@ -59,25 +61,23 @@ public class QuoteService {
     }
 
     private void verifyNotError(JsonNode jsonResponse, QuoteCategory quoteCategory) {
-
         Iterator<String> fieldNames = jsonResponse.fieldNames();
-        boolean isValid = false;
+        boolean isValid=false;
 
-        while (fieldNames.hasNext()) {
+        while(fieldNames.hasNext()) {
             String fieldName = fieldNames.next();
             if (Objects.equals(fieldName, quoteCategory.fieldName)){
-                isValid = true;
+                isValid=true;
             }
         }
         if (!isValid){
-          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A " + fieldNames + " The text: ");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A "+ fieldNames+ " The text: ");
         }
     }
-
     public QuoteCategoriesHolder getCategories(){
-        List<String> categories = QuoteCategory.getAllCategoryNames();
+        List<String> categories=QuoteCategory.getAllCategoryNames();
 
-        QuoteCategoriesHolder quoteCategoriesHolder = new QuoteCategoriesHolder();
+        QuoteCategoriesHolder quoteCategoriesHolder= new QuoteCategoriesHolder();
         quoteCategoriesHolder.setCategories(categories);
 
         return  quoteCategoriesHolder;

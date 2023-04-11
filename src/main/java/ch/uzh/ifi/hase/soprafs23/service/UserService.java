@@ -33,10 +33,12 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final QuoteService quoteService;
 
     @Autowired
     public UserService(@Qualifier("userRepository") UserRepository userRepository, QuoteService quoteService) {
         this.userRepository = userRepository;
+        this.quoteService = quoteService;
     }
 
     public List<User> getUsers() {
@@ -54,7 +56,7 @@ public class UserService {
         checkIfUsernameValid(newUser);
         newUser.setCreationDate((LocalDate.now()));
         newUser.setProfilePictureUrl("https://storage.googleapis.com/sorpa-fs23-gr-leetfive-server.appspot.com/DefaultProfilePicture100x100.jpg");
-        newUser.setQuote("Hey guys I didn't have time to set a quote so I here you guys the standard quote");
+        newUser.setQuote("No Quote");
 
         // saves the given entity but data is only persisted in the database once
         // flush() is called

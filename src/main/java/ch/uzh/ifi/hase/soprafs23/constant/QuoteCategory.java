@@ -1,8 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.constant;
 
-import ch.uzh.ifi.hase.soprafs23.constant.extractJsonData.ExtractJsonArrayConvertor;
-import ch.uzh.ifi.hase.soprafs23.constant.extractJsonData.ExtractJsonData;
-import ch.uzh.ifi.hase.soprafs23.constant.extractJsonData.ExtractJsonElementConvertor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -64,7 +61,7 @@ public enum QuoteCategory {
         return "https://api.api-ninjas.com/v1/quotes?category=" + category;
     }
 
-    public static QuoteCategory getQuoteByType(String categoryName) {
+    public static QuoteCategory getQuoteByCategory(String categoryName) {
         for (QuoteCategory quoteCategory : QuoteCategory.values()) {
           if (quoteCategory.categoryName.equalsIgnoreCase(categoryName)) {
             return quoteCategory;
@@ -83,7 +80,5 @@ public enum QuoteCategory {
 
         return categories;
   }
-
-
 
 }

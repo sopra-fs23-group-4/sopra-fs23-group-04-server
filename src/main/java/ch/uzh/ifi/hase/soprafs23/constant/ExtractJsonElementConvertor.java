@@ -1,6 +1,5 @@
-package ch.uzh.ifi.hase.soprafs23.constant.extractJsonData;
+package ch.uzh.ifi.hase.soprafs23.constant;
 
-import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -10,7 +9,7 @@ public class ExtractJsonElementConvertor implements ExtractJsonData{
 
         QuoteHolder quoteHolder = new QuoteHolder();
         quoteHolder.setQuote(jsonResponse.get(quoteCategory.fieldName).asText());
-        quoteHolder.setType(quoteCategory.fieldName);
+        quoteHolder.setCategory(quoteCategory.fieldName);
         return quoteHolder;
     }
 }
