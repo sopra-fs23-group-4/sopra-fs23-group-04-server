@@ -48,7 +48,7 @@ public class Game {
 
     public boolean inGame(String token){
         for (Player player : players){
-            if (player.getToken()==token){
+            if (player.getToken().equals(token)){
                 return true;
             }
         }
