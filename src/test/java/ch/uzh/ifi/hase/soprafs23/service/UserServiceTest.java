@@ -193,13 +193,41 @@ public class UserServiceTest {
         assertTrue(exception.getReason().contains("The password you tipped in is incorrect"));
     }
     @Test
+    public void logout_success() {
+        // create User
+        User user = new User();
+        user.setToken("token");
+        user.setStatus(UserStatus.ONLINE);
+
+
+        when(userRepository.findByToken(user.getToken())).thenReturn(user);
+
+
+        userService.logout(user);
+
+        assertEquals(UserStatus.OFFLINE, user.getStatus());
+    }
+
+    @Test
+    public void logout_failed(){
+        User user = new User();
+        user.setToken("token");
+        user.setStatus(UserStatus.ONLINE);
+
+
+        when(userRepository.findByToken(user.getToken())).thenReturn(null);
+        
+        assertThrows(ResponseStatusException.class, () -> userService.logout(user));
+
+    }
+
+    @Test
     public void getUsers_usersExistInRepository_success() {
         // Given
         User anotherTestUser = new User();
         anotherTestUser.setId(2L);
         anotherTestUser.setUsername("anotherUsername");
         anotherTestUser.setPassword("anotherPassword");
-        anotherTestUser.setToken("another-valid-token");
 
         List<User> expectedUsers = Arrays.asList(testUser, anotherTestUser);
         when(userRepository.findAll()).thenReturn(expectedUsers);

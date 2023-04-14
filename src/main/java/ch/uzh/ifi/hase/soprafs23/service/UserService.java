@@ -162,4 +162,12 @@ public class UserService {
         userRepository.save(userDB);
     }
 
+    public void logout(User user){
+        User foundUser=userRepository.findByToken(user.getToken());
+        if (foundUser==null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        foundUser.setStatus(UserStatus.OFFLINE);
+    }
+
 }
