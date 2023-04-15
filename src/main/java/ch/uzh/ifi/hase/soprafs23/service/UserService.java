@@ -48,6 +48,7 @@ public class UserService {
     int token = 1;
 
     public User createUser(User newUser) {
+        // TODO change setToken back to random
         //newUser.setToken(UUID.randomUUID().toString());
         newUser.setToken(Integer.toString(token));
         token++;
