@@ -1,7 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GamePostDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.GameDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.GameCategoryService;
