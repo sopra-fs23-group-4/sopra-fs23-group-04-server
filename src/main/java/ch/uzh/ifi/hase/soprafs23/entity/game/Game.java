@@ -3,11 +3,12 @@ package ch.uzh.ifi.hase.soprafs23.entity.game;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundLength;
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.io.Serializable;
 
-public class Game {
+@Entity
+@Table(name = "GAME")
+public class Game implements Serializable {
     @Id
     @GeneratedValue
     private Long gameId;
@@ -47,6 +48,14 @@ public class Game {
         this.length = length;
     }
 
+    public Long getRounds() {
+        return rounds;
+    }
+
+    public void setRounds(Long rounds) {
+        this.rounds = rounds;
+    }
+
     public GameStatus getStatus() {
         return status;
     }
@@ -62,4 +71,5 @@ public class Game {
     public void setHostId(Long hostId) {
         this.hostId = hostId;
     }
+
 }

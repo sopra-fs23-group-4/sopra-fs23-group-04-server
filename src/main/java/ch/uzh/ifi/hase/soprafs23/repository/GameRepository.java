@@ -10,8 +10,8 @@ import java.util.List;
 @Repository("gameRepository")
 public interface GameRepository extends JpaRepository<Game, Long> {
 
-    Game findByPin(Long gamePin);
+    Game findByGamePin(Long gamePin);
 
-    List<Game> findGames(GameStatus status);
+    List<Game> findByStatus(GameStatus status);
 
 }

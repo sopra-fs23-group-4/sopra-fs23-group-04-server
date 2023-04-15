@@ -35,11 +35,11 @@ public class GameService {
     }
 
     public List<Game> getOpenGames() {
-        return gameRepository.findGames(OPEN);
+        return gameRepository.findByStatus(OPEN);
     }
 
     public List<Game> getRunningGames() {
-        return gameRepository.findGames(RUNNING);
+        return gameRepository.findByStatus(RUNNING);
     }
 
     public List<Game> getOpenOrRunningGames() {

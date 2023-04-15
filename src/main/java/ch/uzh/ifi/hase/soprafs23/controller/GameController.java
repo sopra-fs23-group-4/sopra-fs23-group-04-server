@@ -23,12 +23,10 @@ public class GameController {
         this.gameUserService = gameUserService;
     }
 
-    Logger log = LoggerFactory.getLogger(UserController.class);
-
-    @PostMapping("/game/lobby/categories")
+    @PostMapping("/game/lobby/creation")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public Long createGame(@RequestBody GamePostDTO gamePostDTO, HttpServletResponse response) {
+    public Long createGame(@RequestBody GamePostDTO gamePostDTO) {
 
         Game newGame = GameDTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
 
