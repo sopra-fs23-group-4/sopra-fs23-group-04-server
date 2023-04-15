@@ -60,20 +60,6 @@ public class QuoteService {
 
     }
 
-    private void verifyNotError(JsonNode jsonResponse, QuoteCategory quoteCategory) {
-        Iterator<String> fieldNames = jsonResponse.fieldNames();
-        boolean isValid=false;
-
-        while(fieldNames.hasNext()) {
-            String fieldName = fieldNames.next();
-            if (Objects.equals(fieldName, quoteCategory.fieldName)){
-                isValid=true;
-            }
-        }
-        if (!isValid){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A "+ fieldNames+ " The text: ");
-        }
-    }
     public QuoteCategoriesHolder getCategories(){
         List<String> categories=QuoteCategory.getAllCategoryNames();
 

@@ -2,15 +2,20 @@ package ch.uzh.ifi.hase.soprafs23.rest.mapper;
 
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.UserGetDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.UserPostDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.UserPutDTO;
+import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteCategoriesHolder;
+import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.*;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.quote.QuoteCategoriesGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.quote.QuoteGetDTO;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.Mapping;
 
 import java.nio.charset.StandardCharsets;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -24,15 +29,15 @@ public class DTOMapperTest {
     public void testCreateUser_fromUserPostDTO_toUser_success() {
     // create UserPostDTO
     UserPostDTO userPostDTO = new UserPostDTO();
-    userPostDTO.setPassword("name");
+    userPostDTO.setPassword("password");
     userPostDTO.setUsername("username");
 
     // MAP -> Create user
     User user = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
 
-    // check content
 
     assertEquals(userPostDTO.getUsername(), user.getUsername());
+    assertEquals(user.getPassword(),userPostDTO.getPassword());
     }
 
     @Test
@@ -71,20 +76,97 @@ public class DTOMapperTest {
         assertEquals(userPutDTO.getUsername(), user.getUsername());
         assertEquals(userPutDTO.getPassword(), user.getPassword());
     }
-
     @Test
-    public void testCreateUser_fromUserPutDTO_toUser_fail() {
-        // create UserPostDTO
+    public void testCreateUser_fromUserPutDTOToEntity_success() {
+        // create UserPutDTO
         UserPutDTO userPutDTO = new UserPutDTO();
         userPutDTO.setUsername("username");
         userPutDTO.setPassword("password");
+        userPutDTO.setQuote("quote");
+        userPutDTO.setProfilePictureUrl("profilePictureUrl");
 
-        // MAP -> Create user
+        // MAP -> Convert to user
         User user = DTOMapper.INSTANCE.convertUserPutDTOToEntity(userPutDTO);
 
         // check content
         assertEquals(userPutDTO.getUsername(), user.getUsername());
         assertEquals(userPutDTO.getPassword(), user.getPassword());
-        assertEquals(userPutDTO.getToken(), user.getToken());
+        assertEquals(userPutDTO.getQuote(), user.getQuote());
+        assertEquals(userPutDTO.getProfilePictureUrl(), user.getProfilePictureUrl());
     }
+    @Test
+    public void testCreateUser_fromLoginPostDTO_success() {
+        // create UserLoginDTO
+        UserLoginDTO userLoginDTO = new UserLoginDTO();
+        userLoginDTO.setUsername("username");
+        userLoginDTO.setPassword("password");
+
+        // MAP -> Convert to user
+        User user = DTOMapper.INSTANCE.convertUserLoginPostDTOtoEntity(userLoginDTO);
+
+        // check content
+        assertEquals(userLoginDTO.getUsername(), user.getUsername());
+        assertEquals(userLoginDTO.getPassword(), user.getPassword());
+    }
+
+    @Test
+    public void testCreateUser_fromLogoutDTO_success() {
+        // create UserLogoutDTO
+        UserLogoutDTO userLogoutDTO = new UserLogoutDTO();
+        userLogoutDTO.setToken("token");
+
+        // MAP -> Convert to user
+        User user = DTOMapper.INSTANCE.convertUserLogoutDTOtoEntity(userLogoutDTO);
+
+        // check content
+        assertEquals(userLogoutDTO.getToken(), user.getToken());
+    }
+
+    @Test
+    public void testCreateGetUserDTO_fromUser_success() {
+        // create User
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("username");
+        user.setStatus(UserStatus.ONLINE);
+        user.setCreationDate(LocalDate.EPOCH);
+        user.setProfilePictureUrl("profilePictureUrl");
+
+        // MAP -> Convert to UserGetDTO
+        UserGetDTO userGetDTO = DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+
+        // check content
+        assertEquals(user.getId(), userGetDTO.getId());
+        assertEquals(user.getUsername(), userGetDTO.getUsername());
+        assertEquals(user.getStatus(), userGetDTO.getStatus());
+        assertEquals(user.getCreationDate(), userGetDTO.getCreationDate());
+        assertEquals(user.getProfilePictureUrl(), userGetDTO.getProfilePictureUrl());
+    }
+    @Test
+    public void testCreateQuoteGetDTO_fromQuoteHolder_success() {
+
+        QuoteHolder quoteHolder = new QuoteHolder();
+
+        quoteHolder.setQuote("quote");
+
+        QuoteGetDTO quoteGetDTO = DTOMapper.INSTANCE.convertEntityToQuoteGetDTO(quoteHolder);
+
+        assertEquals(quoteHolder.getQuote(), quoteGetDTO.getQuote());
+    }
+
+    @Test
+    public void testConvertEntityToQuoteCategoriesGetDTO_success() {
+
+        QuoteCategoriesHolder quoteCategory = new QuoteCategoriesHolder();
+        List<String> categories = new ArrayList<>();
+        categories.add("category1");
+        categories.add("category2");
+        quoteCategory.setCategories(categories);
+
+        QuoteCategoriesGetDTO quoteCategoriesGetDTO = DTOMapper.INSTANCE.convertEntityToQuoteCategoriesGetDTO(quoteCategory);
+
+        assertEquals(quoteCategory.getCategories(), quoteCategoriesGetDTO.getCategories());
+    }
+
+
 }

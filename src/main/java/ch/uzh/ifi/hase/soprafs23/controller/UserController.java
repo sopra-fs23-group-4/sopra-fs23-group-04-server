@@ -88,25 +88,33 @@ public class UserController {
     @GetMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public UserDTO getUserByID(@PathVariable("userId") long userId){
+    public UserGetDTO getUserByID(@PathVariable("userId") long userId){
 
         // retrieve User entity using ID
         User user = userService.getUserById(userId);
 
         // convert User entity to UserDTO and return
-        return DTOMapper.INSTANCE.convertEntityToUserDTO(user);
+        return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
     }
 
     @GetMapping("/users/username/{username}") // username because of test -> check
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public UserDTO getUserByUsername(@PathVariable("username") String username){
+    public UserGetDTO getUserByUsername(@PathVariable("username") String username){
 
         // retrieve User entity using ID
         User user = userService.getUserByUsername(username);
 
         // convert User entity to UserDTO and return
-        return DTOMapper.INSTANCE.convertEntityToUserDTO(user);
+        return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+    }
+
+    @PutMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(@RequestBody UserLogoutDTO userLogoutDTO){
+
+        User userToBeLoggedOut = DTOMapper.INSTANCE.convertUserLogoutDTOtoEntity(userLogoutDTO);
+        userService.logout(userToBeLoggedOut);
     }
 
 

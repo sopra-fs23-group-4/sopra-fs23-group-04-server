@@ -11,9 +11,16 @@ public class UserGetDTO {
     private String username;
     private UserStatus status;
     private LocalDate creationDate;
+    private String quote;
     private String profilePictureUrl;
 
+    public String getQuote() {
+        return quote;
+    }
 
+    public void setQuote(String quote) {
+        this.quote = quote;
+    }
 
     public Long getId() { return id; }
 
