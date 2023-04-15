@@ -163,8 +163,8 @@ public class UserService {
     }
 
     public void logout(User user){
-        User foundUser=userRepository.findByToken(user.getToken());
-        if (foundUser==null){
+        User foundUser = userRepository.findByToken(user.getToken());
+        if (foundUser == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         foundUser.setStatus(UserStatus.OFFLINE);
