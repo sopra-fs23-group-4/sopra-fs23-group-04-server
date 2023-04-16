@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Random;
 
 import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.OPEN;
 import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.RUNNING;
@@ -22,9 +23,7 @@ import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.RUNNING;
 public class GameService {
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
-
     private final GameRepository gameRepository;
-
     private final GameUserRepository gameUserRepository;
 
     @Autowired
@@ -54,14 +53,13 @@ public class GameService {
         return gameUserRepository.findByGameId(gameId);
     }
 
-    public Long createGame(Game newGame) {
+    public int createGame(Game newGame) {
 
         checkIfHostIsEligible(newGame);
 
         // TODO create and set gamePin
-        // newGame.setGamePin();
+        newGame.setGamePin(generateGamePin());
         newGame.setStatus(OPEN);
-
 
         newGame = gameRepository.save(newGame);
         gameRepository.flush();
@@ -80,12 +78,21 @@ public class GameService {
 
         String errorMessage = "You are already part of a game." +
                 "You cannot host another game!";
-        for (Game game : openOrRunningGames) {
-            List<Long> userIds = getGameUsers(game.getId());
-            if (hostId.equals(game.getHostId()) || userIds.contains(hostId)) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT,
-                        String.format(errorMessage));
+        if (openOrRunningGames.size() > 0) {
+            for (Game game : openOrRunningGames) {
+                List<Long> userIds = getGameUsers(game.getId());
+                if (hostId.equals(game.getHostId()) || userIds.contains(hostId)) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT,
+                            String.format(errorMessage));
+                }
             }
         }
+    }
+
+    private int generateGamePin() {
+
+        Random rnd = new Random();
+
+        return rnd.nextInt(999999);
     }
 }

@@ -7,6 +7,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.*;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.quote.QuoteCategoriesGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.quote.QuoteGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.user.*;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.Mapping;
 

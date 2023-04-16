@@ -1,17 +1,21 @@
 package ch.uzh.ifi.hase.soprafs23.entity.game;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.io.Serializable;
 
-public class GameUser {
+@Entity
+@Table(name = "GAME_USER")
+public class GameUser implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long gameUserId;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private Long gameId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private Long userId;
 }
