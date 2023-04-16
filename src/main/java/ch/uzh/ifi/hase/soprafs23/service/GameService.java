@@ -57,7 +57,6 @@ public class GameService {
 
         checkIfHostIsEligible(newGame);
 
-        // TODO create and set gamePin
         newGame.setGamePin(generateGamePin());
         newGame.setStatus(OPEN);
 

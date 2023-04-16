@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.repository.CategoryRepository;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GamePostDTO;
+import ch.uzh.ifi.hase.soprafs23.service.CategoryService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -11,6 +12,8 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static ch.uzh.ifi.hase.soprafs23.service.CategoryService.categoryRepository;
 
 @Mapper
 public interface GameDTOMapper {
@@ -27,10 +30,18 @@ public interface GameDTOMapper {
     default List<Category> mapCategories(List<String> categories) {
         List<Category> mappedCategories = new ArrayList<>();
         for (String category : categories) {
-            Category mappedCategory = new Category();
-            mappedCategory.setName(category);
+            Category mappedCategory = categoryRepository.findByName(category).orElse(null);
+            if (mappedCategory == null) {
+                mappedCategory = new Category();
+                mappedCategory.setName(category);
+            }
             mappedCategories.add(mappedCategory);
         }
         return mappedCategories;
     }
 }
+
+        //System.out.println("\n-----------------------------------------");
+        //System.out.println(ex);
+        //System.out.println(request);
+        //System.out.println("-----------------------------------------\n");

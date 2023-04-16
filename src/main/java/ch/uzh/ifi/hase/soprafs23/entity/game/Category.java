@@ -1,5 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.entity.game;
 
+import ch.uzh.ifi.hase.soprafs23.repository.CategoryRepository;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -28,4 +30,5 @@ public class Category implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+
 }
