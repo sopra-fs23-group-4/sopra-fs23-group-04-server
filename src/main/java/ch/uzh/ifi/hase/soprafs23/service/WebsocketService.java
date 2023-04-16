@@ -10,7 +10,6 @@ public class WebsocketService {
     protected SimpMessagingTemplate smesg;
     public void sendMessageToClients(String destination, Object dto) {
         this.smesg.convertAndSend(destination, dto);
-
     }
 
 

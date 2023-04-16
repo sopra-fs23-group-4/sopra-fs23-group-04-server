@@ -22,9 +22,18 @@ public class WebsocketController {
     public void startGame(@DestinationVariable int lobbyId) throws IOException{
         log.info("Lobby {}: Game started.", lobbyId);
         //gameService.startGame(lobbyId);
-        //LetterDTO questionToSend = gameService.startNextRound(lobbyId);
-        //this.webSocketService.sendMessageToClients(destination + lobbyId, questionToSend);
+        //LetterDTO LetterToSend.startNextRound(lobbyId);
+        //this.webSocketService.sendMessageToClients(destination + lobbyId, LetterDTO);
     }
+
+    @MessageMapping("/lobbies/{lobbyId}/next-round")
+    public void startNextRound(@DestinationVariable int lobbyId) {
+        log.info("Next round started");
+        //LetterDTO LetterToSend =gameService.startNextRound(lobbyId);
+        //this.webSocketService.sendMessageToClients(destination + lobbyId, LetterDTO);
+    }
+
+
 
 
 
