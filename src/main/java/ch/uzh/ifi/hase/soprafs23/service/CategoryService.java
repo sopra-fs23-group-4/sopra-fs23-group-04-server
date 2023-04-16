@@ -21,9 +21,4 @@ public class CategoryService {
     public CategoryService(@Qualifier("categoryRepository") CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
-
-    public static Boolean checkIfCategoryExists(String name) {
-        Category category = categoryRepository.findByName(name).orElse(null);
-        return category != null;
-    }
 }
