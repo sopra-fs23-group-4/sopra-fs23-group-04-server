@@ -1,4 +1,3 @@
-/*
 package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
@@ -7,6 +6,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,12 +20,11 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-*/
 /**
  * Test class for the UserResource REST resource.
- *
  * @see UserService
- *//*
+ */
+
 
 @WebAppConfiguration
 @SpringBootTest
@@ -89,4 +88,3 @@ public class UserServiceIntegrationTest {
     assertThrows(ResponseStatusException.class, () -> userService.createUser(testUser2));
     }
 }
-*/
