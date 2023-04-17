@@ -2,11 +2,18 @@ package ch.uzh.ifi.hase.soprafs23.entity.game;
 
 import ch.uzh.ifi.hase.soprafs23.constant.RoundLength;
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
+import ch.uzh.ifi.hase.soprafs23.constant.UserRole;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static ch.uzh.ifi.hase.soprafs23.constant.UserRole.HOST;
+import static ch.uzh.ifi.hase.soprafs23.constant.UserRole.PLAYER;
 
 @Entity
 @Table(name = "GAME")
@@ -31,11 +38,6 @@ public class Game implements Serializable {
     @Column(nullable = false)
     private GameStatus status;
 
-    @Column(nullable = false)
-    private Long hostId;
-
-
-
     @ElementCollection
     @OrderColumn
     private List<Character> roundLetters;
@@ -55,7 +57,8 @@ public class Game implements Serializable {
             joinColumns = @JoinColumn(name = "game_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<User> users;
+    @MapKeyColumn(name = "role")
+    private Map<UserRole, User> users = new HashMap<>();
 
     public Long getGameId() {
         return gameId;
@@ -93,14 +96,6 @@ public class Game implements Serializable {
         this.status = status;
     }
 
-    public Long getHostId() {
-        return hostId;
-    }
-
-    public void setHostId(Long hostId) {
-        this.hostId = hostId;
-    }
-
     public List<Character> getRoundLetters() {
         return roundLetters;
     }
@@ -117,12 +112,16 @@ public class Game implements Serializable {
         this.categories = categories;
     }
 
-    public List<User> getUsers() {
+    public Map<UserRole, User> getUsers() {
         return users;
     }
 
-    public void addUser(User user) {
-        this.users.add(user);
+    public void addHost(User user) {
+        this.users.put(HOST, user);
+    }
+
+    public void addPlayer(User user) {
+        this.users.put(PLAYER, user);
     }
 
 }

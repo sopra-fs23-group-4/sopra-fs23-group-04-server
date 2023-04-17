@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.constant.UserRole;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
@@ -15,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.OPEN;
@@ -37,12 +39,15 @@ public class GameService {
 
     public int createGame(Game newGame, String userToken) {
 
-        checkIfUserExists(userToken);
+        User user = getUserByToken(userToken);
 
-        checkIfHostIsEligible(newGame);
+        checkIfUserExists(user);
+
+        checkIfHostIsEligible(user.getId());
 
         newGame.setGamePin(generateGamePin());
         newGame.setStatus(OPEN);
+        newGame.addHost(user);
 
         newGame = gameRepository.save(newGame);
         gameRepository.flush();
@@ -53,15 +58,17 @@ public class GameService {
 
     public void joinGame(int gamePin, String userToken) {
 
-        checkIfUserExists(userToken);
-
         User user = getUserByToken(userToken);
+
+        checkIfUserExists(user);
 
         checkIfUserCanJoin(user.getId());
 
         Game gameToJoin = gameRepository.findByGamePin(gamePin);
 
-        gameToJoin.addUser(user);
+        checkIfGameExists(gameToJoin);
+
+        gameToJoin.addPlayer(user);
     }
 
     public Game getGameByGameId(Long gameId) {
@@ -95,23 +102,22 @@ public class GameService {
     }
 
     private List<Long> getGameUsersId(Game game) {
-        List<User> users = game.getUsers();
         List<Long> usersId = new ArrayList<>();
-        for (User user : users) {
+        for (Map.Entry<UserRole, User> entry : game.getUsers().entrySet()) {
+            User user = entry.getValue();
             usersId.add(user.getId());
         }
         return usersId;
     }
 
-    private void checkIfHostIsEligible(Game gameToBeCreated) {
-        Long hostId = gameToBeCreated.getHostId();
+    private void checkIfHostIsEligible(Long hostId) {
         List<Game> openOrRunningGames = getOpenOrRunningGames();
 
         String errorMessage = "You are already part of a game." +
                 "You cannot host another game!";
         for (Game game : openOrRunningGames) {
             List<Long> userIds = getGameUsersId(game);
-            if (hostId.equals(game.getHostId()) || userIds.contains(hostId)) {
+            if (userIds.contains(hostId)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         String.format(errorMessage));
             }
@@ -127,20 +133,28 @@ public class GameService {
 
         for (Game game : openOrRunningGames) {
             List<Long> userIds = getGameUsersId(game);
-            if (userId.equals(game.getHostId()) || userIds.contains(userId)) {
+            if (userIds.contains(userId)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         String.format(errorMessage));
             }
         }
     }
 
-    private void checkIfUserExists(String userToken) {
-
-        User user = getUserByToken(userToken);
+    private void checkIfUserExists(User user) {
 
         String errorMessage = "User does not exist." +
                 "Please register before playing!";
         if (user == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    String.format(errorMessage));
+        }
+    }
+
+    private void checkIfGameExists(Game game) {
+
+        String errorMessage = "Game does not exist or is not open anymore." +
+                "Please try again with a different pin!";
+        if (game == null || !game.getStatus().equals(OPEN)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format(errorMessage));
         }

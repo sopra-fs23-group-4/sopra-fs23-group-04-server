@@ -21,7 +21,6 @@ public interface GameDTOMapper {
 
     GameDTOMapper INSTANCE = Mappers.getMapper(GameDTOMapper.class);
 
-    @Mapping(source = "hostId", target = "hostId")
     @Mapping(source = "rounds", target = "rounds")
     @Mapping(source = "roundLength", target = "roundLength")
     @Mapping(source = "categories", target = "categories", qualifiedByName = "mapCategories")

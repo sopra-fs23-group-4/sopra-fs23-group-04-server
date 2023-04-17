@@ -47,7 +47,7 @@ public class UserService {
 
     int token = 1;
 
-    public User createUser(User newUser) {
+    public synchronized User createUser(User newUser) {
         // TODO change setToken back to random
         //newUser.setToken(UUID.randomUUID().toString());
         newUser.setToken(Integer.toString(token));
@@ -98,7 +98,7 @@ public class UserService {
         return user;
     }
 
-    public User editUser (Long userId, User editedUser) {
+    public synchronized User editUser (Long userId, User editedUser) {
 
         User userDB = userRepository.findById(userId).orElse(null);
 
