@@ -14,10 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.OPEN;
 import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.RUNNING;
@@ -48,12 +45,25 @@ public class GameService {
         newGame.setGamePin(generateGamePin());
         newGame.setStatus(OPEN);
         newGame.addHost(user);
+        newGame.setRoundLetters(generateRandomLetters(newGame.getRounds()));
 
         newGame = gameRepository.save(newGame);
         gameRepository.flush();
 
         log.debug("Created following game: {}", newGame);
         return newGame.getGamePin();
+    }
+
+    public List<Character> generateRandomLetters(Long numberOfRounds){
+        List<Character> letters = new ArrayList<>();
+
+        for (char letter = 'A'; letter <= 'Z'; letter++) {
+            letters.add(letter);
+        }
+
+        Collections.shuffle(letters);
+
+        return letters.subList(0, numberOfRounds.intValue());
     }
 
     public void joinGame(int gamePin, String userToken) {
