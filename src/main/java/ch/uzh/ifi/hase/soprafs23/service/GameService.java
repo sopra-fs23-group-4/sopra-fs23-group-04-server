@@ -168,6 +168,6 @@ public class GameService {
 
         Random rnd = new Random();
 
-        return rnd.nextInt(999999);
+        return rnd.nextInt(900000) + 100000;
     }
 }
