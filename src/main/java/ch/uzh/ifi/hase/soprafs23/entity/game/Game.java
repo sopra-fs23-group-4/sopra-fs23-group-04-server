@@ -2,29 +2,28 @@ package ch.uzh.ifi.hase.soprafs23.entity.game;
 
 import ch.uzh.ifi.hase.soprafs23.constant.RoundLength;
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
-import ch.uzh.ifi.hase.soprafs23.constant.UserRole;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 
 import javax.persistence.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static ch.uzh.ifi.hase.soprafs23.constant.UserRole.HOST;
-import static ch.uzh.ifi.hase.soprafs23.constant.UserRole.PLAYER;
 
 @Entity
 @Table(name = "GAME")
 public class Game implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "game_id")
     private Long gameId;
+
+    @Column(nullable = false, unique = true)
+    private Long hostId;
 
     @Column(nullable = false, unique = true)
     private int gamePin;
@@ -57,11 +56,18 @@ public class Game implements Serializable {
             joinColumns = @JoinColumn(name = "game_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    @MapKeyColumn(name = "role")
-    private Map<UserRole, User> users = new HashMap<>();
+    private List<User> users = new ArrayList<>();
 
     public Long getGameId() {
         return gameId;
+    }
+
+    public Long getHostId() {
+        return hostId;
+    }
+
+    public void setHostId(Long hostId) {
+        this.hostId = hostId;
     }
 
     public int getGamePin() {
@@ -112,16 +118,12 @@ public class Game implements Serializable {
         this.categories = categories;
     }
 
-    public Map<UserRole, User> getUsers() {
+    public List<User> getUsers() {
         return users;
     }
 
-    public void addHost(User user) {
-        this.users.put(HOST, user);
-    }
-
     public void addPlayer(User user) {
-        this.users.put(PLAYER, user);
+        this.users.add(user);
     }
 
 }

@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import ch.uzh.ifi.hase.soprafs23.constant.UserRole;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
@@ -44,7 +43,8 @@ public class GameService {
 
         newGame.setGamePin(generateGamePin());
         newGame.setStatus(OPEN);
-        newGame.addHost(user);
+        newGame.setHostId(user.getId());
+        newGame.addPlayer(user);
         newGame.setRoundLetters(generateRandomLetters(newGame.getRounds()));
 
         newGame = gameRepository.save(newGame);
@@ -105,16 +105,13 @@ public class GameService {
 
     private List<Game> getOpenOrRunningGames() {
         List<Game> openOrRunningGames = getOpenGames();
-        for (Game game : getRunningGames()) {
-            openOrRunningGames.add(game);
-        }
+        openOrRunningGames.addAll(getRunningGames());
         return openOrRunningGames;
     }
 
     private List<Long> getGameUsersId(Game game) {
         List<Long> usersId = new ArrayList<>();
-        for (Map.Entry<UserRole, User> entry : game.getUsers().entrySet()) {
-            User user = entry.getValue();
+        for (User user : game.getUsers()) {
             usersId.add(user.getId());
         }
         return usersId;
