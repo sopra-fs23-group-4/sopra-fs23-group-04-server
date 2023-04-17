@@ -5,7 +5,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.CategoryGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GameSettingGetDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.mapper.DTOMapper;
+import ch.uzh.ifi.hase.soprafs23.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.GameDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import org.springframework.http.HttpStatus;
@@ -45,7 +45,7 @@ public class GameController {
         List<CategoryGetDTO> categoryGetDTOs = new ArrayList<>();
 
         for (Category gameCategory : gameCategories) {
-            categoryGetDTOs.add(DTOMapper.INSTANCE.convertEntityToCategoryGetDTO(gameCategory));
+            categoryGetDTOs.add(UserDTOMapper.INSTANCE.convertEntityToCategoryGetDTO(gameCategory));
         }
 
         return categoryGetDTOs;
@@ -58,7 +58,7 @@ public class GameController {
 
         Game game = gameService.getGameByGameId(gameId);
 
-        return DTOMapper.INSTANCE.convertEntityToSettingGetDTO(game);
+        return UserDTOMapper.INSTANCE.convertEntityToSettingGetDTO(game);
     }
 
     @PutMapping("/game/lobby/{gamePin}/join")
