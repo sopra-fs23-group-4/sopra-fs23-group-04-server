@@ -53,6 +53,8 @@ public class GameService {
         return gameUserRepository.findByGameId(gameId);
     }
 
+    public Game getGameByGameId(Long gameId) { return gameRepository.findGameByGameId(gameId); }
+
     public int createGame(Game newGame) {
 
         checkIfHostIsEligible(newGame);
@@ -79,7 +81,7 @@ public class GameService {
                 "You cannot host another game!";
         if (openOrRunningGames.size() > 0) {
             for (Game game : openOrRunningGames) {
-                List<Long> userIds = getGameUsers(game.getId());
+                List<Long> userIds = getGameUsers(game.getGameId());
                 if (hostId.equals(game.getHostId()) || userIds.contains(hostId)) {
                     throw new ResponseStatusException(HttpStatus.CONFLICT,
                             String.format(errorMessage));
