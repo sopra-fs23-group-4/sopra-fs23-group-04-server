@@ -34,6 +34,12 @@ public class Game implements Serializable {
     @Column(nullable = false)
     private Long hostId;
 
+
+
+    @ElementCollection
+    @OrderColumn
+    private List<Character> roundLetters;
+
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "GAME_CATEGORY",
@@ -50,7 +56,7 @@ public class Game implements Serializable {
     //)
     //private List<User> users;
 
-    public Long getId() {
+    public Long getGameId() {
         return gameId;
     }
 
@@ -92,6 +98,14 @@ public class Game implements Serializable {
 
     public void setHostId(Long hostId) {
         this.hostId = hostId;
+    }
+
+    public List<Character> getRoundLetters() {
+        return roundLetters;
+    }
+
+    public void setRoundLetters(List<Character> roundLetters) {
+        this.roundLetters = roundLetters;
     }
 
     public List<Category> getCategories() {
