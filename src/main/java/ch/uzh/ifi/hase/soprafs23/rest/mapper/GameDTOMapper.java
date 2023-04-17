@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.rest.mapper;
 
+import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.repository.CategoryRepository;
@@ -26,6 +27,7 @@ public interface GameDTOMapper {
     @Mapping(source = "categories", target = "categories", qualifiedByName = "mapCategories")
     Game convertGamePostDTOtoEntity(GamePostDTO gamePostDTO);
 
+    /** transform the category strings to category objects */
     @Named("mapCategories")
     default List<Category> mapCategories(List<String> categories) {
         List<Category> mappedCategories = new ArrayList<>();

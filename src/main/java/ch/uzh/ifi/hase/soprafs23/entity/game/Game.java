@@ -40,6 +40,7 @@ public class Game implements Serializable {
     @OrderColumn
     private List<Character> roundLetters;
 
+    /** create intermediary table between game and category */
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "GAME_CATEGORY",
@@ -48,13 +49,13 @@ public class Game implements Serializable {
     )
     private List<Category> categories;
 
-    //@ManyToMany
-    //@JoinTable(
-    //        name = "GAME_USER",
-    //        joinColumns = @JoinColumn(name = "gameId"),
-    //        inverseJoinColumns = @JoinColumn(name = "id")
-    //)
-    //private List<User> users;
+    @ManyToMany
+    @JoinTable(
+            name = "GAME_USER",
+            joinColumns = @JoinColumn(name = "game_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> users;
 
     public Long getGameId() {
         return gameId;
@@ -116,11 +117,12 @@ public class Game implements Serializable {
         this.categories = categories;
     }
 
-    //public List<User> getUsers() {
-    //    return users;
-    //}
-//
-    //public void setUsers(List<User> users) {
-    //    this.users = users;
-    //}
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void addUser(User user) {
+        this.users.add(user);
+    }
+
 }

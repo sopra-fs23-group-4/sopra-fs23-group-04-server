@@ -25,11 +25,11 @@ public class GameController {
     @PostMapping("/game/lobby/creation")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public int createGame(@RequestBody GamePostDTO gamePostDTO) {
+    public int createGame(@RequestBody GamePostDTO gamePostDTO, @RequestHeader("Authorization") String userToken) {
 
         Game newGame = GameDTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
 
-        int gamePin = gameService.createGame(newGame);
+        int gamePin = gameService.createGame(newGame, userToken);
 
         return gamePin;
     }
@@ -50,5 +50,13 @@ public class GameController {
         }
 
         return categoryGetDTOs;
+    }
+
+    @PutMapping("/game/lobby/{gamePin}/join")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void joinGame(@PathVariable("gamePin") int gamePin, @RequestHeader("Authorization") String userToken) {
+
+        gameService.joinGame(gamePin, userToken);
+
     }
 }

@@ -1,8 +1,9 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
-import ch.uzh.ifi.hase.soprafs23.repository.GameUserRepository;
+import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -24,38 +26,18 @@ public class GameService {
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
     private final GameRepository gameRepository;
-    private final GameUserRepository gameUserRepository;
+    private final UserRepository userRepository;
 
     @Autowired
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository,
-                       @Qualifier("gameUserRepository") GameUserRepository gameUserRepository) {
+                       @Qualifier("userRepository") UserRepository userRepository) {
         this.gameRepository = gameRepository;
-        this.gameUserRepository = gameUserRepository;
+        this.userRepository = userRepository;
     }
 
-    public List<Game> getOpenGames() {
-        return gameRepository.findByStatus(OPEN);
-    }
+    public int createGame(Game newGame, String userToken) {
 
-    public List<Game> getRunningGames() {
-        return gameRepository.findByStatus(RUNNING);
-    }
-
-    public List<Game> getOpenOrRunningGames() {
-        List<Game> openOrRunningGames = getOpenGames();
-        for (Game game : getRunningGames()) {
-            openOrRunningGames.add(game);
-        }
-        return openOrRunningGames;
-    }
-
-    public List<Long> getGameUsers(Long gameId) {
-        return gameUserRepository.findByGameId(gameId);
-    }
-
-    public Game getGameByGameId(Long gameId) { return gameRepository.findGameByGameId(gameId); }
-
-    public int createGame(Game newGame) {
+        checkIfUserExists(userToken);
 
         checkIfHostIsEligible(newGame);
 
@@ -69,9 +51,57 @@ public class GameService {
         return newGame.getGamePin();
     }
 
+    public void joinGame(int gamePin, String userToken) {
+
+        checkIfUserExists(userToken);
+
+        User user = getUserByToken(userToken);
+
+        checkIfUserCanJoin(user.getId());
+
+        Game gameToJoin = gameRepository.findByGamePin(gamePin);
+
+        gameToJoin.addUser(user);
+    }
+
+    public Game getGameByGameId(Long gameId) {
+        Game game = gameRepository.findByGameId(gameId);
+        String errorMessage = "Game does not exist!";
+        if (game == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    String.format(errorMessage));
+        }
+        return game;
+    }
+
     /**
      * Helper methods to aid in the game creation, modification and deletion
      */
+
+    private List<Game> getOpenGames() {
+        return gameRepository.findByStatus(OPEN);
+    }
+
+    private List<Game> getRunningGames() {
+        return gameRepository.findByStatus(RUNNING);
+    }
+
+    private List<Game> getOpenOrRunningGames() {
+        List<Game> openOrRunningGames = getOpenGames();
+        for (Game game : getRunningGames()) {
+            openOrRunningGames.add(game);
+        }
+        return openOrRunningGames;
+    }
+
+    private List<Long> getGameUsersId(Game game) {
+        List<User> users = game.getUsers();
+        List<Long> usersId = new ArrayList<>();
+        for (User user : users) {
+            usersId.add(user.getId());
+        }
+        return usersId;
+    }
 
     private void checkIfHostIsEligible(Game gameToBeCreated) {
         Long hostId = gameToBeCreated.getHostId();
@@ -79,15 +109,45 @@ public class GameService {
 
         String errorMessage = "You are already part of a game." +
                 "You cannot host another game!";
-        if (openOrRunningGames.size() > 0) {
-            for (Game game : openOrRunningGames) {
-                List<Long> userIds = getGameUsers(game.getGameId());
-                if (hostId.equals(game.getHostId()) || userIds.contains(hostId)) {
-                    throw new ResponseStatusException(HttpStatus.CONFLICT,
-                            String.format(errorMessage));
-                }
+        for (Game game : openOrRunningGames) {
+            List<Long> userIds = getGameUsersId(game);
+            if (hostId.equals(game.getHostId()) || userIds.contains(hostId)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        String.format(errorMessage));
             }
         }
+    }
+
+    private void checkIfUserCanJoin(Long userId) {
+
+        List<Game> openOrRunningGames = getOpenOrRunningGames();
+
+        String errorMessage = "You are already part of a game." +
+                "You cannot join another game!";
+
+        for (Game game : openOrRunningGames) {
+            List<Long> userIds = getGameUsersId(game);
+            if (userId.equals(game.getHostId()) || userIds.contains(userId)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        String.format(errorMessage));
+            }
+        }
+    }
+
+    private void checkIfUserExists(String userToken) {
+
+        User user = getUserByToken(userToken);
+
+        String errorMessage = "User does not exist." +
+                "Please register before playing!";
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    String.format(errorMessage));
+        }
+    }
+
+    private User getUserByToken(String userToken) {
+        return userRepository.findByToken(userToken);
     }
 
     private int generateGamePin() {
