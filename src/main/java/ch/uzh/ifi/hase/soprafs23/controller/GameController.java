@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.CategoryGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GamePostDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.GameSettingGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.GameDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
@@ -29,9 +30,7 @@ public class GameController {
 
         Game newGame = GameDTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
 
-        int gamePin = gameService.createGame(newGame, userToken);
-
-        return gamePin;
+        return gameService.createGame(newGame, userToken);
     }
 
     @GetMapping("/game/{gameId}/categories")
@@ -50,6 +49,16 @@ public class GameController {
         }
 
         return categoryGetDTOs;
+    }
+
+    @GetMapping("game/{gameId}/settings")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GameSettingGetDTO getGameSettingByGameId(@PathVariable("gameId") Long gameId) {
+
+        Game game = gameService.getGameByGameId(gameId);
+
+        return DTOMapper.INSTANCE.convertEntityToSettingGetDTO(game);
     }
 
     @PutMapping("/game/lobby/{gamePin}/join")
