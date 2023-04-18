@@ -23,7 +23,7 @@ public class GameController {
         this.gameService = gameService;
     }
 
-    @PostMapping("/game/lobby/creation")
+    @PostMapping("/games/lobbies/creation")
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public int createGame(@RequestBody GamePostDTO gamePostDTO, @RequestHeader("Authorization") String userToken) {
@@ -61,7 +61,7 @@ public class GameController {
         return UserDTOMapper.INSTANCE.convertEntityToSettingGetDTO(game);
     }
 
-    @PutMapping("/game/lobby/{gamePin}/join")
+    @PutMapping("/games/lobbies/{gamePin}/join")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void joinGame(@PathVariable("gamePin") int gamePin, @RequestHeader("Authorization") String userToken) {
 
