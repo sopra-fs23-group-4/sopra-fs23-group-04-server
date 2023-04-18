@@ -28,13 +28,13 @@ public interface GameDTOMapper {
 
     /** transform the category strings to category objects */
     @Named("mapCategories")
-    default List<Category> mapCategories(List<String> categories) {
+    default List<Category> mapCategories(List<String> categoryNames) {
         List<Category> mappedCategories = new ArrayList<>();
-        for (String category : categories) {
-            Category mappedCategory = categoryRepository.findByName(category).orElse(null);
+        for (String categoryName : categoryNames) {
+            Category mappedCategory = categoryRepository.findByName(categoryName).orElse(null);
             if (mappedCategory == null) {
                 mappedCategory = new Category();
-                mappedCategory.setName(category);
+                mappedCategory.setName(categoryName);
             }
             mappedCategories.add(mappedCategory);
         }
