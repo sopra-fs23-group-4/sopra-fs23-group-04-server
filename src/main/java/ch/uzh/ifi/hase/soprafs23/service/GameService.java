@@ -54,7 +54,7 @@ public class GameService {
         return newGame.getGamePin();
     }
 
-    public List<Character> generateRandomLetters(Long numberOfRounds){
+    public List<Character> generateRandomLetters(int numberOfRounds){
         List<Character> letters = new ArrayList<>();
 
         for (char letter = 'A'; letter <= 'Z'; letter++) {
@@ -63,7 +63,7 @@ public class GameService {
 
         Collections.shuffle(letters);
 
-        return letters.subList(0, numberOfRounds.intValue());
+        return letters.subList(0, numberOfRounds);
     }
 
     public void joinGame(int gamePin, String userToken) {
@@ -175,6 +175,6 @@ public class GameService {
 
         Random rnd = new Random();
 
-        return rnd.nextInt(900000) + 100000;
+        return rnd.nextInt(9000) + 1000;
     }
 }
