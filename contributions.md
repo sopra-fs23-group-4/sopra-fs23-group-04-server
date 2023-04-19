@@ -10,13 +10,13 @@
 
 18.04.2023
 
-| Person                | Last Week          | Next Week     | Description                                   |
-|-----------------------|--------------------|---------------|-----------------------------------------------|
-| Alexandre Bacmann     | #107, #112         | #123, #124    |                                               |
-| Valentin Meyer        | #101, #102         | #114, #118    | added game creation and joining functionality |
-| Christopher Narayanan | #103, #108         | #119, #120    |                                               |
-| Lennart Töllke        | #10, #13, #15, #16 | #18, #19, #21 |                                               |
-| Remo Wiget            | #11, #12, #14      | #20, #22      |                                               |
+| Person                | Last Week          | Next Week     | Description                                                 |
+|-----------------------|--------------------|---------------|-------------------------------------------------------------|
+| Alexandre Bacmann     | #107, #112         | #123, #124    | create lettergenrator, setting endpoint, categories endpoint|
+| Valentin Meyer        | #101, #102         | #114, #118    | added game creation and joining functionality               |
+| Christopher Narayanan | #103, #108         | #119, #120    |                                                             |
+| Lennart Töllke        | #10, #13, #15, #16 | #18, #19, #21 |                                                             |
+| Remo Wiget            | #11, #12, #14      | #20, #22      |                                                             |
 
 25.04.2023
 
