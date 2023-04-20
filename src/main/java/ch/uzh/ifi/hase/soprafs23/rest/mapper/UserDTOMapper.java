@@ -67,6 +67,6 @@ public interface UserDTOMapper {
     @Mapping(source = "rounds", target = "rounds")
     @Mapping(source = "roundLength", target = "roundLength")
     @Mapping(source = "status", target = "status")
-    GameSettingGetDTO convertEntityToSettingGetDTO(Game game);
+    GameSettingGetDTO convertEntityToGameSettingGetDTO(Game game);
 
 }
