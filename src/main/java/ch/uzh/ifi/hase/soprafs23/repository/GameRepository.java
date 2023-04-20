@@ -12,7 +12,7 @@ public interface GameRepository extends JpaRepository<Game, Integer> {
 
     Game findByGameId(Long gameId);
     Game findByGamePin(int gamePin);
-    Game findGameByGameId(Long gameId);
+
 
     List<Game> findByStatus(GameStatus status);
 
