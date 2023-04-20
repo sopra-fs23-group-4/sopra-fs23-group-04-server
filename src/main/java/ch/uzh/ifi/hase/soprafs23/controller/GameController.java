@@ -58,7 +58,7 @@ public class GameController {
 
         Game game = gameService.getGameByGameId(gameId);
 
-        return UserDTOMapper.INSTANCE.convertEntityToSettingGetDTO(game);
+        return UserDTOMapper.INSTANCE.convertEntityToGameSettingGetDTO(game);
     }
 
     @PutMapping("/games/lobbies/{gamePin}/join")
