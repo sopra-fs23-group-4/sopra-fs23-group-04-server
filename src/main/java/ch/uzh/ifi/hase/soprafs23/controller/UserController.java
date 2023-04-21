@@ -1,8 +1,8 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.*;
-import ch.uzh.ifi.hase.soprafs23.rest.mapper.DTOMapper;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.user.*;
+import ch.uzh.ifi.hase.soprafs23.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ public class UserController {
 
         // convert each user to the API representation
         for (User user : users) {
-            userGetDTOs.add(DTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
+            userGetDTOs.add(UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(user));
         }
         return userGetDTOs;
     }
@@ -50,7 +50,7 @@ public class UserController {
     @ResponseBody
     public UserGetDTO createUser(@RequestBody UserPostDTO userPostDTO, HttpServletResponse response) {
         // convert API user to internal representation
-        User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+        User userInput = UserDTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
 
         // create user
         User createdUser = userService.createUser(userInput);
@@ -58,7 +58,7 @@ public class UserController {
         response.addHeader("Authorization", createdUser.getToken());
         log.info("The user " + createdUser.getUsername() + " with id " + createdUser.getId() + " has been created.");
         // convert internal representation of user back to API
-        return DTOMapper.INSTANCE.convertEntityToUserGetDTO(createdUser);
+        return UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(createdUser);
     }
 
     @PostMapping("/login")
@@ -66,20 +66,20 @@ public class UserController {
     @ResponseBody
     public UserGetDTO logInUser(@RequestBody UserLoginDTO userLoginDTO, HttpServletResponse response){
         // convert API user to internal representation
-        User userCredentials = DTOMapper.INSTANCE.convertUserLoginPostDTOtoEntity(userLoginDTO);
+        User userCredentials = UserDTOMapper.INSTANCE.convertUserLoginPostDTOtoEntity(userLoginDTO);
 
         User user = userService.logIn(userCredentials);
 
         response.addHeader("Authorization", user.getToken());
 
-        return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+        return UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
     }
 
     @PutMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void editUser(@PathVariable("userId") Long userId, @RequestBody UserPutDTO userPutDTO){
 
-        User userCredentials = DTOMapper.INSTANCE.convertUserPutDTOToEntity(userPutDTO);
+        User userCredentials = UserDTOMapper.INSTANCE.convertUserPutDTOToEntity(userPutDTO);
 
         userService.editUser(userId, userCredentials);
 
@@ -94,7 +94,7 @@ public class UserController {
         User user = userService.getUserById(userId);
 
         // convert User entity to UserDTO and return
-        return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+        return UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
     }
 
     @GetMapping("/users/username/{username}") // username because of test -> check
@@ -106,14 +106,14 @@ public class UserController {
         User user = userService.getUserByUsername(username);
 
         // convert User entity to UserDTO and return
-        return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
+        return UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
     }
 
     @PutMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void logout(@RequestBody UserLogoutDTO userLogoutDTO){
 
-        User userToBeLoggedOut = DTOMapper.INSTANCE.convertUserLogoutDTOtoEntity(userLogoutDTO);
+        User userToBeLoggedOut = UserDTOMapper.INSTANCE.convertUserLogoutDTOtoEntity(userLogoutDTO);
         userService.logout(userToBeLoggedOut);
     }
 

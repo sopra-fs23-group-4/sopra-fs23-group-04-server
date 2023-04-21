@@ -6,6 +6,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,9 +22,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * Test class for the UserResource REST resource.
- *
  * @see UserService
  */
+
+
 @WebAppConfiguration
 @SpringBootTest
 public class UserServiceIntegrationTest {

@@ -1,11 +1,15 @@
 package ch.uzh.ifi.hase.soprafs23.rest.mapper;
 
+import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
+import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteCategoriesHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.*;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.CategoryGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.GameSettingGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.quote.QuoteCategoriesGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.quote.QuoteGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.user.*;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -21,9 +25,9 @@ import org.mapstruct.factory.Mappers;
  * creating information (POST).
  */
 @Mapper
-public interface DTOMapper {
+public interface UserDTOMapper {
 
-    DTOMapper INSTANCE = Mappers.getMapper(DTOMapper.class);
+    UserDTOMapper INSTANCE = Mappers.getMapper(UserDTOMapper.class);
 
     @Mapping(source = "password", target = "password")
     @Mapping(source = "username", target = "username")
@@ -56,5 +60,13 @@ public interface DTOMapper {
 
     @Mapping(source ="categories", target = "categories")
     QuoteCategoriesGetDTO convertEntityToQuoteCategoriesGetDTO(QuoteCategoriesHolder quoteCategory);
+
+    @Mapping(source = "name", target = "category")
+    CategoryGetDTO convertEntityToCategoryGetDTO(Category category);
+
+    @Mapping(source = "rounds", target = "rounds")
+    @Mapping(source = "roundLength", target = "roundLength")
+    @Mapping(source = "status", target = "status")
+    GameSettingGetDTO convertEntityToGameSettingGetDTO(Game game);
 
 }
