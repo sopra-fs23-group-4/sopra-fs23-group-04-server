@@ -25,6 +25,8 @@ public class Game implements Serializable {
     @Column(nullable = false, unique = true)
     private Long hostId;
 
+    private Long currentRound;
+
     @Column(nullable = false, unique = true)
     private int gamePin;
 
@@ -104,6 +106,12 @@ public class Game implements Serializable {
 
     public List<Character> getRoundLetters() {
         return roundLetters;
+    }
+
+    public Character getRoundLetter(){
+        Character roundLetter=roundLetters.get(currentRound.intValue());
+        currentRound++;
+        return roundLetter;
     }
 
     public void setRoundLetters(List<Character> roundLetters) {

@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs23.webSockets.DTO.LetterDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,7 @@ public class GameService {
         return newGame.getGamePin();
     }
 
-    public List<Character> generateRandomLetters(Long numberOfRounds){
+    public List<Character> generateRandomLetters(Long numberOfRounds) {
         List<Character> letters = new ArrayList<>();
 
         for (char letter = 'A'; letter <= 'Z'; letter++) {
@@ -89,6 +90,19 @@ public class GameService {
                     String.format(errorMessage));
         }
         return game;
+    }
+
+    public void startGame(Long gameId) {
+        Game game=getGameByGameId(gameId);
+        game.setStatus(RUNNING);
+    }
+
+    public LetterDTO startNextRound(Long gameId){
+        Game game=getGameByGameId(gameId);
+        Character letter=game.getRoundLetter();
+        LetterDTO letterDTO=new LetterDTO();
+        letterDTO.setLetter(letter);
+        return letterDTO;
     }
 
     /**
