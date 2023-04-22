@@ -15,7 +15,6 @@ import java.io.IOException;
 public class WebsocketController {
     private final WebsocketService websocketService;
     private final GameService gameService;
-
     private final static String destination = "/topic/lobbies/";
     Logger log = LoggerFactory.getLogger(WebsocketController.class);
 
@@ -34,15 +33,9 @@ public class WebsocketController {
 
     @MessageMapping("/lobbies/{lobbyId}/next-round")
     public void startNextRound(@DestinationVariable Long lobbyId) {
-        log.info("Next round started");
+        log.info("Next round started for {lobby}");
         LetterDTO letterToSend =gameService.startNextRound(lobbyId);
         this.websocketService.sendMessageToClients(destination + lobbyId, letterToSend);
     }
-
-
-
-
-
-
 
 }

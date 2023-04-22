@@ -1,5 +1,8 @@
 package ch.uzh.ifi.hase.soprafs23.constant;
 
+import ch.uzh.ifi.hase.soprafs23.constant.extractJson.ExtractJsonArrayConvertor;
+import ch.uzh.ifi.hase.soprafs23.constant.extractJson.ExtractJsonData;
+import ch.uzh.ifi.hase.soprafs23.constant.extractJson.ExtractJsonElementConvertor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
