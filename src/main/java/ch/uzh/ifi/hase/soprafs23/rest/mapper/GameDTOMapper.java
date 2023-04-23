@@ -19,6 +19,9 @@ import static ch.uzh.ifi.hase.soprafs23.service.CategoryService.categoryReposito
 @Mapper
 public interface GameDTOMapper {
 
+
+
+
     GameDTOMapper INSTANCE = Mappers.getMapper(GameDTOMapper.class);
 
     @Mapping(source = "rounds", target = "rounds")

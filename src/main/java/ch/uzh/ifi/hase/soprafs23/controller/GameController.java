@@ -1,10 +1,12 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
+import ch.uzh.ifi.hase.soprafs23.constant.GameCategory;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.CategoryGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GameSettingGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.GameDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
@@ -31,6 +33,14 @@ public class GameController {
         Game newGame = GameDTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
 
         return gameService.createGame(newGame, userToken);
+    }
+    @GetMapping("/game/categories")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GameCategoriesDTO getStandardCategories(){
+        GameCategoriesDTO gameCategoriesDTO=new GameCategoriesDTO();
+        gameCategoriesDTO.setCategories(GameCategory.getCategories());
+        return gameCategoriesDTO;
     }
 
     @GetMapping("/game/{gameId}/categories")
