@@ -19,22 +19,22 @@ public class WebsocketController {
     Logger log = LoggerFactory.getLogger(WebsocketController.class);
 
     public WebsocketController(WebsocketService websocketService, GameService gameService){
-        this.websocketService=websocketService;
-        this.gameService=gameService;
+        this.websocketService = websocketService;
+        this.gameService = gameService;
     }
 
     @MessageMapping("/lobbies/{lobbyId}/start-game")
     public void startGame(@DestinationVariable Long  lobbyId) throws IOException{
         log.info("Lobby {}: Game started.", lobbyId);
         gameService.startGame(lobbyId);
-        LetterDTO letterToSend =gameService.startNextRound(lobbyId);
+        LetterDTO letterToSend = gameService.startNextRound(lobbyId);
         this.websocketService.sendMessageToClients(destination + lobbyId, letterToSend);
     }
 
     @MessageMapping("/lobbies/{lobbyId}/next-round")
     public void startNextRound(@DestinationVariable Long lobbyId) {
         log.info("Next round started for {lobby}");
-        LetterDTO letterToSend =gameService.startNextRound(lobbyId);
+        LetterDTO letterToSend = gameService.startNextRound(lobbyId);
         this.websocketService.sendMessageToClients(destination + lobbyId, letterToSend);
     }
 

@@ -93,16 +93,25 @@ public class GameService {
     }
 
     public void startGame(Long gameId) {
-        Game game=getGameByGameId(gameId);
+        Game game = getGameByGameId(gameId);
+        game.setCurrentRound(1L);
         game.setStatus(RUNNING);
     }
 
     public LetterDTO startNextRound(Long gameId){
-        Game game=getGameByGameId(gameId);
-        Character letter=game.getRoundLetter();
-        LetterDTO letterDTO=new LetterDTO();
+        Game game = getGameByGameId(gameId);
+        Character letter = game.getRoundLetter();
+        LetterDTO letterDTO = new LetterDTO();
         letterDTO.setLetter(letter);
+        // Check if the next round will be the last one
+        boolean isLastRound = checkIfNextRoundIsLast(game); // Implement this method
+        letterDTO.setIsLastRound(isLastRound);
         return letterDTO;
+    }
+
+    private boolean checkIfNextRoundIsLast(Game game) {
+        Long totalRounds = game.getRounds();
+        return game.getCurrentRound() == (totalRounds - 1);
     }
 
     /**
