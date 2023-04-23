@@ -32,7 +32,7 @@ public class Game implements Serializable {
     private RoundLength roundLength;
 
     @Column(nullable = false)
-    private Long rounds;
+    private Long roundAmount;
 
     @Column(nullable = false)
     private GameStatus status;
@@ -57,6 +57,11 @@ public class Game implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<User> users = new ArrayList<>();
+
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Round> rounds = new ArrayList<>();
+
+    // getters and setters
 
     public Long getGameId() {
         return gameId;
@@ -87,11 +92,11 @@ public class Game implements Serializable {
     }
 
     public Long getRounds() {
-        return rounds;
+        return roundAmount;
     }
 
-    public void setRounds(Long rounds) {
-        this.rounds = rounds;
+    public void setRounds(Long roundAmount) {
+        this.roundAmount = roundAmount;
     }
 
     public GameStatus getStatus() {
@@ -124,6 +129,17 @@ public class Game implements Serializable {
 
     public void addPlayer(User user) {
         this.users.add(user);
+    }
+
+
+    public void addRound(Round round) {
+        round.setGame(this);
+        rounds.add(round);
+    }
+
+    public void removeRound(Round round) {
+        round.setGame(null);
+        rounds.remove(round);
     }
 
 }
