@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static ch.uzh.ifi.hase.soprafs23.constant.RoundStatus.FINISHED;
+
 @Service
 @Transactional
 public class RoundService {
@@ -32,7 +34,8 @@ public class RoundService {
             Round newRound = new Round();
             newRound.setGame(game);
             newRound.setRoundNumber(roundCounter);
-            newRound.setStatus(RoundStatus.NOT_STARTED);
+            // TODO change setStatus back to NOT_STARTED
+            newRound.setStatus(FINISHED);
             newRound.setLetter(letter);
             newRound = roundRepository.save(newRound);
             roundCounter++;

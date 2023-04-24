@@ -134,12 +134,10 @@ public class Game implements Serializable {
     }
 
     public void addRound(Round round) {
-        round.setGame(this);
         rounds.add(round);
     }
 
     public void removeRound(Round round) {
-        round.setGame(null);
         rounds.remove(round);
     }
 
