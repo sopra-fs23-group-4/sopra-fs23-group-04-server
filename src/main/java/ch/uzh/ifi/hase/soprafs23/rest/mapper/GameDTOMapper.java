@@ -53,8 +53,3 @@ public interface GameDTOMapper {
         return mappedCategories;
     }
 }
-
-        //System.out.println("\n-----------------------------------------");
-        //System.out.println(ex);
-        //System.out.println(request);
-        //System.out.println("-----------------------------------------\n");
