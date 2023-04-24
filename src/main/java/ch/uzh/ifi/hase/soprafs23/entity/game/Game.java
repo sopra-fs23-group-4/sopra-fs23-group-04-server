@@ -61,8 +61,6 @@ public class Game implements Serializable {
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Round> rounds = new ArrayList<>();
 
-    // getters and setters
-
     public Long getGameId() {
         return gameId;
     }
