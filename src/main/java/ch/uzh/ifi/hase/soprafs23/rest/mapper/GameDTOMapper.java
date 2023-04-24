@@ -1,11 +1,9 @@
 package ch.uzh.ifi.hase.soprafs23.rest.mapper;
 
-import ch.uzh.ifi.hase.soprafs23.entity.User;
+import ch.uzh.ifi.hase.soprafs23.constant.RoundLength;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
-import ch.uzh.ifi.hase.soprafs23.repository.CategoryRepository;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GamePostDTO;
-import ch.uzh.ifi.hase.soprafs23.service.CategoryService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -19,12 +17,26 @@ import static ch.uzh.ifi.hase.soprafs23.service.CategoryService.categoryReposito
 @Mapper
 public interface GameDTOMapper {
 
+
+
+
     GameDTOMapper INSTANCE = Mappers.getMapper(GameDTOMapper.class);
 
     @Mapping(source = "rounds", target = "rounds")
-    @Mapping(source = "roundLength", target = "roundLength")
+    @Mapping(source = "roundLength", target = "roundLength", qualifiedByName = "mapRoundLength")
     @Mapping(source = "categories", target = "categories", qualifiedByName = "mapCategories")
     Game convertGamePostDTOtoEntity(GamePostDTO gamePostDTO);
+
+    // transoform the roundLength string to Enums
+    @Named("mapRoundLength")
+    default RoundLength mapRoundLength(String roundLength) {
+        return switch (roundLength) {
+            case "SHORT" -> RoundLength.SHORT;
+            case "MEDIUM" -> RoundLength.MEDIUM;
+            case "LONG" -> RoundLength.LONG;
+            default -> throw new IllegalArgumentException("Invalid round length value: " + roundLength);
+        };
+    }
 
     /** transform the category strings to category objects */
     @Named("mapCategories")
