@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.controller;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.WebsocketService;
 import ch.uzh.ifi.hase.soprafs23.webSockets.DTO.LetterDTO;
+import ch.uzh.ifi.hase.soprafs23.webSockets.DTO.WinnerDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -36,6 +37,19 @@ public class WebsocketController {
         log.info("Next round started for {lobby}");
         LetterDTO letterToSend = gameService.startNextRound(lobbyId);
         this.websocketService.sendMessageToClients(destination + lobbyId, letterToSend);
+    }
+
+    @MessageMapping("/lobbies/{lobbyId}/winner")
+    public void winnerAnnoucement(@DestinationVariable Long lobbyId){
+        log.info("Announcing Winner for {lobby$");
+
+        WinnerDTO winner = new WinnerDTO();
+        // TODO get winner
+        //winner.setUser(game.getWinner());
+        //winner.setScore(game.getWinnerScore());
+
+        this.websocketService.sendMessageToClients(destination + lobbyId + "/winner", winner);
+
     }
 
 }
