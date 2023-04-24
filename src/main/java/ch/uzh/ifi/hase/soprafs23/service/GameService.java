@@ -81,6 +81,21 @@ public class GameService {
         gameToJoin.addPlayer(user);
     }
 
+    public void leaveGame(int gamePin, String userToken) {
+
+        User user = getUserByToken(userToken);
+
+        checkIfUserExists(user);
+
+        Game gameToLeave = gameRepository.findByGamePin(gamePin);
+
+        checkIfGameExists(gameToLeave);
+
+        checkIfUserInGame(user, gameToLeave);
+
+        gameToLeave.removePlayer(user);
+    }
+
     public Game getGameByGameId(Long gameId) {
         Game game = gameRepository.findByGameId(gameId);
         String errorMessage = "Game does not exist!";
@@ -144,6 +159,17 @@ public class GameService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         String.format(errorMessage));
             }
+        }
+    }
+
+    private void checkIfUserInGame (User user, Game game) {
+        List<User> gameUsers = game.getUsers();
+
+        String errorMessage = "You are not part of this game or the game is already running.";
+
+        if (!gameUsers.contains(user)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    String.format(errorMessage));
         }
     }
 
