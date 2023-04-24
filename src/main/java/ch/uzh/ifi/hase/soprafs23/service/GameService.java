@@ -81,6 +81,21 @@ public class GameService {
         gameToJoin.addPlayer(user);
     }
 
+    public void leaveGame(int gamePin, String userToken) {
+
+        User user = getUserByToken(userToken);
+
+        checkIfUserExists(user);
+
+        Game gameToLeave = gameRepository.findByGamePin(gamePin);
+
+        checkIfGameExists(gameToLeave);
+
+        checkIfUserInGame(user, gameToLeave);
+
+        gameToLeave.removePlayer(user);
+    }
+
     public Game getGameByGameId(Long gameId) {
         Game game = gameRepository.findByGameId(gameId);
         String errorMessage = "Game does not exist!";

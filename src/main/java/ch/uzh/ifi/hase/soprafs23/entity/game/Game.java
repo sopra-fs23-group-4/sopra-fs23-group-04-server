@@ -61,8 +61,6 @@ public class Game implements Serializable {
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Round> rounds = new ArrayList<>();
 
-    // getters and setters
-
     public Long getGameId() {
         return gameId;
     }
@@ -131,6 +129,9 @@ public class Game implements Serializable {
         this.users.add(user);
     }
 
+    public void removePlayer(User user) {
+        this.users.remove(user);
+    }
 
     public void addRound(Round round) {
         round.setGame(this);
