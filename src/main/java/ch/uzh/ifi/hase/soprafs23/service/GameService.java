@@ -162,6 +162,17 @@ public class GameService {
         }
     }
 
+    private void checkIfUserInGame (User user, Game game) {
+        List<User> gameUsers = game.getUsers();
+
+        String errorMessage = "You are not part of this game or the game is already running.";
+
+        if (!gameUsers.contains(user)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    String.format(errorMessage));
+        }
+    }
+
     private void checkIfUserExists(User user) {
 
         String errorMessage = "User does not exist." +
