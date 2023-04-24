@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.controller.RoundController;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
@@ -25,12 +26,15 @@ public class GameService {
     private final Logger log = LoggerFactory.getLogger(UserService.class);
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
+    private final RoundController roundController;
 
     @Autowired
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository,
-                       @Qualifier("userRepository") UserRepository userRepository) {
+                       @Qualifier("userRepository") UserRepository userRepository,
+                       @Qualifier("roundController") RoundController roundController) {
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
+        this.roundController = roundController;
     }
 
     public int createGame(Game newGame, String userToken) {
@@ -49,6 +53,8 @@ public class GameService {
 
         newGame = gameRepository.save(newGame);
         gameRepository.flush();
+
+        roundController.createAllRounds(newGame);
 
         log.debug("Created following game: {}", newGame);
         return newGame.getGamePin();

@@ -1,5 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.constant;
 
 public enum RoundStatus {
-    RUNNING, FINISHED
+    NOT_STARTED, RUNNING, FINISHED
 }

@@ -34,6 +34,7 @@ public class GameController {
 
         return gameService.createGame(newGame, userToken);
     }
+
     @GetMapping("/game/categories")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
