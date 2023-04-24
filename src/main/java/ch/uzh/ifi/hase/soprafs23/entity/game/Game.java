@@ -131,6 +131,9 @@ public class Game implements Serializable {
         this.users.add(user);
     }
 
+    public void removePlayer(User user) {
+        this.users.remove(user);
+    }
 
     public void addRound(Round round) {
         round.setGame(this);

@@ -78,4 +78,12 @@ public class GameController {
         gameService.joinGame(gamePin, userToken);
 
     }
+
+    @PutMapping("/games/lobbies/{gamePin}/leave")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void leaveGame(@PathVariable("gamePin") int gamePin, @RequestHeader("Authorization") String userToken) {
+
+        gameService.leaveGame(gamePin, userToken);
+
+    }
 }
