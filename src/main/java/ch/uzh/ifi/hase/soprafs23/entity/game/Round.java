@@ -28,10 +28,7 @@ public class Round implements Serializable {
     private RoundStatus status;
 
     @Column(nullable = false)
-    private Long categoryId;
-
-    @Column(nullable = false)
-    private char letter;
+    private Character letter;
 
     public Long getRoundId() {
         return roundId;
@@ -61,19 +58,11 @@ public class Round implements Serializable {
         this.status = status;
     }
 
-    public Long getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public char getLetter() {
+    public Character getLetter() {
         return letter;
     }
 
-    public void setLetter(char letter) {
+    public void setLetter(Character letter) {
         this.letter = letter;
     }
 
