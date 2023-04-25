@@ -1,10 +1,9 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.constant.ScorePoint;
 import ch.uzh.ifi.hase.soprafs23.constant.VoteOption;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Answer;
-import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
-import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Vote;
 import ch.uzh.ifi.hase.soprafs23.repository.AnswerRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
@@ -21,9 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.OPEN;
-import static ch.uzh.ifi.hase.soprafs23.constant.RoundStatus.FINISHED;
-
 @Service
 @Transactional
 public class VoteService {
@@ -33,16 +29,19 @@ public class VoteService {
     private final GameRepository gameRepository;
     private final AnswerRepository answerRepository;
     private final VoteRepository voteRepository;
+    private final AnswerService answerService;
 
     @Autowired
     public VoteService(@Qualifier("userRepository") UserRepository userRepository,
                        @Qualifier("gameRepository") GameRepository gameRepository,
                        @Qualifier("answerRepository") AnswerRepository answerRepository,
-                       @Qualifier("voteRepository") VoteRepository voteRepository) {
+                       @Qualifier("voteRepository") VoteRepository voteRepository,
+                       @Qualifier("answerService") AnswerService answerService) {
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.answerRepository = answerRepository;
         this.voteRepository = voteRepository;
+        this.answerService = answerService;
     }
 
     public void saveVote(int gamePin, Long answerId, String userToken, List<String> votingStrings) {
@@ -59,10 +58,15 @@ public class VoteService {
             Vote newVote = new Vote();
             newVote.setAnswer(answer);
             newVote.setUser(user);
-            newVote = setVoteOption(newVote, votingString);
-            newVote = voteRepository.save(newVote);
+            setVoteOption(newVote, votingString);
+            voteRepository.save(newVote);
         }
         voteRepository.flush();
+
+        // Calculate the score points for the answer after votes have been saved
+        ScorePoint scorePoint = answerService.calculateScorePoint(answer);
+        answer.setScorepoint(scorePoint);
+        answerRepository.flush();
     }
 
     private void checkIfUserExists(User user) {
@@ -85,7 +89,7 @@ public class VoteService {
         }
     }
 
-    private Vote setVoteOption(Vote newVote, String vote) {
+    private void setVoteOption(Vote newVote, String vote) {
         String errorMessage = "At least one of the votes is invalid!";
 
         try {
@@ -94,8 +98,6 @@ public class VoteService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format(errorMessage));
         }
-
-        return newVote;
     }
 
     private void checkIfVotingExists(User user, Answer answer) {

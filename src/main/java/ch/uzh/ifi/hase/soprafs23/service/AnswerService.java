@@ -1,14 +1,13 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.constant.ScorePoint;
+import ch.uzh.ifi.hase.soprafs23.constant.VoteOption;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Answer;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Vote;
-import ch.uzh.ifi.hase.soprafs23.repository.AnswerRepository;
-import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
-import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
-import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs23.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,16 +32,19 @@ public class AnswerService {
     private final UserRepository userRepository;
     private final RoundRepository roundRepository;
     private final AnswerRepository answerRepository;
+    private final VoteRepository voteRepository;
 
     @Autowired
     public AnswerService(@Qualifier("gameRepository") GameRepository gameRepository,
                          @Qualifier("userRepository") UserRepository userRepository,
                          @Qualifier("roundRepository") RoundRepository roundRepository,
-                         @Qualifier("answerRepository") AnswerRepository answerRepository) {
+                         @Qualifier("answerRepository") AnswerRepository answerRepository,
+                         @Qualifier("voteRepository") VoteRepository voteRepository) {
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.roundRepository = roundRepository;
         this.answerRepository = answerRepository;
+        this.voteRepository = voteRepository;
     }
 
     public void saveAnswers(int gamePin, String userToken, Long roundNumber, Map<String, String> answers) {
@@ -64,9 +66,34 @@ public class AnswerService {
             newAnswer.setRound(round);
             newAnswer.setUser(user);
             newAnswer.setAnswer(answer);
+            newAnswer.setAnswerCategory(categoryName);
             newAnswer = answerRepository.save(newAnswer);
         }
         answerRepository.flush();
+    }
+
+    public ScorePoint calculateScorePoint(Answer answer) {
+        List<Vote> votes = voteRepository.findByAnswer(answer);
+        int correctUniqueVotes = 0;
+        int correctNotUniqueVotes = 0;
+        int incorrectVotes = 0;
+
+        for (Vote vote : votes) {
+            VoteOption votedOption = vote.getVotedOption();
+            switch (votedOption) {
+                case CORRECT_UNIQUE -> correctUniqueVotes++;
+                case CORRECT_NOT_UNIQUE -> correctNotUniqueVotes++;
+                case INCORRECT -> incorrectVotes++;
+            }
+        }
+
+        int correctVotes = correctUniqueVotes + correctNotUniqueVotes;
+
+        if (correctVotes > incorrectVotes) {
+            return (correctNotUniqueVotes > 0) ? ScorePoint.CORRECT_NOT_UNIQUE : ScorePoint.CORRECT_UNIQUE;
+        } else {
+            return ScorePoint.INCORRECT;
+        }
     }
 
     private void checkIfGameExistsAndIsOpen(Game game) {

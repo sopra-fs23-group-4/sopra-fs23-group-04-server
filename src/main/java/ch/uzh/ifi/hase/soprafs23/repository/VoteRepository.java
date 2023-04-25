@@ -13,4 +13,6 @@ import java.util.List;
 @Repository("voteRepository")
 public interface VoteRepository extends JpaRepository<Vote, Integer> {
     List<Vote> findByUserAndAnswer(User user, Answer answer);
+
+    List<Vote> findByAnswer(Answer answer);
 }

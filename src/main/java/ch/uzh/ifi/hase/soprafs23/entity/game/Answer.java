@@ -1,6 +1,8 @@
 package ch.uzh.ifi.hase.soprafs23.entity.game;
 
+import ch.uzh.ifi.hase.soprafs23.constant.GameCategory;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
+import ch.uzh.ifi.hase.soprafs23.constant.ScorePoint;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 
 import javax.persistence.*;
@@ -22,7 +24,13 @@ public class Answer {
     private User user;
 
     @Column(nullable = false)
+    private String answerCategory;
+
+    @Column(nullable = false)
     private String answer;
+
+    @Column
+    private ScorePoint scorepoint;
 
     public Long getAnswerId() {
         return id;
@@ -43,6 +51,9 @@ public class Answer {
     public void setUser(User user) {
         this.user = user;
     }
+    public String getAnswerCategory() { return answerCategory; }
+
+    public void setAnswerCategory(String answerCategory) { this.answerCategory = answerCategory; }
 
     public String getAnswer() {
         return answer;
@@ -51,4 +62,8 @@ public class Answer {
     public void setAnswer(String answer) {
         this.answer = answer;
     }
+
+    public ScorePoint getScorepoint() { return scorepoint; }
+
+    public void setScorepoint(ScorePoint scorepoint) { this.scorepoint = scorepoint; }
 }
