@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.constant;
 
 
+import ch.uzh.ifi.hase.soprafs23.constant.extractJson.ExtractJsonElementConvertor;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
