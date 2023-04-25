@@ -22,7 +22,7 @@ public class UserRepositoryIntegrationTest {
   private UserRepository userRepository;
 
   @Test
-  public void findByName_success() {
+  public void findByUsername_success() {
     // given
     User user = new User();
 
@@ -45,4 +45,5 @@ public class UserRepositoryIntegrationTest {
     assertEquals(found.getToken(), user.getToken());
     assertEquals(found.getStatus(), user.getStatus());
   }
+
 }
