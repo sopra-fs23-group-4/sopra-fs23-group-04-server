@@ -23,7 +23,7 @@
 | Person                | Last Week  | Next Week          | Description |
 |-----------------------|------------|--------------------|-------------|
 | Alexandre Bacmann     | #123, #124 |                    |             |
-| Valentin Meyer        | #114, #118 |                    |             |
+| Valentin Meyer        | #114, #118 |                    |added the answer and voting functionality |
 | Christopher Narayanan | #119, #120 |                    |             |
 | Lennart Töllke        | #18, #19   | #19, #21, #26, #27 |             |
 | Remo Wiget            | #20, #23   | #22, #24           |             |
