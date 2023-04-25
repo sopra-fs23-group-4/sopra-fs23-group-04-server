@@ -11,6 +11,9 @@ import ch.uzh.ifi.hase.soprafs23.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.GameDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -20,9 +23,11 @@ import java.util.List;
 public class GameController {
 
     private final GameService gameService;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    GameController(GameService gameService) {
+    GameController(GameService gameService, SimpMessagingTemplate messagingTemplate) {
         this.gameService = gameService;
+        this.messagingTemplate=messagingTemplate;
     }
 
     @PostMapping("/games/lobbies/creation")
@@ -42,6 +47,10 @@ public class GameController {
         GameCategoriesDTO gameCategoriesDTO=new GameCategoriesDTO();
         gameCategoriesDTO.setCategories(GameCategory.getCategories());
         return gameCategoriesDTO;
+    }
+    @MessageMapping("/game.start/{lobbyId}")
+    public void gameStart(@DestinationVariable String lobbyId) {
+        messagingTemplate.convertAndSend("/topic/game-start/" + lobbyId, "Game has started!");
     }
 
     @GetMapping("/game/{gameId}/categories")
