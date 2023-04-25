@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Answer;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
+import ch.uzh.ifi.hase.soprafs23.entity.game.Vote;
 import ch.uzh.ifi.hase.soprafs23.repository.AnswerRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Map;
 
 import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.OPEN;
@@ -52,6 +54,8 @@ public class AnswerService {
 
         Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
         checkIfRoundExistsAndIsFinished(round);
+
+        checkIfAnswerExists(round, user);
 
         for (Map.Entry<String, String> entry : answers.entrySet()) {
             String categoryName = entry.getKey();
@@ -90,6 +94,18 @@ public class AnswerService {
         String errorMessage = "Round does not exist or is not finished yet.";
 
         if (round == null || !round.getStatus().equals(FINISHED)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    String.format(errorMessage));
+        }
+    }
+
+    private void checkIfAnswerExists(Round round, User user) {
+
+        List<Answer> answers = answerRepository.findByRoundAndUser(round, user);
+
+        String errorMessage = "These Answers have already been saved.";
+
+        if (answers.size() > 0) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format(errorMessage));
         }
