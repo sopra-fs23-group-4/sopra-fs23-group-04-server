@@ -2,7 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.controller.RoundController;
-import ch.uzh.ifi.hase.soprafs23.websocket.DTO.UserJoinDTO;
+import ch.uzh.ifi.hase.soprafs23.repository.UserGameRepository;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
@@ -10,6 +10,7 @@ import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.LetterDTO;
+import ch.uzh.ifi.hase.soprafs23.websocket.DTO.GameUsersDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,16 +34,19 @@ public class GameService {
     private final UserRepository userRepository;
     private final RoundController roundController;
     private final RoundRepository roundRepository;
+    private final UserGameRepository userGameRepository;
 
     @Autowired
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository,
                        @Qualifier("userRepository") UserRepository userRepository,
                        @Qualifier("roundController") RoundController roundController,
-                       @Qualifier("roundRepository") RoundRepository roundRepository) {
+                       @Qualifier("roundRepository") RoundRepository roundRepository,
+                       @Qualifier("userGameRepository") UserGameRepository userGameRepository) {
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.roundController = roundController;
         this.roundRepository=roundRepository;
+        this.userGameRepository = userGameRepository;
     }
 
     public int createGame(Game newGame, String userToken) {
@@ -81,7 +85,7 @@ public class GameService {
         return letters.subList(0, numberOfRounds.intValue());
     }
 
-    public void joinGame(int gamePin, String userToken) {
+    public GameUsersDTO joinGame(int gamePin, String userToken) {
 
         User user = getUserByToken(userToken);
 
@@ -94,21 +98,36 @@ public class GameService {
         checkIfGameExists(gameToJoin);
 
         gameToJoin.addPlayer(user);
+
+        return getAllUserNamesOfGame(gameToJoin);
     }
 
-    public void leaveGame(int gamePin, String userToken) {
+    public GameUsersDTO leaveGame(int gamePin, String userToken) {
 
         User user = getUserByToken(userToken);
 
         checkIfUserExists(user);
 
-        Game gameToLeave = gameRepository.findByGamePin(gamePin);
+        Game game = gameRepository.findByGamePin(gamePin);
 
-        checkIfGameExists(gameToLeave);
+        checkIfGameExists(game);
 
-        checkIfUserInGame(user, gameToLeave);
+        checkIfUserInGame(user, game);
 
-        gameToLeave.removePlayer(user);
+        Boolean userIsHost = checkIfUserIsHost(user, game);
+
+        game.removePlayer(user);
+
+        Boolean gameHasUsers = checkIfGameHasUsers(game);
+
+        if (userIsHost && gameHasUsers) {
+            setNewHost(game);
+        } else if (!gameHasUsers) {
+            deleteGameAndRounds(game);
+            return new GameUsersDTO();
+        }
+
+        return getAllUserNamesOfGame(game);
     }
 
     public Game getGameByGameId(Long gameId) {
@@ -119,13 +138,6 @@ public class GameService {
                     String.format(errorMessage));
         }
         return game;
-    }
-
-    public UserJoinDTO getUserJoinDTO(String userToken){
-        User found=userRepository.findByToken(userToken);
-        UserJoinDTO userJoinDTO=new UserJoinDTO();
-        userJoinDTO.setName(found.getUsername());
-        return userJoinDTO;
     }
 
     public LetterDTO startGame(int gamePin){
@@ -202,17 +214,6 @@ public class GameService {
         }
     }
 
-    private void checkIfUserInGame (User user, Game game) {
-        List<User> gameUsers = game.getUsers();
-
-        String errorMessage = "You are not part of this game or the game is already running.";
-
-        if (!gameUsers.contains(user)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
-    }
-
     private void checkIfUserExists(User user) {
 
         String errorMessage = "User does not exist." +
@@ -223,6 +224,45 @@ public class GameService {
         }
     }
 
+    private void checkIfUserInGame(User user, Game game) {
+        List<User> gameUsers = game.getUsers();
+
+        String errorMessage = "You are not part of this game or the game is already running.";
+
+        if (!gameUsers.contains(user)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    String.format(errorMessage));
+        }
+    }
+
+    private Boolean checkIfUserIsHost(User user, Game game) {
+        Long hostId = game.getHostId();
+
+        String errorMessage = "You are not part of this game or the game is already running.";
+
+        return hostId.equals(user.getId());
+    }
+
+    private Boolean checkIfGameHasUsers(Game game) {
+        List<User> users = game.getUsers();
+        return users.size() > 0;
+    }
+
+    private void deleteGameAndRounds(Game game) {
+        List<Round> rounds = roundRepository.findByGame(game);
+        for (Round round : rounds) {
+            roundRepository.delete(round);
+        }
+        gameRepository.delete(game);
+    }
+
+    private void setNewHost(Game game) {
+        List<User> users = game.getUsers();
+        Random rand = new Random();
+        User hostCandidate = users.get(rand.nextInt(users.size()));
+        game.setHostId(hostCandidate.getId());
+    }
+
     private void checkIfGameExists(Game game) {
 
         String errorMessage = "Game does not exist or is not open anymore." +
@@ -231,6 +271,21 @@ public class GameService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format(errorMessage));
         }
+    }
+
+    private GameUsersDTO getAllUserNamesOfGame(Game gameToJoin) {
+        User host = userRepository.findById(gameToJoin.getHostId()).orElse(null);
+        List<User> users = userGameRepository.findUsersByGame(gameToJoin);
+        List<String> usernames = new ArrayList<>();
+        for (User user : users) {
+            if (user.equals(host)) {
+                usernames.add(user.getUsername());
+            }
+        }
+        GameUsersDTO gameUsersDTO = new GameUsersDTO();
+        gameUsersDTO.setHostUsername(host.getUsername());
+        gameUsersDTO.setUsernames(usernames);
+        return gameUsersDTO;
     }
 
     private User getUserByToken(String userToken) {
