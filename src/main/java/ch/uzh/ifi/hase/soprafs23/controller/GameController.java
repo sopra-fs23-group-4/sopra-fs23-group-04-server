@@ -10,8 +10,8 @@ import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.GameDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
+import ch.uzh.ifi.hase.soprafs23.websocket.DTO.GameUsersDTO;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.LetterDTO;
-import ch.uzh.ifi.hase.soprafs23.websocket.DTO.UserJoinDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -87,24 +87,29 @@ public class GameController {
 
     @PutMapping("/games/lobbies/{gamePin}/join")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void joinGame(@PathVariable("gamePin") int gamePin, @RequestHeader("Authorization") String userToken) {
+    public void joinGame(@PathVariable("gamePin") int gamePin,
+                         @RequestHeader("Authorization") String userToken) {
 
-        gameService.joinGame(gamePin, userToken);
-        UserJoinDTO userJoinDTO= gameService.getUserJoinDTO(userToken);
-        messagingTemplate.convertAndSend("/topic/lobbies/" + gamePin, userJoinDTO);
+        GameUsersDTO gameUsersDTO = gameService.joinGame(gamePin, userToken);
+
+        messagingTemplate.convertAndSend("/topic/lobbies/" + gamePin, gameUsersDTO);
     }
 
     @SendTo("/topic/lobbies/{gamePin}")
-    public Object sendMsg(@Payload Object objectDTO,@DestinationVariable String gamePin) {
+    public Object sendMsg(@Payload Object objectDTO,
+                          @DestinationVariable String gamePin) {
         return objectDTO;
     }
 
 
     @PutMapping("/games/lobbies/{gamePin}/leave")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void leaveGame(@PathVariable("gamePin") int gamePin, @RequestHeader("Authorization") String userToken) {
+    public void leaveGame(@PathVariable("gamePin") int gamePin,
+                          @RequestHeader("Authorization") String userToken) {
 
-        gameService.leaveGame(gamePin, userToken);
+        GameUsersDTO gameUsersDTO = gameService.leaveGame(gamePin, userToken);
+
+        messagingTemplate.convertAndSend("/topic/lobbies/" + gamePin, gameUsersDTO);
 
     }
 }
