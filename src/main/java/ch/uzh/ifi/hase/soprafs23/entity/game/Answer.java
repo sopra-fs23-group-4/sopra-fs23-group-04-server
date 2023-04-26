@@ -30,7 +30,7 @@ public class Answer {
     private String answer;
 
     @Column
-    private ScorePoint scorepoint;
+    private ScorePoint scorePoint;
 
     public Long getAnswerId() {
         return id;
@@ -63,7 +63,7 @@ public class Answer {
         this.answer = answer;
     }
 
-    public ScorePoint getScorepoint() { return scorepoint; }
+    public ScorePoint getScorePoint() { return scorePoint; }
 
-    public void setScorepoint(ScorePoint scorepoint) { this.scorepoint = scorepoint; }
+    public void setScorePoint(ScorePoint scorePoint) { this.scorePoint = scorePoint; }
 }

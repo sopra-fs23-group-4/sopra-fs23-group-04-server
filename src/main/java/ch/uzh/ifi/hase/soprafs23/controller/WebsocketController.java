@@ -1,8 +1,10 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
+import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.WebsocketService;
 import ch.uzh.ifi.hase.soprafs23.webSockets.DTO.LetterDTO;
+import ch.uzh.ifi.hase.soprafs23.webSockets.DTO.ScoreboardEntryDTO;
 import ch.uzh.ifi.hase.soprafs23.webSockets.DTO.WinnerDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +13,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 public class WebsocketController {
@@ -40,16 +44,29 @@ public class WebsocketController {
     }
 
     @MessageMapping("/lobbies/{lobbyId}/winner")
-    public void winnerAnnoucement(@DestinationVariable Long lobbyId){
+    public void winnerAnnoucement(@DestinationVariable Long lobbyId) {
         log.info("Announcing Winner for {lobby$");
 
-        WinnerDTO winner = new WinnerDTO();
-        // TODO get winner
-        //winner.setUser(game.getWinner());
-        //winner.setScore(game.getWinnerScore());
+        Map.Entry<List<User>, Integer> winnerEntry = websocketService.getWinner(lobbyId);
+        List<User> winners = winnerEntry.getKey();
+        Long maxScore = winnerEntry.getValue().longValue();
 
-        this.websocketService.sendMessageToClients(destination + lobbyId + "/winner", winner);
+        for (User winnerUser : winners) {
+            WinnerDTO winner = new WinnerDTO();
+            winner.setUser(winnerUser);
+            winner.setScore(maxScore);
 
+            this.websocketService.sendMessageToClients(destination + lobbyId + "/winner", winner);
+        }
+    }
+
+    @MessageMapping("/lobbies/{lobbyId}/scoreboard")
+    public void getScoreboard(@DestinationVariable Long lobbyId) {
+        log.info("Getting scoreboard for lobby {}", lobbyId);
+
+        List<ScoreboardEntryDTO> scoreboard = websocketService.getScoreboard(lobbyId);
+
+        this.websocketService.sendMessageToClients(destination + lobbyId + "/scoreboard", scoreboard);
     }
 
 }

@@ -65,7 +65,7 @@ public class VoteService {
 
         // Calculate the score points for the answer after votes have been saved
         ScorePoint scorePoint = answerService.calculateScorePoint(answer);
-        answer.setScorepoint(scorePoint);
+        answer.setScorePoint(scorePoint);
         answerRepository.flush();
     }
 
