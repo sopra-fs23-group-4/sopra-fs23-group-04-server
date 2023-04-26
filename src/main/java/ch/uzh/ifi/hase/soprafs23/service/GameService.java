@@ -1,11 +1,15 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.controller.RoundController;
-import ch.uzh.ifi.hase.soprafs23.controller.UserJoinDTO;
+import ch.uzh.ifi.hase.soprafs23.websocket.DTO.UserJoinDTO;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
+import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
+import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs23.websocket.DTO.LetterDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,14 +32,17 @@ public class GameService {
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
     private final RoundController roundController;
+    private final RoundRepository roundRepository;
 
     @Autowired
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository,
                        @Qualifier("userRepository") UserRepository userRepository,
-                       @Qualifier("roundController") RoundController roundController) {
+                       @Qualifier("roundController") RoundController roundController,
+                       @Qualifier("roundRepository") RoundRepository roundRepository) {
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.roundController = roundController;
+        this.roundRepository=roundRepository;
     }
 
     public int createGame(Game newGame, String userToken) {
@@ -51,6 +58,7 @@ public class GameService {
         newGame.setHostId(user.getId());
         newGame.addPlayer(user);
         newGame.setRoundLetters(generateRandomLetters(newGame.getRounds()));
+        newGame.setCurrentRound(1);
 
         newGame = gameRepository.save(newGame);
         gameRepository.flush();
@@ -118,6 +126,24 @@ public class GameService {
         UserJoinDTO userJoinDTO=new UserJoinDTO();
         userJoinDTO.setName(found.getUsername());
         return userJoinDTO;
+    }
+
+    public LetterDTO startGame(int gamePin){
+        Game game=gameRepository.findByGamePin(gamePin);
+        game.setStatus(RUNNING);
+        return nextRound(gamePin);
+
+    }
+
+    public LetterDTO nextRound(int gamePin){
+        Game game=gameRepository.findByGamePin(gamePin);
+        Round round=roundRepository.findByGameAndRoundNumber(game,game.getCurrentRound());
+        round.setStatus(RoundStatus.RUNNING);
+        LetterDTO letterDTO=new LetterDTO();
+        letterDTO.setLetter(round.getLetter());
+        letterDTO.setRound(round.getRoundNumber());
+        game.setCurrentRound(1+game.getCurrentRound());
+        return letterDTO;
     }
 
     /**

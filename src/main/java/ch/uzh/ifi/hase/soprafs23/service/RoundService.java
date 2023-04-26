@@ -28,7 +28,7 @@ public class RoundService {
     }
 
     public void createAllRounds(Game game) {
-        Long roundCounter = 1L;
+        int roundCounter = 1;
         List<Character> letters = game.getRoundLetters();
         for (Character letter : letters) {
             Round newRound = new Round();

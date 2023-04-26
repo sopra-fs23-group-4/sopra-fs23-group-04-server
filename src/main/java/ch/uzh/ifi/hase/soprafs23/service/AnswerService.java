@@ -45,7 +45,7 @@ public class AnswerService {
         this.answerRepository = answerRepository;
     }
 
-    public void saveAnswers(int gamePin, String userToken, Long roundNumber, Map<String, String> answers) {
+    public void saveAnswers(int gamePin, String userToken, int roundNumber, Map<String, String> answers) {
         Game game = gameRepository.findByGamePin(gamePin);
         checkIfGameExistsAndIsOpen(game);
 

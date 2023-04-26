@@ -10,9 +10,10 @@ import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.GameDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
+import ch.uzh.ifi.hase.soprafs23.websocket.DTO.LetterDTO;
+import ch.uzh.ifi.hase.soprafs23.websocket.DTO.UserJoinDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -50,9 +51,10 @@ public class GameController {
         gameCategoriesDTO.setCategories(GameCategory.getCategories());
         return gameCategoriesDTO;
     }
-    @MessageMapping("/game.start/{lobbyId}")
-    public void gameStart(@DestinationVariable String lobbyId) {
-        messagingTemplate.convertAndSend("/topic/game-start/" + lobbyId, "Game has started!");
+    @PostMapping("/game/{gamePin}/start-game")
+    public void gameStart(@PathVariable("gamePin") int gamePin) {
+        LetterDTO letterDTO= gameService.startGame(gamePin);
+        messagingTemplate.convertAndSend("/topic/lobbies/" +gamePin, letterDTO);
     }
 
     @GetMapping("/game/{gameId}/categories")
@@ -93,10 +95,10 @@ public class GameController {
     }
 
     @SendTo("/topic/lobbies/{gamePin}")
-    public UserJoinDTO notifyUsers(@Payload UserJoinDTO userJoinDTO,@DestinationVariable String gamePin) {
-        System.out.println(userJoinDTO.getName());
-        return userJoinDTO;
+    public Object sendMsg(@Payload Object objectDTO,@DestinationVariable String gamePin) {
+        return objectDTO;
     }
+
 
     @PutMapping("/games/lobbies/{gamePin}/leave")
     @ResponseStatus(HttpStatus.NO_CONTENT)

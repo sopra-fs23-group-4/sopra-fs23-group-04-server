@@ -19,7 +19,7 @@ public class AnswerController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public void saveAnswers(@PathVariable("gamePin") int gamePin,
-                            @PathVariable("roundNumber") Long roundNumber,
+                            @PathVariable("roundNumber") int roundNumber,
                             @RequestHeader("Authorization") String userToken,
                             @RequestBody Map<String, String> answers) {
 
