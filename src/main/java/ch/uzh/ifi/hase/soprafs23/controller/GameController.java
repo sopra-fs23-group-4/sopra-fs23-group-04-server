@@ -13,6 +13,8 @@ import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -86,7 +88,14 @@ public class GameController {
     public void joinGame(@PathVariable("gamePin") int gamePin, @RequestHeader("Authorization") String userToken) {
 
         gameService.joinGame(gamePin, userToken);
+        UserJoinDTO userJoinDTO= gameService.getUserJoinDTO(userToken);
+        messagingTemplate.convertAndSend("/topic/lobbies/" + gamePin, userJoinDTO);
+    }
 
+    @SendTo("/topic/lobbies/{gamePin}")
+    public UserJoinDTO notifyUsers(@Payload UserJoinDTO userJoinDTO,@DestinationVariable String gamePin) {
+        System.out.println(userJoinDTO.getName());
+        return userJoinDTO;
     }
 
     @PutMapping("/games/lobbies/{gamePin}/leave")

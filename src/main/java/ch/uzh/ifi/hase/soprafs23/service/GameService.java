@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.controller.RoundController;
+import ch.uzh.ifi.hase.soprafs23.controller.UserJoinDTO;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
@@ -110,6 +111,13 @@ public class GameService {
                     String.format(errorMessage));
         }
         return game;
+    }
+
+    public UserJoinDTO getUserJoinDTO(String userToken){
+        User found=userRepository.findByToken(userToken);
+        UserJoinDTO userJoinDTO=new UserJoinDTO();
+        userJoinDTO.setName(found.getUsername());
+        return userJoinDTO;
     }
 
     /**
