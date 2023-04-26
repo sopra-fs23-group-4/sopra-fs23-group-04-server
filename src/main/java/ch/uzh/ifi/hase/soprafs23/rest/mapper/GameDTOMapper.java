@@ -40,7 +40,7 @@ public interface GameDTOMapper {
     default List<Category> mapCategories(List<String> categoryNames) {
         List<Category> mappedCategories = new ArrayList<>();
         for (String categoryName : categoryNames) {
-            Category mappedCategory = categoryRepository.findByName(categoryName).orElse(null);
+            Category mappedCategory = categoryRepository.findByName(categoryName);
             if (mappedCategory == null) {
                 mappedCategory = new Category();
                 mappedCategory.setName(categoryName);
