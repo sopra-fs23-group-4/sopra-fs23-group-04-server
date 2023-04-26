@@ -122,6 +122,9 @@ public class GameService {
 
         if (userIsHost && gameHasUsers) {
             setNewHost(game);
+        } else if (!gameHasUsers) {
+            deleteGameAndRounds(game);
+            return new GameUsersDTO();
         }
 
         return getAllUserNamesOfGame(game);
@@ -243,6 +246,14 @@ public class GameService {
     private Boolean checkIfGameHasUsers(Game game) {
         List<User> users = game.getUsers();
         return users.size() > 0;
+    }
+
+    private void deleteGameAndRounds(Game game) {
+        List<Round> rounds = roundRepository.findByGame(game);
+        for (Round round : rounds) {
+            roundRepository.delete(round);
+        }
+        gameRepository.delete(game);
     }
 
     private void setNewHost(Game game) {
