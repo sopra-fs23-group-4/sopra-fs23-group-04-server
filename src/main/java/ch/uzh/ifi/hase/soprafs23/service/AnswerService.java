@@ -1,14 +1,8 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
-import ch.uzh.ifi.hase.soprafs23.entity.game.Answer;
-import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
-import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
-import ch.uzh.ifi.hase.soprafs23.entity.game.Vote;
-import ch.uzh.ifi.hase.soprafs23.repository.AnswerRepository;
-import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
-import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
-import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs23.entity.game.*;
+import ch.uzh.ifi.hase.soprafs23.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.OPEN;
 import static ch.uzh.ifi.hase.soprafs23.constant.RoundStatus.FINISHED;
@@ -33,16 +26,19 @@ public class AnswerService {
     private final UserRepository userRepository;
     private final RoundRepository roundRepository;
     private final AnswerRepository answerRepository;
+    private final CategoryRepository categoryRepository;
 
     @Autowired
     public AnswerService(@Qualifier("gameRepository") GameRepository gameRepository,
                          @Qualifier("userRepository") UserRepository userRepository,
                          @Qualifier("roundRepository") RoundRepository roundRepository,
-                         @Qualifier("answerRepository") AnswerRepository answerRepository) {
+                         @Qualifier("answerRepository") AnswerRepository answerRepository,
+                         @Qualifier("categoryRepository") CategoryRepository categoryRepository) {
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.roundRepository = roundRepository;
         this.answerRepository = answerRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     public void saveAnswers(int gamePin, String userToken, Long roundNumber, Map<String, String> answers) {
@@ -55,19 +51,31 @@ public class AnswerService {
         Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
         checkIfRoundExistsAndIsFinished(round);
 
-        checkIfAnswerExists(round, user);
+        checkIfAnswersAlreadyExist(round, user);
 
-        for (Map.Entry<String, String> entry : answers.entrySet()) {
-            String categoryName = entry.getKey();
-            String answer = entry.getValue();
-            Answer newAnswer = new Answer();
-            newAnswer.setRound(round);
-            newAnswer.setUser(user);
-            newAnswer.setAnswer(answer);
-            newAnswer = answerRepository.save(newAnswer);
-        }
-        answerRepository.flush();
+        saveAnswersToDatabase(answers, user, round);
     }
+
+    public List<Map<Long, String>> getAnswers(int gamePin, Long roundNumber, String categoryName, String userToken) {
+        Game game = gameRepository.findByGamePin(gamePin);
+        checkIfGameExistsAndIsOpen(game);
+
+        User user = userRepository.findByToken(userToken);
+        checkIfUserExists(user);
+
+        Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
+        checkIfRoundExistsAndIsFinished(round);
+
+        Category category = getCategoryIfItExists(categoryName);
+
+        List<Answer> answers = answerRepository.findByRound(round);
+
+        return filterAnswersByDeletingUser(answers, user, category);
+    }
+
+    /**
+     * Helper methods to aid with the answer saving, creation and retrieval
+     */
 
     private void checkIfGameExistsAndIsOpen(Game game) {
 
@@ -84,7 +92,7 @@ public class AnswerService {
         String errorMessage = "User does not exist." +
                 "Please register before playing!";
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     String.format(errorMessage));
         }
     }
@@ -99,15 +107,57 @@ public class AnswerService {
         }
     }
 
-    private void checkIfAnswerExists(Round round, User user) {
+    private void checkIfAnswersAlreadyExist(Round round, User user) {
 
         List<Answer> answers = answerRepository.findByRoundAndUser(round, user);
 
         String errorMessage = "These Answers have already been saved.";
 
         if (answers.size() > 0) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     String.format(errorMessage));
         }
+    }
+
+    private Category getCategoryIfItExists(String categoryName) {
+
+        Category category = categoryRepository.findByName(categoryName);
+
+        String errorMessage = "There exists no such category.";
+
+        if (category == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    String.format(errorMessage));
+        }
+        return category;
+    }
+
+    private void saveAnswersToDatabase(Map<String, String> answers, User user, Round round) {
+        for (Map.Entry<String, String> entry : answers.entrySet()) {
+            String categoryName = entry.getKey();
+            Category category = getCategoryIfItExists(categoryName);
+            String answer = entry.getValue();
+            Answer newAnswer = new Answer();
+            newAnswer.setRound(round);
+            newAnswer.setUser(user);
+            newAnswer.setAnswer(answer);
+            newAnswer.setCategory(category);
+            newAnswer = answerRepository.save(newAnswer);
+        }
+        answerRepository.flush();
+    }
+
+    private List<Map<Long, String>> filterAnswersByDeletingUser(List<Answer> answers, User user, Category category) {
+
+        List<Map<Long, String>> filteredAnswers = new ArrayList<>();
+
+        for (Answer answer : answers) {
+            if (!answer.getUser().equals(user) && answer.getCategory() == category) {
+                Map<Long, String> answerTuple = new HashMap<>();
+                answerTuple.put(answer.getAnswerId(), answer.getAnswer());
+                filteredAnswers.add(answerTuple);
+            }
+        }
+        return filteredAnswers;
     }
 }
