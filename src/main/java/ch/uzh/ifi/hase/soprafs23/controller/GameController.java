@@ -16,6 +16,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -48,6 +49,7 @@ public class GameController {
         gameCategoriesDTO.setCategories(GameCategory.getCategories());
         return gameCategoriesDTO;
     }
+
     @PostMapping("/game/{gamePin}/start-game")
     public void gameStart(@PathVariable("gamePin") int gamePin) {
         LetterDTO letterDTO= gameService.startGame(gamePin);
@@ -86,13 +88,6 @@ public class GameController {
 
         GameUsersDTO gameUsersDTO = gameService.joinGame(gamePin, userToken);
 
-        try {
-            Thread.sleep(1000);
-        }
-        catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
         messagingTemplate.convertAndSend("/topic/lobbies/" + gamePin, gameUsersDTO);
     }
 
@@ -110,7 +105,11 @@ public class GameController {
 
         GameUsersDTO gameUsersDTO = gameService.leaveGame(gamePin, userToken);
 
-        messagingTemplate.convertAndSend("/topic/lobbies/" + gamePin, gameUsersDTO);
+        try {
+            gameService.checkIfGameExists(gameService.getGameByGamePin(gamePin));
+            messagingTemplate.convertAndSend("/topic/lobbies/" + gamePin, gameUsersDTO);
+        }
+        catch (ResponseStatusException ignored) {}
 
     }
 }

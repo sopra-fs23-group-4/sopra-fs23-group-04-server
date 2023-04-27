@@ -272,7 +272,7 @@ public class GameService {
         game.setHostId(hostCandidate.getId());
     }
 
-    private void checkIfGameExists(Game game) {
+    public void checkIfGameExists(Game game) {
 
         String errorMessage = "Game does not exist or is not open anymore." +
                 "Please try again with a different pin!";
