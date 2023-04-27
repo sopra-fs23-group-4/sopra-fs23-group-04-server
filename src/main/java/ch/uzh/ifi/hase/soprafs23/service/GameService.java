@@ -127,8 +127,8 @@ public class GameService {
         return getHostAndAllUserNamesOfGame(game);
     }
 
-    public Game getGameByGameId(Long gameId) {
-        Game game = gameRepository.findByGameId(gameId);
+    public Game getGameByGamePin(int gamePin) {
+        Game game = gameRepository.findByGamePin(gamePin);
         String errorMessage = "Game does not exist!";
         if (game == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
