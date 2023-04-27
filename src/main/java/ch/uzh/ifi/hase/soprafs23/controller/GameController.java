@@ -86,6 +86,13 @@ public class GameController {
 
         GameUsersDTO gameUsersDTO = gameService.joinGame(gamePin, userToken);
 
+        try {
+            Thread.sleep(1000);
+        }
+        catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         messagingTemplate.convertAndSend("/topic/lobbies/" + gamePin, gameUsersDTO);
     }
 
