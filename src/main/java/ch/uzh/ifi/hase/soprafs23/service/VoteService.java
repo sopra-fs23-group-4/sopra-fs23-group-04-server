@@ -213,18 +213,18 @@ public class VoteService {
         return voteGetDTO;
     }
 
-    private ScorePoint calculatePoints(int numberOfUnique, int numberOfNotUnique, int numberOfWrong) {
+    private int calculatePoints(int numberOfUnique, int numberOfNotUnique, int numberOfWrong) {
 
         int numberOfCorrect = numberOfUnique + numberOfNotUnique;
 
         if (numberOfCorrect >= numberOfWrong) {
             if (numberOfUnique >= numberOfNotUnique) {
-                return ScorePoint.CORRECT_UNIQUE;
+                return ScorePoint.CORRECT_UNIQUE.getPoints();
             } else {
-                return ScorePoint.CORRECT_NOT_UNIQUE;
+                return ScorePoint.CORRECT_NOT_UNIQUE.getPoints();
             }
         } else {
-            return ScorePoint.INCORRECT;
+            return ScorePoint.INCORRECT.getPoints();
         }
     }
 

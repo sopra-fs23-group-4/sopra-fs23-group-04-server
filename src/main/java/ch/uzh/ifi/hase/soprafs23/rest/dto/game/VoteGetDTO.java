@@ -1,14 +1,12 @@
 package ch.uzh.ifi.hase.soprafs23.rest.dto.game;
 
-import ch.uzh.ifi.hase.soprafs23.constant.ScorePoint;
-
 public class VoteGetDTO {
     private String username;
     private String answerString;
     private int numberOfUnique;
     private int numberOfNotUnique;
     private int numberOfWrong;
-    private ScorePoint points;
+    private int points;
 
     public String getUsername() {
         return username;
@@ -50,11 +48,11 @@ public class VoteGetDTO {
         this.numberOfWrong = numberOfWrong;
     }
 
-    public ScorePoint getPoints() {
+    public int getPoints() {
         return points;
     }
 
-    public void setPoints(ScorePoint points) {
+    public void setPoints(int points) {
         this.points = points;
     }
 }
