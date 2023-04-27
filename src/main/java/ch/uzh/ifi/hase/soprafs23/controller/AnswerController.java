@@ -35,8 +35,8 @@ public class AnswerController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public void endRound(@PathVariable("gamePin") int gamePin,
-                            @PathVariable("roundNumber") int roundNumber,
-                            @RequestHeader("Authorization") String userToken) {
+                         @PathVariable("roundNumber") int roundNumber,
+                         @RequestHeader("Authorization") String userToken) {
 
         answerService.endGame(gamePin, userToken, roundNumber);
 
