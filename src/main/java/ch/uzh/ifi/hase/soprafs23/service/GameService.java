@@ -287,7 +287,7 @@ public class GameService {
         List<User> users = gameToJoin.getUsers();
         List<String> usernames = new ArrayList<>();
         for (User user : users) {
-            if (user.equals(host)) {
+            if (!user.equals(host)) {
                 usernames.add(user.getUsername());
             }
         }
