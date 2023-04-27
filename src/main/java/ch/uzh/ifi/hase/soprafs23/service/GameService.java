@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.controller.RoundController;
+import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
@@ -134,6 +135,18 @@ public class GameService {
                     String.format(errorMessage));
         }
         return game;
+    }
+
+
+    public List<String> getGameCategoryNames(Game game) {
+        List<Category> gameCategories = game.getCategories();
+
+        List<String> gameCategoryNames = new ArrayList<>();
+
+        for (Category gameCategory : gameCategories) {
+            gameCategoryNames.add(gameCategory.getName());
+        }
+        return gameCategoryNames;
     }
 
     public LetterDTO startGame(int gamePin){
