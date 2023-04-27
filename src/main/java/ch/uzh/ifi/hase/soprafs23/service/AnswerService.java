@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.*;
 
 import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.OPEN;
+import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.RUNNING;
 import static ch.uzh.ifi.hase.soprafs23.constant.RoundStatus.FINISHED;
 
 @Service
@@ -41,11 +42,25 @@ public class AnswerService {
         this.categoryRepository = categoryRepository;
     }
 
+    public void endGame(int gamePin, String userToken, int roundNumber) {
+        Game game = gameRepository.findByGamePin(gamePin);
+        checkIfGameExists(game);
+        checkIfGameIsRunning(game);
+
+        User user = userRepository.findByToken(userToken);
+        checkIfUserExists(user);
+        checkIfUserIsInGame(game, user);
+
+        Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
+        checkIfRoundExists(round);
+        round.setStatus(FINISHED);
+    }
+
     public void saveAnswers(int gamePin, String userToken, int roundNumber, Map<String, String> answers) {
 
         Game game = gameRepository.findByGamePin(gamePin);
         checkIfGameExists(game);
-        checkIfGameIsOpen(game);
+        checkIfGameIsRunning(game);
 
         User user = userRepository.findByToken(userToken);
         checkIfUserExists(user);
@@ -99,6 +114,14 @@ public class AnswerService {
         String errorMessage = "Game is not open anymore. Please try again with a different game!";
 
         if (!game.getStatus().equals(OPEN)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
+        }
+    }
+
+    private void checkIfGameIsRunning(Game game) {
+        String errorMessage = "Game is not running anymore. Please try again with a different game!";
+
+        if (!game.getStatus().equals(RUNNING)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
         }
     }
