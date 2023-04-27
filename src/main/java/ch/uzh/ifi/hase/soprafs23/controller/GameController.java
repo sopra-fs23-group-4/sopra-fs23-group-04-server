@@ -26,9 +26,12 @@ public class GameController {
     private final GameService gameService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    GameController(GameService gameService, SimpMessagingTemplate messagingTemplate) {
+    GameController(GameService gameService,
+                   SimpMessagingTemplate messagingTemplate) {
+
         this.gameService = gameService;
         this.messagingTemplate=messagingTemplate;
+
     }
 
     @PostMapping("/games/lobbies/creation")
@@ -50,7 +53,7 @@ public class GameController {
         return gameCategoriesDTO;
     }
 
-    @PostMapping("/game/{gamePin}/start-game")
+    @PostMapping("/games/{gamePin}/start")
     public void gameStart(@PathVariable("gamePin") int gamePin) {
         LetterDTO letterDTO= gameService.startGame(gamePin);
         messagingTemplate.convertAndSend("/topic/lobbies/" +gamePin, letterDTO);

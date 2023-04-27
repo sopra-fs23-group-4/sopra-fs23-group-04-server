@@ -31,19 +31,6 @@ public class AnswerController {
         answerService.saveAnswers(gamePin, userToken, roundNumber, answers);
     }
 
-    @PutMapping("/games/{gamePin}/{roundNumber}/end")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public void endRound(@PathVariable("gamePin") int gamePin,
-                         @PathVariable("roundNumber") int roundNumber,
-                         @RequestHeader("Authorization") String userToken) {
-
-        answerService.endGame(gamePin, userToken, roundNumber);
-
-        String type="end";
-        messagingTemplate.convertAndSend("/topic/games/" + gamePin + "/rounds", type);
-    }
-
     @GetMapping("/games/{gamePin}/{roundNumber}/{categoryName}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody

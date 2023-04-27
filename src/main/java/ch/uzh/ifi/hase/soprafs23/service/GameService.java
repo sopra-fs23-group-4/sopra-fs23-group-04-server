@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
@@ -20,9 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
-
-import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.OPEN;
-import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.RUNNING;
 
 @Service
 @Transactional
@@ -54,7 +52,7 @@ public class GameService {
         checkIfHostIsEligible(user.getId());
 
         newGame.setGamePin(generateGamePin());
-        newGame.setStatus(OPEN);
+        newGame.setStatus(GameStatus.OPEN);
         newGame.setHostId(user.getId());
         newGame.addPlayer(user);
         newGame.setRoundLetters(generateRandomLetters(newGame.getRounds()));
@@ -127,8 +125,11 @@ public class GameService {
     }
 
     public Game getGameByGamePin(int gamePin) {
+
         Game game = gameRepository.findByGamePin(gamePin);
+
         String errorMessage = "Game does not exist!";
+
         if (game == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     String.format(errorMessage));
@@ -149,21 +150,14 @@ public class GameService {
     }
 
     public LetterDTO startGame(int gamePin){
-        Game game=gameRepository.findByGamePin(gamePin);
-        game.setStatus(RUNNING);
-        return nextRound(gamePin);
 
-    }
+        Game game = gameRepository.findByGamePin(gamePin);
+        checkIfGameExists(game);
 
-    public LetterDTO nextRound(int gamePin){
-        Game game=gameRepository.findByGamePin(gamePin);
-        Round round=roundRepository.findByGameAndRoundNumber(game,game.getCurrentRound());
-        round.setStatus(RoundStatus.RUNNING);
-        LetterDTO letterDTO=new LetterDTO();
-        letterDTO.setLetter(round.getLetter());
-        letterDTO.setRound(round.getRoundNumber());
-        game.setCurrentRound(1+game.getCurrentRound());
-        return letterDTO;
+        game.setStatus(GameStatus.RUNNING);
+
+        return roundService.nextRound(gamePin);
+
     }
 
     /**
@@ -171,11 +165,11 @@ public class GameService {
      */
 
     private List<Game> getOpenGames() {
-        return gameRepository.findByStatus(OPEN);
+        return gameRepository.findByStatus(GameStatus.OPEN);
     }
 
     private List<Game> getRunningGames() {
-        return gameRepository.findByStatus(RUNNING);
+        return gameRepository.findByStatus(GameStatus.RUNNING);
     }
 
     private List<Game> getOpenOrRunningGames() {
@@ -275,7 +269,7 @@ public class GameService {
 
         String errorMessage = "Game does not exist or is not open anymore." +
                 "Please try again with a different pin!";
-        if (game == null || !game.getStatus().equals(OPEN)) {
+        if (game == null || !game.getStatus().equals(GameStatus.OPEN)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format(errorMessage));
         }

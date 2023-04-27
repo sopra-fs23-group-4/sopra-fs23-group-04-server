@@ -42,20 +42,6 @@ public class AnswerService {
         this.categoryRepository = categoryRepository;
     }
 
-    public void endGame(int gamePin, String userToken, int roundNumber) {
-        Game game = gameRepository.findByGamePin(gamePin);
-        checkIfGameExists(game);
-        checkIfGameIsRunning(game);
-
-        User user = userRepository.findByToken(userToken);
-        checkIfUserExists(user);
-        checkIfUserIsInGame(game, user);
-
-        Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
-        checkIfRoundExists(round);
-        round.setStatus(FINISHED);
-    }
-
     public void saveAnswers(int gamePin, String userToken, int roundNumber, Map<String, String> answers) {
 
         Game game = gameRepository.findByGamePin(gamePin);
