@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.controller.RoundController;
+import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.repository.UserGameRepository;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
@@ -130,14 +131,26 @@ public class GameService {
         return getAllUserNamesOfGame(game);
     }
 
-    public Game getGameByGameId(Long gameId) {
-        Game game = gameRepository.findByGameId(gameId);
+    public Game getGameByGamePin(int gamePin) {
+        Game game = gameRepository.findByGamePin(gamePin);
         String errorMessage = "Game does not exist!";
         if (game == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     String.format(errorMessage));
         }
         return game;
+    }
+
+
+    public List<String> getGameCategoryNames(Game game) {
+        List<Category> gameCategories = game.getCategories();
+
+        List<String> gameCategoryNames = new ArrayList<>();
+
+        for (Category gameCategory : gameCategories) {
+            gameCategoryNames.add(gameCategory.getName());
+        }
+        return gameCategoryNames;
     }
 
     public LetterDTO startGame(int gamePin){

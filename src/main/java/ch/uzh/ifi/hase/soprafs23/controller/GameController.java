@@ -1,9 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
 import ch.uzh.ifi.hase.soprafs23.constant.GameCategory;
-import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.CategoryGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.GameSettingGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
@@ -19,7 +17,6 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -57,30 +54,27 @@ public class GameController {
         messagingTemplate.convertAndSend("/topic/lobbies/" +gamePin, letterDTO);
     }
 
-    @GetMapping("/game/{gameId}/categories")
+    @GetMapping("/game/{gamePin}/categories")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<CategoryGetDTO> getGameCategoryByGameId(@PathVariable("gameId") Long gameId) {
+    public GameCategoriesDTO getGameCategoryByGamePin(@PathVariable("gamePin") int gamePin) {
 
-        Game game = gameService.getGameByGameId(gameId);
+        Game game = gameService.getGameByGamePin(gamePin);
 
-        List<Category> gameCategories = game.getCategories();
+        List<String> gameCategoryNames = gameService.getGameCategoryNames(game);
 
-        List<CategoryGetDTO> categoryGetDTOs = new ArrayList<>();
+        GameCategoriesDTO gameCategoriesDTO=new GameCategoriesDTO();
+        gameCategoriesDTO.setCategories(gameCategoryNames);
 
-        for (Category gameCategory : gameCategories) {
-            categoryGetDTOs.add(UserDTOMapper.INSTANCE.convertEntityToCategoryGetDTO(gameCategory));
-        }
-
-        return categoryGetDTOs;
+        return gameCategoriesDTO;
     }
 
-    @GetMapping("game/{gameId}/settings")
+    @GetMapping("game/{gamePin}/settings")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public GameSettingGetDTO getGameSettingByGameId(@PathVariable("gameId") Long gameId) {
+    public GameSettingGetDTO getGameSettingByGamePin(@PathVariable("gamePin") int gamePin) {
 
-        Game game = gameService.getGameByGameId(gameId);
+        Game game = gameService.getGameByGamePin(gamePin);
 
         return UserDTOMapper.INSTANCE.convertEntityToGameSettingGetDTO(game);
     }
