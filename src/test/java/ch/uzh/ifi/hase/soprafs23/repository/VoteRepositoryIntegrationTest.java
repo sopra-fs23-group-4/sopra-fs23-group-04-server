@@ -38,7 +38,7 @@ public class VoteRepositoryIntegrationTest {
         Answer answer = new Answer();
         answer.setRound(round);
         answer.setUser(user);
-        answer.setAnswer("Answer");
+        answer.setAnswerString("Answer");
         entityManager.persist(answer);
 
         Vote vote = new Vote();
@@ -50,7 +50,7 @@ public class VoteRepositoryIntegrationTest {
         entityManager.flush();
 
         // when
-        List<Vote> found = voteRepository.findByUserAndAnswer(user, answer);
+        List<Vote> found = voteRepository.findByUser(user);
 
         // then
         assertEquals(1, found.size());

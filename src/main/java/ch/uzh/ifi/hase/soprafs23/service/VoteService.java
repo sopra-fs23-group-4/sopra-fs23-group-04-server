@@ -2,13 +2,9 @@ package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.VoteOption;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
-import ch.uzh.ifi.hase.soprafs23.entity.game.Answer;
-import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
-import ch.uzh.ifi.hase.soprafs23.entity.game.Vote;
-import ch.uzh.ifi.hase.soprafs23.repository.AnswerRepository;
-import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
-import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
-import ch.uzh.ifi.hase.soprafs23.repository.VoteRepository;
+import ch.uzh.ifi.hase.soprafs23.entity.game.*;
+import ch.uzh.ifi.hase.soprafs23.repository.*;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.game.VoteGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.VoteOptionsGetDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,24 +28,30 @@ public class VoteService {
     private final GameRepository gameRepository;
     private final AnswerRepository answerRepository;
     private final VoteRepository voteRepository;
+    private final CategoryRepository categoryRepository;
+    private final RoundRepository roundRepository;
 
     @Autowired
     public VoteService(@Qualifier("userRepository") UserRepository userRepository,
                        @Qualifier("gameRepository") GameRepository gameRepository,
                        @Qualifier("answerRepository") AnswerRepository answerRepository,
-                       @Qualifier("voteRepository") VoteRepository voteRepository) {
+                       @Qualifier("voteRepository") VoteRepository voteRepository,
+                       @Qualifier("categoryRepository") CategoryRepository categoryRepository,
+                       @Qualifier("roundRepository") RoundRepository roundRepository) {
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.answerRepository = answerRepository;
         this.voteRepository = voteRepository;
+        this.categoryRepository = categoryRepository;
+        this.roundRepository = roundRepository;
     }
 
     public void saveVote(int gamePin, String categoryName, String userToken, Map<Long, String> votings) {
 
         Game game = gameRepository.findByGamePin(gamePin);
-        checkIfGameExists(game);
-
         User user = userRepository.findByToken(userToken);
+
+        checkIfGameExists(game);
         checkIfUserExists(user);
 
         checkIfUserIsInGame(game, user);
@@ -63,24 +65,50 @@ public class VoteService {
 
             String votingString = voting.getValue();
 
-            checkIfAnswerAndVotingExists(answer, user);
+            Vote vote = voteRepository.findByUserAndAnswer(user, answer);
+
+            checkIfAnswerAndVoteExists(answer, vote);
 
             saveVoting(answer, user, votingString);
 
         }
     }
 
+    public List<VoteGetDTO> getVotes(int gamePin, int roundNumber, String categoryName, String userToken) {
+
+        Game game = gameRepository.findByGamePin(gamePin);
+        Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
+        Category category = categoryRepository.findByName(categoryName);
+        User user = userRepository.findByToken(userToken);
+
+        checkIfGameExists(game);
+        checkIfRoundExists(round);
+        checkIfCategoryExists(category);
+        checkIfUserExists(user);
+        checkIfUserIsInGame(game, user);
+
+        List<User> users = game.getUsers();
+
+        return getVoteGetDTOList(game, round, category, users);
+
+    }
+
     public VoteOptionsGetDTO getVoteOptions() {
+
         VoteOptionsGetDTO voteOptionsGetDTO = new VoteOptionsGetDTO();
         List<String> voteOptions = new ArrayList<>();
+
         for (VoteOption voteOption : VoteOption.values()) {
             voteOptions.add(voteOption.name());
         }
+
         voteOptionsGetDTO.setVoteOptions(voteOptions);
+
         return voteOptionsGetDTO;
     }
 
     private void checkIfGameExists(Game game) {
+
         String errorMessage = "Game does not exist. Please try again with a different game!";
 
         if (game == null) {
@@ -92,7 +120,27 @@ public class VoteService {
 
         String errorMessage = "User does not exist." +
                 "Please register before playing!";
+
         if (user == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    String.format(errorMessage));
+        }
+    }
+
+    private void checkIfRoundExists(Round round) {
+
+        String errorMessage = "Round does not exist.";
+
+        if (round == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    String.format(errorMessage));
+        }
+    }
+    private void checkIfCategoryExists(Category category) {
+
+        String errorMessage = "Category does not exist.";
+
+        if (category == null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format(errorMessage));
         }
@@ -108,14 +156,62 @@ public class VoteService {
         }
     }
 
+    private List<VoteGetDTO> getVoteGetDTOList(Game game, Round round, Category category, List<User> users) {
+
+        List<VoteGetDTO> voteGetDTOList = new ArrayList<>();
+
+        for (User user : users) {
+
+            Answer answer = answerRepository.findByRoundAndCategoryAndUser(round, category, user);
+            checkIfAnswerExists(answer);
+
+            List<User> allUsersFiltered = new ArrayList<>(users);
+            allUsersFiltered.remove(user);
+
+            VoteGetDTO newVoteGetDTO = createVoteGetDTO(user.getUsername(), allUsersFiltered,answer);
+            voteGetDTOList.add(newVoteGetDTO);
+        }
+
+        return voteGetDTOList;
+
+    }
+
+    private VoteGetDTO createVoteGetDTO(String username, List<User> allUsersFiltered, Answer answer) {
+        int numberOfUnique = 0;
+        int numberOfNotUnique = 0;
+        int numberOfWrong = 0;
+
+        VoteGetDTO voteGetDTO = new VoteGetDTO();
+        voteGetDTO.setUsername(username);
+        voteGetDTO.setAnswerString(answer.getAnswerString());
+
+
+
+        for (User user : allUsersFiltered) {
+
+            Vote vote = voteRepository.findByUserAndAnswer(user, answer);
+
+            if (vote.getVotedOption().equals(VoteOption.CORRECT_UNIQUE)) {
+                numberOfUnique++;
+            }
+            else if (vote.getVotedOption().equals(VoteOption.CORRECT_NOT_UNIQUE)) {
+                numberOfNotUnique++;
+            }
+            else {
+                numberOfWrong++;
+            }
+        }
+
+        voteGetDTO.setNumberOfUnique(numberOfUnique);
+        voteGetDTO.setNumberOfNotUnique(numberOfNotUnique);
+        voteGetDTO.setNumberOfWrong(numberOfWrong);
+
+        return voteGetDTO;
+    }
+
     private void checkIfCategoryMatches(Answer answer, String categoryName) {
 
         String errorMessage = "The category of voting and the answers don't match.";
-
-        System.out.println("\n---------------------------------");
-        System.out.println(answer.getCategory().getName());
-        System.out.println(categoryName);
-        System.out.println("---------------------------------\n");
 
         if(!answer.getCategory().getName().equals(categoryName)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
@@ -125,11 +221,11 @@ public class VoteService {
         return answerRepository.findById(answerId);
     }
 
-    private void checkIfAnswerAndVotingExists(Answer answer, User user) {
+    private void checkIfAnswerAndVoteExists(Answer answer, Vote vote) {
 
         checkIfAnswerExists(answer);
 
-        checkIfVotingExists(user, answer);
+        checkIfVoteExists(vote);
     }
 
     private void checkIfAnswerExists(Answer answer) {
@@ -142,13 +238,11 @@ public class VoteService {
         }
     }
 
-    private void checkIfVotingExists(User user, Answer answer) {
-
-        List<Vote> votes = voteRepository.findByUserAndAnswer(user, answer);
+    private void checkIfVoteExists(Vote vote) {
 
         String errorMessage = "This Voting has already been saved.";
 
-        if (votes.size() > 0) {
+        if (vote != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format(errorMessage));
         }
@@ -163,6 +257,7 @@ public class VoteService {
     }
 
     private Vote setVoteOption(Vote newVote, String vote) {
+
         String errorMessage = "At least one of the votes is invalid!";
 
         try {
