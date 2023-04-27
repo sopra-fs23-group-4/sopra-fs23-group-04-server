@@ -14,9 +14,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
-import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.OPEN;
-import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.RUNNING;
+import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.*;
 import static ch.uzh.ifi.hase.soprafs23.constant.RoundStatus.FINISHED;
+import static ch.uzh.ifi.hase.soprafs23.constant.ScorePoint.INCORRECT;
 
 @Service
 @Transactional
@@ -65,7 +65,7 @@ public class AnswerService {
     public List<Map<Long, String>> getAnswers(int gamePin, int roundNumber, String categoryName, String userToken) {
         Game game = gameRepository.findByGamePin(gamePin);
         checkIfGameExists(game);
-        checkIfGameIsOpen(game);
+        checkIfGameIsRunning(game);
 
         User user = userRepository.findByToken(userToken);
         checkIfUserExists(user);
@@ -93,14 +93,6 @@ public class AnswerService {
 
         if (game == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage);
-        }
-    }
-
-    private void checkIfGameIsOpen(Game game) {
-        String errorMessage = "Game is not open anymore. Please try again with a different game!";
-
-        if (!game.getStatus().equals(OPEN)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
         }
     }
 
@@ -162,9 +154,7 @@ public class AnswerService {
 
     private Category getCategory(String categoryName) {
 
-        Category category = categoryRepository.findByName(categoryName);
-
-        return category;
+        return categoryRepository.findByName(categoryName);
     }
 
     private void checkIfCategoryExists(Category category) {
@@ -187,6 +177,7 @@ public class AnswerService {
             newAnswer.setUser(user);
             newAnswer.setAnswerString(answer);
             newAnswer.setCategory(category);
+            newAnswer.setScorePoint(INCORRECT);
             newAnswer = answerRepository.save(newAnswer);
         }
         answerRepository.flush();

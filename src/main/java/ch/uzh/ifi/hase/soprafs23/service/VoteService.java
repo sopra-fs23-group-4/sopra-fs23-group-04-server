@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.constant.ScorePoint;
 import ch.uzh.ifi.hase.soprafs23.constant.VoteOption;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.*;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -206,7 +208,24 @@ public class VoteService {
         voteGetDTO.setNumberOfNotUnique(numberOfNotUnique);
         voteGetDTO.setNumberOfWrong(numberOfWrong);
 
+        voteGetDTO.setPoints(calculatePoints(numberOfUnique, numberOfNotUnique, numberOfWrong));
+
         return voteGetDTO;
+    }
+
+    private ScorePoint calculatePoints(int numberOfUnique, int numberOfNotUnique, int numberOfWrong) {
+
+        int numberOfCorrect = numberOfUnique + numberOfNotUnique;
+
+        if (numberOfCorrect >= numberOfWrong) {
+            if (numberOfUnique >= numberOfNotUnique) {
+                return ScorePoint.CORRECT_UNIQUE;
+            } else {
+                return ScorePoint.CORRECT_NOT_UNIQUE;
+            }
+        } else {
+            return ScorePoint.INCORRECT;
+        }
     }
 
     private void checkIfCategoryMatches(Answer answer, String categoryName) {
