@@ -14,8 +14,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
-import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.OPEN;
+import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.*;
 import static ch.uzh.ifi.hase.soprafs23.constant.RoundStatus.FINISHED;
+import static ch.uzh.ifi.hase.soprafs23.constant.ScorePoint.INCORRECT;
 
 @Service
 @Transactional
@@ -41,14 +42,16 @@ public class AnswerService {
         this.categoryRepository = categoryRepository;
     }
 
-    public void saveAnswers(int gamePin, String userToken, Long roundNumber, Map<String, String> answers) {
+    public void saveAnswers(int gamePin, String userToken, int roundNumber, Map<String, String> answers) {
+
         Game game = gameRepository.findByGamePin(gamePin);
         checkIfGameExists(game);
-        checkIfGameIsOpen(game);
-
+        checkIfGameIsRunning(game);
 
         User user = userRepository.findByToken(userToken);
         checkIfUserExists(user);
+
+        checkIfUserIsInGame(game, user);
 
         Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
         checkIfRoundExists(round);
@@ -59,19 +62,22 @@ public class AnswerService {
         saveAnswersToDatabase(answers, user, round);
     }
 
-    public List<Map<Long, String>> getAnswers(int gamePin, Long roundNumber, String categoryName, String userToken) {
+    public List<Map<Long, String>> getAnswers(int gamePin, int roundNumber, String categoryName, String userToken) {
         Game game = gameRepository.findByGamePin(gamePin);
         checkIfGameExists(game);
-        checkIfGameIsOpen(game);
+        checkIfGameIsRunning(game);
 
         User user = userRepository.findByToken(userToken);
         checkIfUserExists(user);
+
+        checkIfUserIsInGame(game, user);
 
         Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
         checkIfRoundExists(round);
         checkIfRoundIsFinished(round);
 
-        Category category = getCategoryIfItExists(categoryName);
+        Category category = getCategory(categoryName);
+        checkIfCategoryExists(category);
 
         List<Answer> answers = answerRepository.findByRoundAndCategory(round, category);
 
@@ -86,14 +92,14 @@ public class AnswerService {
         String errorMessage = "Game does not exist. Please try again with a different game!";
 
         if (game == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage);
         }
     }
 
-    private void checkIfGameIsOpen(Game game) {
-        String errorMessage = "Game is not open anymore. Please try again with a different game!";
+    private void checkIfGameIsRunning(Game game) {
+        String errorMessage = "Game is not running anymore. Please try again with a different game!";
 
-        if (!game.getStatus().equals(OPEN)) {
+        if (!game.getStatus().equals(RUNNING)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
         }
     }
@@ -108,11 +114,21 @@ public class AnswerService {
         }
     }
 
+    private void checkIfUserIsInGame(Game game, User user) {
+        List<User> users = game.getUsers();
+
+        String errorMessage = "User is not part of this game.";
+
+        if(!users.contains(user)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
+        }
+    }
+
     private void checkIfRoundExists(Round round) {
         String errorMessage = "Round does not exist.";
 
         if (round == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage);
         }
     }
 
@@ -131,14 +147,17 @@ public class AnswerService {
         String errorMessage = "These Answers have already been saved.";
 
         if (answers.size() > 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format(errorMessage));
         }
     }
 
-    private Category getCategoryIfItExists(String categoryName) {
+    private Category getCategory(String categoryName) {
 
-        Category category = categoryRepository.findByName(categoryName);
+        return categoryRepository.findByName(categoryName);
+    }
+
+    private void checkIfCategoryExists(Category category) {
 
         String errorMessage = "There exists no such category.";
 
@@ -146,19 +165,19 @@ public class AnswerService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     String.format(errorMessage));
         }
-        return category;
     }
 
     private void saveAnswersToDatabase(Map<String, String> answers, User user, Round round) {
         for (Map.Entry<String, String> entry : answers.entrySet()) {
             String categoryName = entry.getKey();
-            Category category = getCategoryIfItExists(categoryName);
+            Category category = getCategory(categoryName);
             String answer = entry.getValue();
             Answer newAnswer = new Answer();
             newAnswer.setRound(round);
             newAnswer.setUser(user);
-            newAnswer.setAnswer(answer);
+            newAnswer.setAnswerString(answer);
             newAnswer.setCategory(category);
+            newAnswer.setScorePoint(INCORRECT);
             newAnswer = answerRepository.save(newAnswer);
         }
         answerRepository.flush();
@@ -171,7 +190,7 @@ public class AnswerService {
         for (Answer answer : answers) {
             if (!answer.getUser().equals(user)) {
                 Map<Long, String> answerTuple = new HashMap<>();
-                answerTuple.put(answer.getAnswerId(), answer.getAnswer());
+                answerTuple.put(answer.getAnswerId(), answer.getAnswerString());
                 filteredAnswers.add(answerTuple);
             }
         }

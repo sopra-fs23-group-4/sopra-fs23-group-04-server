@@ -22,7 +22,7 @@ public class Round implements Serializable {
     private Game game;
 
     @Column(nullable = false)
-    private Long roundNumber;
+    private int roundNumber;
 
     @Column(nullable = false)
     private RoundStatus status;
@@ -42,11 +42,11 @@ public class Round implements Serializable {
         this.game = game;
     }
 
-    public Long getRoundNumber() {
+    public int getRoundNumber() {
         return roundNumber;
     }
 
-    public void setRoundNumber(Long roundNumber) {
+    public void setRoundNumber(int roundNumber) {
         this.roundNumber = roundNumber;
     }
 

@@ -12,6 +12,6 @@ public interface RoundRepository extends JpaRepository<Round, Long> {
 
     List<Round> findByGame(Game game);
 
-    Round findByGameAndRoundNumber(Game game, Long roundNumber);
+    Round findByGameAndRoundNumber(Game game, int roundNumber);
 
 }
