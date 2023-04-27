@@ -70,7 +70,7 @@ public class GameController {
 
         List<String> gameCategoryNames = gameService.getGameCategoryNames(game);
 
-        GameCategoriesDTO gameCategoriesDTO=new GameCategoriesDTO();
+        GameCategoriesDTO gameCategoriesDTO = new GameCategoriesDTO();
         gameCategoriesDTO.setCategories(gameCategoryNames);
 
         return gameCategoriesDTO;
@@ -87,9 +87,9 @@ public class GameController {
     }
 
     @GetMapping("games/{gamePin}/users")
-        @ResponseStatus(HttpStatus.OK)
-        @ResponseBody
-        public GameUsersDTO getGameUsersByGamePin(@PathVariable("gamePin") int gamePin) {
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GameUsersDTO getGameUsersByGamePin(@PathVariable("gamePin") int gamePin) {
 
         Game game = gameService.getGameByGamePin(gamePin);
 
