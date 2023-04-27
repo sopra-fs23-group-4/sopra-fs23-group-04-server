@@ -38,12 +38,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Generate unique version name
+        id: generate_version_name
+        run: echo "::set-output name=version_name::$(date +%Y%m%d%H%M%S)"
+
       - name: Deploy to App Engine
         id: deploy
         uses: google-github-actions/deploy-appengine@v0.2.0
         with:
           deliverables: app.yaml
-          version: v1
+          version: ${{ steps.generate_version_name.outputs.version_name }}
           credentials: ${{ secrets.GCP_SERVICE_CREDENTIALS }}
 
       - name: Test

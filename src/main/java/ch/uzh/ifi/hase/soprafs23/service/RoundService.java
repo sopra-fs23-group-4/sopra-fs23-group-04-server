@@ -83,7 +83,8 @@ public class RoundService {
         round.setStatus(RoundStatus.FINISHED);
     }
 
-    public LetterDTO nextRound(int gamePin){
+    public LetterDTO nextRound(int gamePin) {
+
         Game game = gameRepository.findByGamePin(gamePin);
         Round round = roundRepository.findByGameAndRoundNumber(game,game.getCurrentRound());
 
