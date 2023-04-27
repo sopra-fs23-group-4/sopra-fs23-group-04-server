@@ -44,7 +44,7 @@ public class GameController {
         return gameService.createGame(newGame, userToken);
     }
 
-    @GetMapping("/game/categories")
+    @GetMapping("/games/categories")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public GameCategoriesDTO getStandardCategories(){
@@ -59,7 +59,7 @@ public class GameController {
         messagingTemplate.convertAndSend("/topic/lobbies/" +gamePin, letterDTO);
     }
 
-    @GetMapping("/game/{gamePin}/categories")
+    @GetMapping("/games/{gamePin}/categories")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public GameCategoriesDTO getGameCategoryByGamePin(@PathVariable("gamePin") int gamePin) {
@@ -74,7 +74,7 @@ public class GameController {
         return gameCategoriesDTO;
     }
 
-    @GetMapping("game/{gamePin}/settings")
+    @GetMapping("games/{gamePin}/settings")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public GameSettingGetDTO getGameSettingByGamePin(@PathVariable("gamePin") int gamePin) {
@@ -84,7 +84,7 @@ public class GameController {
         return UserDTOMapper.INSTANCE.convertEntityToGameSettingGetDTO(game);
     }
 
-    @GetMapping("game/{gamePin}/users")
+    @GetMapping("games/{gamePin}/users")
         @ResponseStatus(HttpStatus.OK)
         @ResponseBody
         public GameUsersDTO getGameUsersByGamePin(@PathVariable("gamePin") int gamePin) {
