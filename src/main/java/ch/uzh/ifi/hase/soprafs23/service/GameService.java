@@ -282,7 +282,7 @@ public class GameService {
         }
     }
 
-    private GameUsersDTO getHostAndAllUserNamesOfGame(Game gameToJoin) {
+    public GameUsersDTO getHostAndAllUserNamesOfGame(Game gameToJoin) {
         User host = userRepository.findById(gameToJoin.getHostId()).orElse(null);
         List<User> users = gameToJoin.getUsers();
         List<String> usernames = new ArrayList<>();
