@@ -2,13 +2,17 @@ package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
+import ch.uzh.ifi.hase.soprafs23.entity.game.Answer;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
+import ch.uzh.ifi.hase.soprafs23.repository.AnswerRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardEntryDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.game.WinnerDTO;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.LetterDTO;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.GameUsersDTO;
 import org.slf4j.Logger;
@@ -32,15 +36,19 @@ public class GameService {
     private final RoundRepository roundRepository;
     private final RoundService roundService;
 
+    private final AnswerRepository answerRepository;
+
     @Autowired
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository,
                        @Qualifier("userRepository") UserRepository userRepository,
                        @Qualifier("roundRepository") RoundRepository roundRepository,
-                       @Qualifier("roundService") RoundService roundService) {
+                       @Qualifier("roundService") RoundService roundService,
+                       @Qualifier("answerRepository") AnswerRepository answerRepository) {
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.roundRepository = roundRepository;
         this.roundService = roundService;
+        this.answerRepository = answerRepository;
     }
 
     public int createGame(Game newGame, String userToken) {
@@ -299,5 +307,58 @@ public class GameService {
         Random rnd = new Random();
 
         return rnd.nextInt(9000) + 1000;
+    }
+
+
+    private Map<User, Integer> calculateUserScores(int gamePin) {
+        List<Answer> answers = answerRepository.findAllByGamePin(gamePin);
+
+        Map<User, Integer> userScores = new HashMap<>();
+        for (Answer answer : answers) {
+            User user = answer.getUser();
+            int currentScore = userScores.getOrDefault(user, 0);
+            currentScore += answer.getScorePoint().getPoints();
+            userScores.put(user, currentScore);
+        }
+
+        return userScores;
+    }
+
+    public List<WinnerDTO> getWinner(int gamePin) {
+        Map<User, Integer> userScores = calculateUserScores(gamePin);
+
+        List<WinnerDTO> winners = new ArrayList<>();
+        int maxScore = -1;
+        for (Map.Entry<User, Integer> entry : userScores.entrySet()) {
+            if (entry.getValue() > maxScore) {
+                winners.clear();
+                WinnerDTO winnerDTO = new WinnerDTO();
+                winnerDTO.setUser(entry.getKey());
+                winnerDTO.setScore(entry.getValue().longValue());
+                winners.add(winnerDTO);
+                maxScore = entry.getValue();
+            } else if (entry.getValue() == maxScore) {
+                WinnerDTO winnerDTO = new WinnerDTO();
+                winnerDTO.setUser(entry.getKey());
+                winnerDTO.setScore(entry.getValue().longValue());
+                winners.add(winnerDTO);
+            }
+        }
+
+        return winners;
+    }
+
+    public List<ScoreboardEntryDTO> getScoreboard(int gameId) {
+        Map<User, Integer> userScores = calculateUserScores(gameId);
+
+        List<ScoreboardEntryDTO> scoreboard = new ArrayList<>();
+        for (Map.Entry<User, Integer> entry : userScores.entrySet()) {
+            ScoreboardEntryDTO scoreboardEntry = new ScoreboardEntryDTO();
+            scoreboardEntry.setUser(entry.getKey());
+            scoreboardEntry.setScore(entry.getValue());
+            scoreboard.add(scoreboardEntry);
+        }
+
+        return scoreboard;
     }
 }

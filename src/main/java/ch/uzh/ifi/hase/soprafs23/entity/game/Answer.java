@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.entity.game;
 
+import ch.uzh.ifi.hase.soprafs23.constant.ScorePoint;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 
 import javax.persistence.*;
@@ -26,6 +27,10 @@ public class Answer {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+
+    @Column(nullable = false)
+    private ScorePoint scorePoint;
 
     public Long getAnswerId() {
         return id;
@@ -61,5 +66,13 @@ public class Answer {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public ScorePoint getScorePoint() {
+        return scorePoint;
+    }
+
+    public void setScorePoint(ScorePoint scorePoint) {
+        this.scorePoint = scorePoint;
     }
 }
