@@ -85,14 +85,14 @@ public class GameController {
     }
 
     @GetMapping("game/{gamePin}/users")
-        @ResponseStatus(HttpStatus.OK)
-        @ResponseBody
-        public GameUsersDTO getGameUsersByGamePin(@PathVariable("gamePin") int gamePin) {
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public GameUsersDTO getGameUsersByGamePin(@PathVariable("gamePin") int gamePin) {
 
-            Game game = gameService.getGameByGamePin(gamePin);
+        Game game = gameService.getGameByGamePin(gamePin);
 
-            return gameService.getHostAndAllUserNamesOfGame(game);
-        }
+        return gameService.getHostAndAllUserNamesOfGame(game);
+    }
 
     @PutMapping("/games/lobbies/{gamePin}/join")
     @ResponseStatus(HttpStatus.NO_CONTENT)
