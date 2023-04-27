@@ -176,7 +176,7 @@ public class AnswerService {
             Answer newAnswer = new Answer();
             newAnswer.setRound(round);
             newAnswer.setUser(user);
-            newAnswer.setAnswer(answer);
+            newAnswer.setAnswerString(answer);
             newAnswer.setCategory(category);
             newAnswer = answerRepository.save(newAnswer);
         }
@@ -190,7 +190,7 @@ public class AnswerService {
         for (Answer answer : answers) {
             if (!answer.getUser().equals(user)) {
                 Map<Long, String> answerTuple = new HashMap<>();
-                answerTuple.put(answer.getAnswerId(), answer.getAnswer());
+                answerTuple.put(answer.getAnswerId(), answer.getAnswerString());
                 filteredAnswers.add(answerTuple);
             }
         }

@@ -17,4 +17,5 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
     Answer findById(Long answerId);
     List<Answer> findByRoundAndUser(Round round, User user);
     List<Answer> findByRoundAndCategory(Round round, Category category);
+    Answer findByRoundAndCategoryAndUser(Round round, Category category, User user);
 }
