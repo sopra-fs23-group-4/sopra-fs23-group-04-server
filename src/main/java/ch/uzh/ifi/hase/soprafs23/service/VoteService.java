@@ -4,12 +4,12 @@ import ch.uzh.ifi.hase.soprafs23.constant.VoteOption;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Answer;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
-import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Vote;
 import ch.uzh.ifi.hase.soprafs23.repository.AnswerRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.VoteRepository;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.game.VoteOptionsGetDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
-
-import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.OPEN;
-import static ch.uzh.ifi.hase.soprafs23.constant.RoundStatus.FINISHED;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -45,24 +44,48 @@ public class VoteService {
         this.voteRepository = voteRepository;
     }
 
-    public void saveVote(int gamePin, Long answerId, String userToken, List<String> votingStrings) {
+    public void saveVote(int gamePin, String categoryName, String userToken, Map<Long, String> votings) {
+
+        Game game = gameRepository.findByGamePin(gamePin);
+        checkIfGameExists(game);
 
         User user = userRepository.findByToken(userToken);
         checkIfUserExists(user);
 
-        Answer answer = answerRepository.findById(answerId);
-        checkIfAnswerExists(answer);
+        checkIfUserIsInGame(game, user);
 
-        checkIfVotingExists(user, answer);
+        for (Map.Entry<Long, String> voting : votings.entrySet()) {
 
-        for (String votingString : votingStrings) {
-            Vote newVote = new Vote();
-            newVote.setAnswer(answer);
-            newVote.setUser(user);
-            newVote = setVoteOption(newVote, votingString);
-            newVote = voteRepository.save(newVote);
+            Long answerId = voting.getKey();
+            Answer answer = getAnswerById(answerId);
+
+            checkIfCategoryMatches(answer, categoryName);
+
+            String votingString = voting.getValue();
+
+            checkIfAnswerAndVotingExists(answer, user);
+
+            saveVoting(answer, user, votingString);
+
         }
-        voteRepository.flush();
+    }
+
+    public VoteOptionsGetDTO getVoteOptions() {
+        VoteOptionsGetDTO voteOptionsGetDTO = new VoteOptionsGetDTO();
+        List<String> voteOptions = new ArrayList<>();
+        for (VoteOption voteOption : VoteOption.values()) {
+            voteOptions.add(voteOption.name());
+        }
+        voteOptionsGetDTO.setVoteOptions(voteOptions);
+        return voteOptionsGetDTO;
+    }
+
+    private void checkIfGameExists(Game game) {
+        String errorMessage = "Game does not exist. Please try again with a different game!";
+
+        if (game == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage);
+        }
     }
 
     private void checkIfUserExists(User user) {
@@ -75,6 +98,40 @@ public class VoteService {
         }
     }
 
+    private void checkIfUserIsInGame(Game game, User user) {
+        List<User> users = game.getUsers();
+
+        String errorMessage = "User is not part of this game.";
+
+        if(!users.contains(user)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
+        }
+    }
+
+    private void checkIfCategoryMatches(Answer answer, String categoryName) {
+
+        String errorMessage = "The category of voting and the answers don't match.";
+
+        System.out.println("\n---------------------------------");
+        System.out.println(answer.getCategory().getName());
+        System.out.println(categoryName);
+        System.out.println("---------------------------------\n");
+
+        if(!answer.getCategory().getName().equals(categoryName)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
+        }
+    }
+    private Answer getAnswerById(Long answerId) {
+        return answerRepository.findById(answerId);
+    }
+
+    private void checkIfAnswerAndVotingExists(Answer answer, User user) {
+
+        checkIfAnswerExists(answer);
+
+        checkIfVotingExists(user, answer);
+    }
+
     private void checkIfAnswerExists(Answer answer) {
 
         String errorMessage = "This answer does not exist.";
@@ -83,6 +140,26 @@ public class VoteService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format(errorMessage));
         }
+    }
+
+    private void checkIfVotingExists(User user, Answer answer) {
+
+        List<Vote> votes = voteRepository.findByUserAndAnswer(user, answer);
+
+        String errorMessage = "This Voting has already been saved.";
+
+        if (votes.size() > 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    String.format(errorMessage));
+        }
+    }
+
+    private void saveVoting(Answer answer, User user, String votingString) {
+        Vote newVote = new Vote();
+        newVote.setAnswer(answer);
+        newVote.setUser(user);
+        newVote = setVoteOption(newVote, votingString);
+        voteRepository.saveAndFlush(newVote);
     }
 
     private Vote setVoteOption(Vote newVote, String vote) {
@@ -96,17 +173,5 @@ public class VoteService {
         }
 
         return newVote;
-    }
-
-    private void checkIfVotingExists(User user, Answer answer) {
-
-        List<Vote> votes = voteRepository.findByUserAndAnswer(user, answer);
-
-        String errorMessage = "This Voting has already been saved.";
-
-        if (votes.size() > 0) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
     }
 }

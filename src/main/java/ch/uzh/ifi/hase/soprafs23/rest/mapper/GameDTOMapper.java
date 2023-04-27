@@ -3,7 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.rest.mapper;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundLength;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.GamePostDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GamePostDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

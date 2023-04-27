@@ -2,7 +2,6 @@ package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.controller.RoundController;
-import ch.uzh.ifi.hase.soprafs23.repository.UserGameRepository;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
@@ -34,19 +33,16 @@ public class GameService {
     private final UserRepository userRepository;
     private final RoundController roundController;
     private final RoundRepository roundRepository;
-    private final UserGameRepository userGameRepository;
 
     @Autowired
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository,
                        @Qualifier("userRepository") UserRepository userRepository,
                        @Qualifier("roundController") RoundController roundController,
-                       @Qualifier("roundRepository") RoundRepository roundRepository,
-                       @Qualifier("userGameRepository") UserGameRepository userGameRepository) {
+                       @Qualifier("roundRepository") RoundRepository roundRepository) {
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.roundController = roundController;
-        this.roundRepository=roundRepository;
-        this.userGameRepository = userGameRepository;
+        this.roundRepository = roundRepository;
     }
 
     public int createGame(Game newGame, String userToken) {
@@ -99,7 +95,7 @@ public class GameService {
 
         gameToJoin.addPlayer(user);
 
-        return getAllUserNamesOfGame(gameToJoin);
+        return getHostAndAllUserNamesOfGame(gameToJoin);
     }
 
     public GameUsersDTO leaveGame(int gamePin, String userToken) {
@@ -127,7 +123,7 @@ public class GameService {
             return new GameUsersDTO();
         }
 
-        return getAllUserNamesOfGame(game);
+        return getHostAndAllUserNamesOfGame(game);
     }
 
     public Game getGameByGameId(Long gameId) {
@@ -273,9 +269,9 @@ public class GameService {
         }
     }
 
-    private GameUsersDTO getAllUserNamesOfGame(Game gameToJoin) {
+    private GameUsersDTO getHostAndAllUserNamesOfGame(Game gameToJoin) {
         User host = userRepository.findById(gameToJoin.getHostId()).orElse(null);
-        List<User> users = userGameRepository.findUsersByGame(gameToJoin);
+        List<User> users = gameToJoin.getUsers();
         List<String> usernames = new ArrayList<>();
         for (User user : users) {
             if (user.equals(host)) {

@@ -48,9 +48,6 @@ public class User implements Serializable {
     @Column
     private String profilePictureUrl;
 
-
-
-
     public Long getId() {
         return id;
     }

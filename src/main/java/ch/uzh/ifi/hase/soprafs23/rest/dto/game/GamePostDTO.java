@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs23.rest.dto;
+package ch.uzh.ifi.hase.soprafs23.rest.dto.game;
 
 import ch.uzh.ifi.hase.soprafs23.constant.RoundLength;
 

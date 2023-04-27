@@ -25,13 +25,14 @@ public class AnswerController {
                             @RequestBody Map<String, String> answers) {
 
         answerService.saveAnswers(gamePin, userToken, roundNumber, answers);
+
     }
 
     @GetMapping("/games/{gamePin}/{roundNumber}/{categoryName}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public List<Map<Long, String>> getAnswers(@PathVariable("gamePin") int gamePin,
-                                              @PathVariable("roundNumber") Long roundNumber,
+                                              @PathVariable("roundNumber") int roundNumber,
                                               @PathVariable("categoryName") String categoryName,
                                               @RequestHeader("Authorization") String userToken) {
 

@@ -42,13 +42,15 @@ public class AnswerService {
     }
 
     public void saveAnswers(int gamePin, String userToken, int roundNumber, Map<String, String> answers) {
+
         Game game = gameRepository.findByGamePin(gamePin);
         checkIfGameExists(game);
         checkIfGameIsOpen(game);
 
-
         User user = userRepository.findByToken(userToken);
         checkIfUserExists(user);
+
+        checkIfUserIsInGame(game, user);
 
         Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
         checkIfRoundExists(round);
@@ -59,7 +61,7 @@ public class AnswerService {
         saveAnswersToDatabase(answers, user, round);
     }
 
-    public List<Map<Long, String>> getAnswers(int gamePin, Long roundNumber, String categoryName, String userToken) {
+    public List<Map<Long, String>> getAnswers(int gamePin, int roundNumber, String categoryName, String userToken) {
         Game game = gameRepository.findByGamePin(gamePin);
         checkIfGameExists(game);
         checkIfGameIsOpen(game);
@@ -67,11 +69,14 @@ public class AnswerService {
         User user = userRepository.findByToken(userToken);
         checkIfUserExists(user);
 
+        checkIfUserIsInGame(game, user);
+
         Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
         checkIfRoundExists(round);
         checkIfRoundIsFinished(round);
 
-        Category category = getCategoryIfItExists(categoryName);
+        Category category = getCategory(categoryName);
+        checkIfCategoryExists(category);
 
         List<Answer> answers = answerRepository.findByRoundAndCategory(round, category);
 
@@ -86,7 +91,7 @@ public class AnswerService {
         String errorMessage = "Game does not exist. Please try again with a different game!";
 
         if (game == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage);
         }
     }
 
@@ -108,11 +113,21 @@ public class AnswerService {
         }
     }
 
+    private void checkIfUserIsInGame(Game game, User user) {
+        List<User> users = game.getUsers();
+
+        String errorMessage = "User is not part of this game.";
+
+        if(!users.contains(user)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
+        }
+    }
+
     private void checkIfRoundExists(Round round) {
         String errorMessage = "Round does not exist.";
 
         if (round == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage);
         }
     }
 
@@ -131,14 +146,19 @@ public class AnswerService {
         String errorMessage = "These Answers have already been saved.";
 
         if (answers.size() > 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format(errorMessage));
         }
     }
 
-    private Category getCategoryIfItExists(String categoryName) {
+    private Category getCategory(String categoryName) {
 
         Category category = categoryRepository.findByName(categoryName);
+
+        return category;
+    }
+
+    private void checkIfCategoryExists(Category category) {
 
         String errorMessage = "There exists no such category.";
 
@@ -146,13 +166,12 @@ public class AnswerService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     String.format(errorMessage));
         }
-        return category;
     }
 
     private void saveAnswersToDatabase(Map<String, String> answers, User user, Round round) {
         for (Map.Entry<String, String> entry : answers.entrySet()) {
             String categoryName = entry.getKey();
-            Category category = getCategoryIfItExists(categoryName);
+            Category category = getCategory(categoryName);
             String answer = entry.getValue();
             Answer newAnswer = new Answer();
             newAnswer.setRound(round);
