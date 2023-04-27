@@ -4,6 +4,8 @@ import ch.uzh.ifi.hase.soprafs23.constant.GameCategory;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GamePostDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GameSettingGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardEntryDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.game.WinnerDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.GameDTOMapper;
@@ -74,7 +76,7 @@ public class GameController {
         return gameCategoriesDTO;
     }
 
-    @GetMapping("game/{gamePin}/settings")
+    @GetMapping("games/{gamePin}/settings")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public GameSettingGetDTO getGameSettingByGamePin(@PathVariable("gamePin") int gamePin) {
@@ -84,10 +86,10 @@ public class GameController {
         return UserDTOMapper.INSTANCE.convertEntityToGameSettingGetDTO(game);
     }
 
-    @GetMapping("game/{gamePin}/users")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public GameUsersDTO getGameUsersByGamePin(@PathVariable("gamePin") int gamePin) {
+    @GetMapping("games/{gamePin}/users")
+        @ResponseStatus(HttpStatus.OK)
+        @ResponseBody
+        public GameUsersDTO getGameUsersByGamePin(@PathVariable("gamePin") int gamePin) {
 
         Game game = gameService.getGameByGamePin(gamePin);
 
@@ -124,5 +126,19 @@ public class GameController {
         }
         catch (ResponseStatusException ignored) {}
 
+    }
+
+    @GetMapping("/games/lobbies/{gamePin}/winner")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<WinnerDTO> getWinner(@PathVariable("gamePin") int gamePin) {
+        return gameService.getWinner(gamePin);
+    }
+
+    @GetMapping("/games/lobbies/{gamePin}/scoreboard")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<ScoreboardEntryDTO> getScoreboard(@PathVariable("gamePin") int gamePin) {
+        return gameService.getScoreboard(gamePin);
     }
 }

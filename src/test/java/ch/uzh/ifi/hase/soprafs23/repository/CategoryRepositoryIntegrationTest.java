@@ -33,7 +33,7 @@ public class CategoryRepositoryIntegrationTest {
         entityManager.flush();
 
         // when
-        Optional<Category> found = categoryRepository.findByName(category.getName());
+        Optional<Category> found = Optional.ofNullable(categoryRepository.findByName(category.getName()));
 
         // then
         assertTrue(found.isPresent());
@@ -46,7 +46,7 @@ public class CategoryRepositoryIntegrationTest {
         String categoryName = "NonExistentCategory";
 
         // when
-        Optional<Category> found = categoryRepository.findByName(categoryName);
+        Optional<Category> found = Optional.ofNullable(categoryRepository.findByName(categoryName));
 
         // then
         assertFalse(found.isPresent());
