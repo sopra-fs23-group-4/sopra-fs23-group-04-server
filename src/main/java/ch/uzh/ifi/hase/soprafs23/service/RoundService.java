@@ -9,6 +9,8 @@ import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.LetterDTO;
+import ch.uzh.ifi.hase.soprafs23.websocket.DTO.RoundEndDTO;
+import ch.uzh.ifi.hase.soprafs23.websocket.DTO.RoundTimerDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static ch.uzh.ifi.hase.soprafs23.constant.RoundStatus.NOT_STARTED;
 
@@ -30,14 +35,19 @@ public class RoundService {
     private final RoundRepository roundRepository;
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
+    private final WebSocketService webSocketService;
+
+    private final String targetDestination="/topic/lobbies/";
 
     @Autowired
     public RoundService(@Qualifier("roundRepository") RoundRepository roundRepository,
                         @Qualifier("gameRepository")GameRepository gameRepository,
-                        @Qualifier("userRepository") UserRepository userRepository) {
+                        @Qualifier("userRepository") UserRepository userRepository,
+                        WebSocketService webSocketService) {
         this.roundRepository = roundRepository;
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
+        this.webSocketService=webSocketService;
     }
 
     public void createAllRounds(Game game) {
@@ -64,6 +74,7 @@ public class RoundService {
         checkIfRoundExists(round);
 
         round.setStatus(RoundStatus.RUNNING);
+        roundRepository.save(round);
 
         return nextRound(gamePin);
 
@@ -81,6 +92,8 @@ public class RoundService {
         checkIfRoundExists(round);
         checkIfRoundIsRunning(round);
         round.setStatus(RoundStatus.FINISHED);
+
+        roundRepository.saveAndFlush(round);
     }
 
     public LetterDTO nextRound(int gamePin) {
@@ -89,6 +102,7 @@ public class RoundService {
         Round round = roundRepository.findByGameAndRoundNumber(game,game.getCurrentRound());
 
         round.setStatus(RoundStatus.RUNNING);
+        roundRepository.save(round);
 
         LetterDTO letterDTO = new LetterDTO();
         letterDTO.setLetter(round.getLetter());
@@ -98,6 +112,51 @@ public class RoundService {
 
         return letterDTO;
     }
+
+    public void startRoundTime(int gamePin){
+        System.out.println("starting");
+        Game game = gameRepository.findByGamePin(gamePin);
+        Round round = roundRepository.findByGameAndRoundNumber(game, game.getCurrentRound());
+        round.setStatus(RoundStatus.RUNNING);
+        int roundLength = game.getRoundLength().getDuration();
+        System.out.println(roundLength);
+        AtomicInteger remainingTime = new AtomicInteger(roundLength);
+
+        Timer timer = new Timer();
+        TimerTask updateTask = new TimerTask() {
+
+            @Override
+            public void run() {
+                System.out.println("was here");
+                int timeLeft = remainingTime.addAndGet(-3);
+                if (timeLeft <= 0) {
+
+                    RoundEndDTO roundEndDTO = new RoundEndDTO();
+                    webSocketService.sendMessageToClients(targetDestination + gamePin, roundEndDTO);
+                    round.setStatus(RoundStatus.FINISHED);
+                    roundRepository.save(round);
+                    System.out.println(timeLeft);
+                    timer.cancel();
+
+                }
+                else if (round.getStatus()==RoundStatus.FINISHED){
+                    timer.cancel();
+
+                }
+
+                else{
+                    System.out.println("here were we should be");
+
+                    RoundTimerDTO roundTimerDTO = new RoundTimerDTO();
+                    roundTimerDTO.setTimeRemaining(timeLeft);
+                    webSocketService.sendMessageToClients(targetDestination + gamePin, roundTimerDTO);
+                }
+            }
+        };
+
+        timer.scheduleAtFixedRate(updateTask, 0, 3000); // Schedule the task to run every 3 seconds (3000 ms)
+    }
+
 
     /**
      * Helper methods to aid in the game creation, modification and deletion

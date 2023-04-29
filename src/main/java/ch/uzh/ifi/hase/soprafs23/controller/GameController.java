@@ -10,6 +10,8 @@ import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.GameDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
+import ch.uzh.ifi.hase.soprafs23.service.RoundService;
+import ch.uzh.ifi.hase.soprafs23.service.WebSocketService;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.GameUsersDTO;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.LetterDTO;
 import org.springframework.http.HttpStatus;
@@ -25,14 +27,20 @@ import java.util.List;
 @RestController
 public class GameController {
 
+    public static final String FinalDestination = "/topic/lobbies/";
     private final GameService gameService;
-    private final SimpMessagingTemplate messagingTemplate;
+
+    private final String destination= FinalDestination;
+    private final WebSocketService webSocketService;
+    private final RoundService roundService;
 
     GameController(GameService gameService,
-                   SimpMessagingTemplate messagingTemplate) {
+                   WebSocketService webSocketService,
+                    RoundService roundService) {
 
         this.gameService = gameService;
-        this.messagingTemplate=messagingTemplate;
+        this.webSocketService=webSocketService;
+        this.roundService=roundService;
 
     }
 
@@ -58,7 +66,8 @@ public class GameController {
     @PostMapping("/games/{gamePin}/start")
     public void gameStart(@PathVariable("gamePin") int gamePin) {
         LetterDTO letterDTO= gameService.startGame(gamePin);
-        messagingTemplate.convertAndSend("/topic/lobbies/" +gamePin, letterDTO);
+        webSocketService.sendMessageToClients(FinalDestination +gamePin, letterDTO);
+        roundService.startRoundTime(gamePin);
     }
 
     @GetMapping("/games/{gamePin}/categories")
@@ -103,14 +112,9 @@ public class GameController {
 
         GameUsersDTO gameUsersDTO = gameService.joinGame(gamePin, userToken);
 
-        messagingTemplate.convertAndSend("/topic/lobbies/" + gamePin, gameUsersDTO);
+        webSocketService.sendMessageToClients(FinalDestination + gamePin, gameUsersDTO);
     }
 
-    @SendTo("/topic/lobbies/{gamePin}")
-    public Object sendMsg(@Payload Object objectDTO,
-                          @DestinationVariable String gamePin) {
-        return objectDTO;
-    }
 
 
     @PutMapping("/games/lobbies/{gamePin}/leave")
@@ -122,7 +126,7 @@ public class GameController {
 
         try {
             gameService.checkIfGameExists(gameService.getGameByGamePin(gamePin));
-            messagingTemplate.convertAndSend("/topic/lobbies/" + gamePin, gameUsersDTO);
+            webSocketService.sendMessageToClients(FinalDestination + gamePin, gameUsersDTO);
         }
         catch (ResponseStatusException ignored) {}
 

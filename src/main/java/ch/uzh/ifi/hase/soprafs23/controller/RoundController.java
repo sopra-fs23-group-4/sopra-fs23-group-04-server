@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.RoundService;
+import ch.uzh.ifi.hase.soprafs23.service.WebSocketService;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.LetterDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -13,12 +14,14 @@ import org.springframework.web.bind.annotation.*;
 public class RoundController {
 
     private final RoundService roundService;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final WebSocketService webSocketService;
+    public static final String FinalDestination = "/topic/lobbies/";
 
     RoundController(RoundService roundService,
-                    SimpMessagingTemplate messagingTemplate) {
+                    SimpMessagingTemplate messagingTemplate,
+                    WebSocketService webSocketService) {
         this.roundService = roundService;
-        this.messagingTemplate=messagingTemplate;
+        this.webSocketService=webSocketService;
     }
 
     @PutMapping("/games/{gamePin}/{roundNumber}/start")
@@ -27,7 +30,11 @@ public class RoundController {
 
         LetterDTO letterDTO = roundService.startRound(gamePin, roundNumber);
 
-        messagingTemplate.convertAndSend("/topic/lobbies/" +gamePin, letterDTO);
+        webSocketService.sendMessageToClients(FinalDestination+gamePin,letterDTO);
+
+        roundService.startRoundTime(gamePin);
+
+
     }
 
     @PutMapping("/games/{gamePin}/{roundNumber}/end")
@@ -40,6 +47,6 @@ public class RoundController {
         roundService.endRound(gamePin, userToken, roundNumber);
 
         String type="end";
-        messagingTemplate.convertAndSend("/topic/games/" + gamePin + "/rounds", type);
+        webSocketService.sendMessageToClients(FinalDestination+gamePin, type);
     }
 }
