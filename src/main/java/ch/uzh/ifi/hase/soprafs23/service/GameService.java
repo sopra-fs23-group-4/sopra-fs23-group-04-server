@@ -208,7 +208,7 @@ public class GameService {
         }
     }
 
-    private void checkIfUserCanJoin(Long userId) {
+    void checkIfUserCanJoin(Long userId) {
 
         List<Game> openOrRunningGames = getOpenOrRunningGames();
 
@@ -224,7 +224,7 @@ public class GameService {
         }
     }
 
-    private void checkIfUserExists(User user) {
+    void checkIfUserExists(User user) {
 
         String errorMessage = "User does not exist." +
                 "Please register before playing!";
@@ -310,7 +310,7 @@ public class GameService {
     }
 
 
-    private Map<User, Integer> calculateUserScores(int gamePin) {
+    Map<User, Integer> calculateUserScores(int gamePin) {
         List<Answer> answers = answerRepository.findAllByGamePin(gamePin);
 
         Map<User, Integer> userScores = new HashMap<>();

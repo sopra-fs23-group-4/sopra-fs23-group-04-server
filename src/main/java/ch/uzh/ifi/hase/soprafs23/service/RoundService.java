@@ -131,8 +131,9 @@ public class RoundService {
                 int timeLeft = remainingTime.addAndGet(-3);
                 if (timeLeft <= 0) {
 
-                    RoundEndDTO roundEndDTO = new RoundEndDTO();
-                    webSocketService.sendMessageToClients(targetDestination + gamePin, roundEndDTO);
+
+                    String type="end";
+                    webSocketService.sendMessageToClients(targetDestination+gamePin, type);
                     round.setStatus(RoundStatus.FINISHED);
                     roundRepository.save(round);
                     System.out.println(timeLeft);
@@ -145,11 +146,11 @@ public class RoundService {
                 }
 
                 else{
-                    System.out.println("here were we should be");
+                    System.out.println(timeLeft);
 
                     RoundTimerDTO roundTimerDTO = new RoundTimerDTO();
                     roundTimerDTO.setTimeRemaining(timeLeft);
-                    webSocketService.sendMessageToClients(targetDestination + gamePin, roundTimerDTO);
+                    webSocketService.sendMessageToClients(targetDestination + gamePin+"/1", roundTimerDTO);
                 }
             }
         };
