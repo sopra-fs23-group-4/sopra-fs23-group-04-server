@@ -145,7 +145,6 @@ public class GameService {
         return game;
     }
 
-
     public List<String> getGameCategoryNames(Game game) {
         List<Category> gameCategories = game.getCategories();
 
