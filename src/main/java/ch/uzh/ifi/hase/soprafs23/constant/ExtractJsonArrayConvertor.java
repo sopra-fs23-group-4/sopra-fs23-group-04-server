@@ -8,8 +8,13 @@ public class ExtractJsonArrayConvertor implements ExtractJsonData {
     public QuoteHolder jsonToQuoteHolder(JsonNode jsonResponse, QuoteCategory quoteCategory) {
 
         QuoteHolder quoteHolder = new QuoteHolder();
-        quoteHolder.setQuote(jsonResponse.get(0).get(quoteCategory.fieldName).asText());
+        if (quoteCategory.fieldName.equals("quote")){
+            quoteHolder.setQuote(jsonResponse.get(0).get(quoteCategory.fieldName).asText()+ " -"+ jsonResponse.get(0).get("author").asText());
+        }
+        else {
+        quoteHolder.setQuote(jsonResponse.get(0).get(quoteCategory.fieldName).asText());}
         quoteHolder.setCategory(quoteCategory.fieldName);
         return quoteHolder;
+
     }
 }
