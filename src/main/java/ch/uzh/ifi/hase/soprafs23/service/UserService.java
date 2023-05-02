@@ -86,7 +86,7 @@ public class UserService {
 
     }
 
-    public User getUserById(Long id) {
+    public User getUserById(int id) {
         return userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
@@ -98,7 +98,7 @@ public class UserService {
         return user;
     }
 
-    public synchronized User editUser (Long userId, User editedUser) {
+    public synchronized User editUser (int userId, User editedUser) {
 
         User userDB = userRepository.findById(userId).orElse(null);
 

@@ -10,7 +10,7 @@ import java.util.List;
 @Repository("gameRepository")
 public interface GameRepository extends JpaRepository<Game, Integer> {
 
-    Game findByGameId(Long gameId);
+    Game findByGameId(int gameId);
     Game findByGamePin(int gamePin);
     List<Game> findByStatus(GameStatus status);
 

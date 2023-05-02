@@ -75,7 +75,7 @@ public class GameService {
         return newGame.getGamePin();
     }
 
-    public List<Character> generateRandomLetters(Long numberOfRounds){
+    public List<Character> generateRandomLetters(int numberOfRounds){
         List<Character> letters = new ArrayList<>();
 
         for (char letter = 'A'; letter <= 'Z'; letter++) {
@@ -84,7 +84,7 @@ public class GameService {
 
         Collections.shuffle(letters);
 
-        return letters.subList(0, numberOfRounds.intValue());
+        return letters.subList(0, numberOfRounds);
     }
 
     public GameUsersDTO joinGame(int gamePin, String userToken) {
@@ -185,21 +185,21 @@ public class GameService {
         return openOrRunningGames;
     }
 
-    private List<Long> getGameUsersId(Game game) {
-        List<Long> usersId = new ArrayList<>();
+    private List<Integer> getGameUsersId(Game game) {
+        List<Integer> usersId = new ArrayList<>();
         for (User user : game.getUsers()) {
             usersId.add(user.getId());
         }
         return usersId;
     }
 
-    private void checkIfHostIsEligible(Long hostId) {
+    private void checkIfHostIsEligible(int hostId) {
         List<Game> openOrRunningGames = getOpenOrRunningGames();
 
         String errorMessage = "You are already part of a game." +
                 "You cannot host another game!";
         for (Game game : openOrRunningGames) {
-            List<Long> userIds = getGameUsersId(game);
+            List<Integer> userIds = getGameUsersId(game);
             if (userIds.contains(hostId)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         String.format(errorMessage));
@@ -207,7 +207,7 @@ public class GameService {
         }
     }
 
-    void checkIfUserCanJoin(Long userId) {
+    void checkIfUserCanJoin(int userId) {
 
         List<Game> openOrRunningGames = getOpenOrRunningGames();
 
@@ -215,7 +215,7 @@ public class GameService {
                 "You cannot join another game!";
 
         for (Game game : openOrRunningGames) {
-            List<Long> userIds = getGameUsersId(game);
+            List<Integer> userIds = getGameUsersId(game);
             if (userIds.contains(userId)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         String.format(errorMessage));
@@ -245,11 +245,9 @@ public class GameService {
     }
 
     private Boolean checkIfUserIsHost(User user, Game game) {
-        Long hostId = game.getHostId();
+        int hostId = game.getHostId();
 
-        String errorMessage = "You are not part of this game or the game is already running.";
-
-        return hostId.equals(user.getId());
+        return hostId == user.getId();
     }
 
     private Boolean checkIfGameHasUsers(Game game) {
@@ -333,13 +331,13 @@ public class GameService {
                 winners.clear();
                 WinnerDTO winnerDTO = new WinnerDTO();
                 winnerDTO.setUser(entry.getKey());
-                winnerDTO.setScore(entry.getValue().longValue());
+                winnerDTO.setScore(entry.getValue());
                 winners.add(winnerDTO);
                 maxScore = entry.getValue();
             } else if (entry.getValue() == maxScore) {
                 WinnerDTO winnerDTO = new WinnerDTO();
                 winnerDTO.setUser(entry.getKey());
-                winnerDTO.setScore(entry.getValue().longValue());
+                winnerDTO.setScore(entry.getValue());
                 winners.add(winnerDTO);
             }
         }

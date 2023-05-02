@@ -27,10 +27,10 @@ public class GameRepositoryIntegrationTest {
         // given
         Game game = new Game();
 
-        game.setHostId(1L);
+        game.setHostId(1);
         game.setGamePin(1234);
         game.setRoundLength(RoundLength.SHORT);
-        game.setRounds(3L);
+        game.setRounds(3);
         game.setStatus(GameStatus.RUNNING);
 
         entityManager.persist(game);
@@ -51,17 +51,17 @@ public class GameRepositoryIntegrationTest {
     public void findByStatus_success() {
         // given
         Game game1 = new Game();
-        game1.setHostId(1L);
+        game1.setHostId(1);
         game1.setGamePin(1234);
         game1.setRoundLength(RoundLength.SHORT);
-        game1.setRounds(3L);
+        game1.setRounds(3);
         game1.setStatus(GameStatus.RUNNING);
 
         Game game2 = new Game();
-        game2.setHostId(2L);
+        game2.setHostId(2);
         game2.setGamePin(5678);
         game2.setRoundLength(RoundLength.LONG);
-        game2.setRounds(5L);
+        game2.setRounds(5);
         game2.setStatus(GameStatus.RUNNING);
 
         entityManager.persist(game1);
@@ -81,10 +81,10 @@ public class GameRepositoryIntegrationTest {
     public void findByGameId_success() {
         // given
         Game game = new Game();
-        game.setHostId(1L);
+        game.setHostId(1);
         game.setGamePin(1234);
         game.setRoundLength(RoundLength.SHORT);
-        game.setRounds(3L);
+        game.setRounds(3);
         game.setStatus(GameStatus.RUNNING);
 
         entityManager.persist(game);
@@ -105,10 +105,10 @@ public class GameRepositoryIntegrationTest {
     public void findByStatus_notFound() {
         // given
         Game game1 = new Game();
-        game1.setHostId(1L);
+        game1.setHostId(1);
         game1.setGamePin(1234);
         game1.setRoundLength(RoundLength.SHORT);
-        game1.setRounds(3L);
+        game1.setRounds(3);
         game1.setStatus(GameStatus.RUNNING);
 
         entityManager.persist(game1);
@@ -125,17 +125,17 @@ public class GameRepositoryIntegrationTest {
     public void findByGameId_notFound() {
         // given
         Game game = new Game();
-        game.setHostId(1L);
+        game.setHostId(1);
         game.setGamePin(1234);
         game.setRoundLength(RoundLength.SHORT);
-        game.setRounds(3L);
+        game.setRounds(3);
         game.setStatus(GameStatus.CLOSED);
 
         entityManager.persist(game);
         entityManager.flush();
 
         // when
-        Game found = gameRepository.findByGameId(-1L);
+        Game found = gameRepository.findByGameId(-1);
 
         // then
         assertNull(found);

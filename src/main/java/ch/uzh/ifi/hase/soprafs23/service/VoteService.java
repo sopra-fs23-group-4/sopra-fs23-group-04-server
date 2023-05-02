@@ -48,7 +48,7 @@ public class VoteService {
         this.roundRepository = roundRepository;
     }
 
-    public void saveVote(int gamePin, String categoryName, String userToken, Map<Long, String> votings) {
+    public void saveVote(int gamePin, String categoryName, String userToken, Map<Integer, String> votings) {
 
         Game game = gameRepository.findByGamePin(gamePin);
         User user = userRepository.findByToken(userToken);
@@ -58,9 +58,9 @@ public class VoteService {
 
         checkIfUserIsInGame(game, user);
 
-        for (Map.Entry<Long, String> voting : votings.entrySet()) {
+        for (Map.Entry<Integer, String> voting : votings.entrySet()) {
 
-            Long answerId = voting.getKey();
+            int answerId = voting.getKey();
             Answer answer = getAnswerById(answerId);
 
             checkIfCategoryMatches(answer, categoryName);
@@ -236,7 +236,7 @@ public class VoteService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
         }
     }
-    private Answer getAnswerById(Long answerId) {
+    private Answer getAnswerById(int answerId) {
         return answerRepository.findById(answerId);
     }
 

@@ -48,7 +48,7 @@ public class UserServiceTest {
 
         // given
         testUser = new User();
-        testUser.setId(1L);
+        testUser.setId(1);
         testUser.setUsername("username");
         testUser.setPassword("password");
         testUser.setToken("valid-token");
@@ -104,16 +104,16 @@ public class UserServiceTest {
     @Test
     public void editUser_validInputs_success() {
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        when(userRepository.findById(1)).thenReturn(Optional.of(testUser));
         User editedUser = new User();
-        editedUser.setId(1L);
+        editedUser.setId(1);
         editedUser.setUsername("new-username");
         editedUser.setPassword("new-password");
         editedUser.setToken("valid-token");
         editedUser.setQuote("new-quote"); // Add a new quote for the edited user
 
         // When
-        User resultUser = userService.editUser(1L, editedUser);
+        User resultUser = userService.editUser(1, editedUser);
 
         // Then
         assertEquals(editedUser.getId(), resultUser.getId());
@@ -126,29 +126,29 @@ public class UserServiceTest {
     @Test
     public void editUser_userNotFound_throwResponseStatusException() {
         // Given
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        when(userRepository.findById(1)).thenReturn(Optional.empty());
         User editedUser = new User();
-        editedUser.setId(1L);
+        editedUser.setId(1);
         editedUser.setUsername("new-username");
         editedUser.setPassword("new-password");
         editedUser.setToken("valid-token");
 
         // Then (expect exception)
-        assertThrows(ResponseStatusException.class, () -> userService.editUser(1L, editedUser));
+        assertThrows(ResponseStatusException.class, () -> userService.editUser(1, editedUser));
     }
 
     @Test
     public void editUser_invalidToken_throwResponseStatusException() {
         // Given
-        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        when(userRepository.findById(1)).thenReturn(Optional.of(testUser));
         User editedUser = new User();
-        editedUser.setId(1L);
+        editedUser.setId(1);
         editedUser.setUsername("new-username");
         editedUser.setPassword("new-password");
         editedUser.setToken("invalid-token");
 
         // Then (expect exception)
-        assertThrows(ResponseStatusException.class, () -> userService.editUser(1L, editedUser));
+        assertThrows(ResponseStatusException.class, () -> userService.editUser(1, editedUser));
     }
 
     @Test
@@ -225,7 +225,7 @@ public class UserServiceTest {
     public void getUsers_usersExistInRepository_success() {
         // Given
         User anotherTestUser = new User();
-        anotherTestUser.setId(2L);
+        anotherTestUser.setId(2);
         anotherTestUser.setUsername("anotherUsername");
         anotherTestUser.setPassword("anotherPassword");
 
@@ -267,7 +267,7 @@ public class UserServiceTest {
     @Test
     public void getUserById_validId_returnsUser() {
         // Given
-        Long userId = 1L;
+        int userId = 1;
         when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
 
         // When
@@ -282,7 +282,7 @@ public class UserServiceTest {
     @Test
     public void getUserById_invalidId_throwsResponseStatusException() {
         // Given
-        Long userId = 1L;
+        int userId = 1;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // Then

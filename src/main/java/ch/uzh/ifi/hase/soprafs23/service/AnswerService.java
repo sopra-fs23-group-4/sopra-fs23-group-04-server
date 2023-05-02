@@ -62,7 +62,7 @@ public class AnswerService {
         saveAnswersToDatabase(answers, user, round);
     }
 
-    public List<Map<Long, String>> getAnswers(int gamePin, int roundNumber, String categoryName, String userToken) {
+    public List<Map<Integer, String>> getAnswers(int gamePin, int roundNumber, String categoryName, String userToken) {
         Game game = gameRepository.findByGamePin(gamePin);
         checkIfGameExists(game);
         checkIfGameIsRunning(game);
@@ -183,13 +183,13 @@ public class AnswerService {
         answerRepository.flush();
     }
 
-    private List<Map<Long, String>> filterAnswersByDeletingUser(List<Answer> answers, User user) {
+    private List<Map<Integer, String>> filterAnswersByDeletingUser(List<Answer> answers, User user) {
 
-        List<Map<Long, String>> filteredAnswers = new ArrayList<>();
+        List<Map<Integer, String>> filteredAnswers = new ArrayList<>();
 
         for (Answer answer : answers) {
             if (!answer.getUser().equals(user)) {
-                Map<Long, String> answerTuple = new HashMap<>();
+                Map<Integer, String> answerTuple = new HashMap<>();
                 answerTuple.put(answer.getAnswerId(), answer.getAnswerString());
                 filteredAnswers.add(answerTuple);
             }
