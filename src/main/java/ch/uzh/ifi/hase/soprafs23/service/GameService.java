@@ -59,7 +59,7 @@ public class GameService {
 
         checkIfHostIsEligible(user.getId());
 
-        newGame.setGamePin(generateGamePin());
+        newGame.setGamePin(generateGameUniquePin());
         newGame.setStatus(GameStatus.OPEN);
         newGame.setHostId(user.getId());
         newGame.addPlayer(user);
@@ -299,13 +299,23 @@ public class GameService {
         return userRepository.findByToken(userToken);
     }
 
+
+    private int generateGameUniquePin() {
+        int newGamePin = generateGamePin();
+        Game game = gameRepository.findByGamePin(newGamePin);
+        while (game != null) {
+            newGamePin = generateGamePin();
+            game = gameRepository.findByGamePin(newGamePin);
+        }
+        return newGamePin;
+    }
+
     private int generateGamePin() {
 
         Random rnd = new Random();
 
         return rnd.nextInt(9000) + 1000;
     }
-
 
     Map<User, Integer> calculateUserScores(int gamePin) {
         List<Answer> answers = answerRepository.findAllByGamePin(gamePin);
