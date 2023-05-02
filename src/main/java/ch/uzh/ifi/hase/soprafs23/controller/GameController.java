@@ -2,10 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.controller;
 
 import ch.uzh.ifi.hase.soprafs23.constant.GameCategory;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GamePostDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GameSettingGetDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardEntryDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.game.WinnerDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.game.*;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.GameDTOMapper;
@@ -29,8 +26,7 @@ public class GameController {
 
     public static final String FinalDestination = "/topic/lobbies/";
     private final GameService gameService;
-
-    private final String destination= FinalDestination;
+    ;
     private final WebSocketService webSocketService;
     private final RoundService roundService;
 
@@ -62,6 +58,7 @@ public class GameController {
         gameCategoriesDTO.setCategories(GameCategory.getCategories());
         return gameCategoriesDTO;
     }
+
 
     @PostMapping("/games/{gamePin}/start")
     public void gameStart(@PathVariable("gamePin") int gamePin) {
