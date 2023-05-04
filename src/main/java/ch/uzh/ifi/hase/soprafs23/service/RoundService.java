@@ -88,6 +88,7 @@ public class RoundService {
         checkIfUserExists(user);
         checkIfUserIsInGame(game, user);
 
+
         Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
         checkIfRoundExists(round);
         checkIfRoundIsRunning(round);
@@ -131,13 +132,14 @@ public class RoundService {
                 if (timeLeft <= 0) {
 
 
+
+                    round.setStatus(RoundStatus.FINISHED);
+                    roundRepository.save(round);
+                    System.out.println(timeLeft);
                     String fill="roundEnd";
                     RoundEndDTO roundEndDTO=new RoundEndDTO();
                     roundEndDTO.setRounded(fill);
                     webSocketService.sendMessageToClients(targetDestination+gamePin, roundEndDTO);
-                    round.setStatus(RoundStatus.FINISHED);
-                    roundRepository.save(round);
-                    System.out.println(timeLeft);
                     timer.cancel();
 
                 }
