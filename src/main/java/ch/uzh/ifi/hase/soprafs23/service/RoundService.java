@@ -108,7 +108,6 @@ public class RoundService {
         letterDTO.setLetter(round.getLetter());
         letterDTO.setRound(round.getRoundNumber());
 
-        game.setCurrentRound(1+game.getCurrentRound());
 
         return letterDTO;
     }
@@ -132,8 +131,10 @@ public class RoundService {
                 if (timeLeft <= 0) {
 
 
-                    String type="end";
-                    webSocketService.sendMessageToClients(targetDestination+gamePin, type);
+                    String fill="roundEnd";
+                    RoundEndDTO roundEndDTO=new RoundEndDTO();
+                    roundEndDTO.setRounded(fill);
+                    webSocketService.sendMessageToClients(targetDestination+gamePin, roundEndDTO);
                     round.setStatus(RoundStatus.FINISHED);
                     roundRepository.save(round);
                     System.out.println(timeLeft);
@@ -150,7 +151,7 @@ public class RoundService {
 
                     RoundTimerDTO roundTimerDTO = new RoundTimerDTO();
                     roundTimerDTO.setTimeRemaining(timeLeft);
-                    webSocketService.sendMessageToClients(targetDestination + gamePin+"/1", roundTimerDTO);
+                    webSocketService.sendMessageToClients(targetDestination + gamePin, roundTimerDTO);
                 }
             }
         };

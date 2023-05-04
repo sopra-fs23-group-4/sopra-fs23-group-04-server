@@ -1,6 +1,8 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
 import ch.uzh.ifi.hase.soprafs23.service.AnswerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,8 @@ public class AnswerController {
 
     private final AnswerService answerService;
     private final SimpMessagingTemplate messagingTemplate;
+
+    Logger log = LoggerFactory.getLogger(AnswerController.class);
 
 
     AnswerController(AnswerService answerService, SimpMessagingTemplate messagingTemplate) {
@@ -38,6 +42,7 @@ public class AnswerController {
                                               @PathVariable("roundNumber") int roundNumber,
                                               @PathVariable("categoryName") String categoryName,
                                               @RequestHeader("Authorization") String userToken) {
+        log.info("Answer recieved from game : "+ gamePin +" " + roundNumber +categoryName);
 
         return answerService.getAnswers(gamePin, roundNumber, categoryName, userToken);
     }

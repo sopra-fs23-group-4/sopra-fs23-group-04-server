@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.constant.ScorePoint;
 import ch.uzh.ifi.hase.soprafs23.constant.VoteOption;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
@@ -7,6 +8,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.game.*;
 import ch.uzh.ifi.hase.soprafs23.repository.*;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.VoteGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.VoteOptionsGetDTO;
+import ch.uzh.ifi.hase.soprafs23.websocket.DTO.RoundTimerDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @Transactional
@@ -32,6 +32,8 @@ public class VoteService {
     private final VoteRepository voteRepository;
     private final CategoryRepository categoryRepository;
     private final RoundRepository roundRepository;
+    private final WebSocketService webSocketService;
+
 
     @Autowired
     public VoteService(@Qualifier("userRepository") UserRepository userRepository,
@@ -39,14 +41,56 @@ public class VoteService {
                        @Qualifier("answerRepository") AnswerRepository answerRepository,
                        @Qualifier("voteRepository") VoteRepository voteRepository,
                        @Qualifier("categoryRepository") CategoryRepository categoryRepository,
-                       @Qualifier("roundRepository") RoundRepository roundRepository) {
+                       @Qualifier("roundRepository") RoundRepository roundRepository,
+                       WebSocketService webSocketService) {
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.answerRepository = answerRepository;
         this.voteRepository = voteRepository;
         this.categoryRepository = categoryRepository;
         this.roundRepository = roundRepository;
+        this.webSocketService=webSocketService;
     }
+
+    /*public void votingTimer(int gamePin){
+        Game game = gameRepository.findByGamePin(gamePin);
+        Round round = roundRepository.findByGameAndRoundNumber(game, game.getCurrentRound());
+        round.setStatus(RoundStatus.RUNNING);
+        int roundLength = game.getRoundLength().getDuration();
+        System.out.println(roundLength);
+        AtomicInteger remainingTime = new AtomicInteger(roundLength);
+
+        Timer timer = new Timer();
+        TimerTask updateTask = new TimerTask() {
+
+            @Override
+            public void run() {
+                System.out.println("was here");
+                int timeLeft = remainingTime.addAndGet(-3);
+                if (timeLeft <= 0) {
+
+
+                    String type="endVote";
+                    webSocketService.sendMessageToClients(targetDestination+gamePin, type);
+                    round.setStatus(RoundStatus.FINISHED);
+                    roundRepository.save(round);
+                    System.out.println(timeLeft);
+                    timer.cancel();
+
+                }
+
+                else{
+                    System.out.println(timeLeft);
+
+                    RoundTimerDTO roundTimerDTO = new RoundTimerDTO();
+                    roundTimerDTO.setTimeRemaining(timeLeft);
+                    webSocketService.sendMessageToClients(targetDestination + gamePin, roundTimerDTO);
+                }
+            }
+        };
+
+        timer.scheduleAtFixedRate(updateTask, 0, 3000);
+    }*/
 
     public void saveVote(int gamePin, String categoryName, String userToken, Map<Long, String> votings) {
 
