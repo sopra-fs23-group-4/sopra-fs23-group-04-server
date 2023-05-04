@@ -20,7 +20,8 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
     List<Answer> findByRoundAndUser(Round round, User user);
     List<Answer> findByRoundAndCategory(Round round, Category category);
     Answer findByRoundAndCategoryAndUser(Round round, Category category, User user);
-
     @Query("SELECT a FROM Answer a WHERE a.round.game.gamePin = :gamePin")
     List<Answer> findAllByGamePin(@Param("gamePin") int gamePin);
+    List<Answer> findAllByUser(User user);
+
 }

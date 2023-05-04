@@ -2,7 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.rest.dto.game;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 
-public class ScoreboardEntryDTO {
+public class ScoreboardGetDTO {
 
 
     private User user;

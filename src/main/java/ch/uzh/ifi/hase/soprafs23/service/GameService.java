@@ -1,7 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
-import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Answer;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
@@ -11,8 +10,9 @@ import ch.uzh.ifi.hase.soprafs23.repository.AnswerRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardEntryDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.game.WinnerDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.game.LeaderboardGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.game.WinnerGetDTO;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.LetterDTO;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.GameUsersDTO;
 import org.slf4j.Logger;
@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -324,21 +325,21 @@ public class GameService {
         return userScores;
     }
 
-    public List<WinnerDTO> getWinner(int gamePin) {
+    public List<WinnerGetDTO> getWinner(int gamePin) {
         Map<User, Integer> userScores = calculateUserScores(gamePin);
 
-        List<WinnerDTO> winners = new ArrayList<>();
+        List<WinnerGetDTO> winners = new ArrayList<>();
         int maxScore = -1;
         for (Map.Entry<User, Integer> entry : userScores.entrySet()) {
             if (entry.getValue() > maxScore) {
                 winners.clear();
-                WinnerDTO winnerDTO = new WinnerDTO();
+                WinnerGetDTO winnerDTO = new WinnerGetDTO();
                 winnerDTO.setUser(entry.getKey());
                 winnerDTO.setScore(entry.getValue().longValue());
                 winners.add(winnerDTO);
                 maxScore = entry.getValue();
             } else if (entry.getValue() == maxScore) {
-                WinnerDTO winnerDTO = new WinnerDTO();
+                WinnerGetDTO winnerDTO = new WinnerGetDTO();
                 winnerDTO.setUser(entry.getKey());
                 winnerDTO.setScore(entry.getValue().longValue());
                 winners.add(winnerDTO);
@@ -348,17 +349,50 @@ public class GameService {
         return winners;
     }
 
-    public List<ScoreboardEntryDTO> getScoreboard(int gameId) {
+    public List<ScoreboardGetDTO> getScoreboard(int gameId) {
         Map<User, Integer> userScores = calculateUserScores(gameId);
 
-        List<ScoreboardEntryDTO> scoreboard = new ArrayList<>();
+        List<ScoreboardGetDTO> scoreboard = new ArrayList<>();
         for (Map.Entry<User, Integer> entry : userScores.entrySet()) {
-            ScoreboardEntryDTO scoreboardEntry = new ScoreboardEntryDTO();
+            ScoreboardGetDTO scoreboardEntry = new ScoreboardGetDTO();
             scoreboardEntry.setUser(entry.getKey());
             scoreboardEntry.setScore(entry.getValue());
             scoreboard.add(scoreboardEntry);
         }
 
         return scoreboard;
+    }
+
+    public List<LeaderboardGetDTO> getLeaderboard() {
+
+        List<User> users = userRepository.findAll();
+
+        Map<User, Integer> leaderboard = new HashMap<>();
+
+        // Initialize all users with a score of 0
+        for (User user : users) {
+            leaderboard.put(user, 0);
+        }
+
+        for (User user: users){
+            int totalUserScore = 0;
+            List<Answer> userAnswer = answerRepository.findAllByUser(user);
+            for (Answer answer: userAnswer){
+                totalUserScore += answer.getScorePoint().getPoints();
+            }
+            leaderboard.put(user, totalUserScore);
+        }
+
+        // Sort the leaderboard map by scores in descending order and create LeaderboardGetDTO objects
+
+        return leaderboard.entrySet().stream()
+                .sorted(Map.Entry.<User, Integer>comparingByValue().reversed())
+                .map(entry -> {
+                    LeaderboardGetDTO leaderboardGetDTO = new LeaderboardGetDTO();
+                    leaderboardGetDTO.setUser(entry.getKey());
+                    leaderboardGetDTO.setAccumulatedScore(entry.getValue());
+                    return leaderboardGetDTO;
+                })
+                .collect(Collectors.toList());
     }
 }
