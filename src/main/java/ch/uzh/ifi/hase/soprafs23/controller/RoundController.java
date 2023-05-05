@@ -6,6 +6,7 @@ import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.RoundService;
 import ch.uzh.ifi.hase.soprafs23.service.WebSocketService;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.LetterDTO;
+import ch.uzh.ifi.hase.soprafs23.websocket.DTO.RoundEndDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +47,9 @@ public class RoundController {
 
         roundService.endRound(gamePin, userToken, roundNumber);
 
-        String type="end";
-        webSocketService.sendMessageToClients(FinalDestination+gamePin, type);
+        String fill="roundEnd";
+        RoundEndDTO roundEndDTO=new RoundEndDTO();
+        roundEndDTO.setRounded(fill);
+        webSocketService.sendMessageToClients(FinalDestination+gamePin, roundEndDTO);
     }
 }

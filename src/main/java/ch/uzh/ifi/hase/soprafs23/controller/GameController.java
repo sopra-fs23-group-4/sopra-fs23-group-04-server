@@ -2,10 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.controller;
 
 import ch.uzh.ifi.hase.soprafs23.constant.GameCategory;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GamePostDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GameSettingGetDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardEntryDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.game.WinnerDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.game.*;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.GameDTOMapper;
@@ -15,10 +12,6 @@ import ch.uzh.ifi.hase.soprafs23.service.WebSocketService;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.GameUsersDTO;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.LetterDTO;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -29,8 +22,6 @@ public class GameController {
 
     public static final String FinalDestination = "/topic/lobbies/";
     private final GameService gameService;
-
-    private final String destination= FinalDestination;
     private final WebSocketService webSocketService;
     private final RoundService roundService;
 
@@ -62,6 +53,7 @@ public class GameController {
         gameCategoriesDTO.setCategories(GameCategory.getCategories());
         return gameCategoriesDTO;
     }
+
 
     @PostMapping("/games/{gamePin}/start")
     public void gameStart(@PathVariable("gamePin") int gamePin) {
@@ -135,14 +127,21 @@ public class GameController {
     @GetMapping("/games/lobbies/{gamePin}/winner")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<WinnerDTO> getWinner(@PathVariable("gamePin") int gamePin) {
+    public List<WinnerGetDTO> getWinner(@PathVariable("gamePin") int gamePin) {
         return gameService.getWinner(gamePin);
     }
 
     @GetMapping("/games/lobbies/{gamePin}/scoreboard")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<ScoreboardEntryDTO> getScoreboard(@PathVariable("gamePin") int gamePin) {
+    public List<ScoreboardGetDTO> getScoreboard(@PathVariable("gamePin") int gamePin) {
         return gameService.getScoreboard(gamePin);
+    }
+
+    @GetMapping("/games/lobbies/Leaderboard")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public List<LeaderboardGetDTO> getLeaderboard(){
+        return gameService.getLeaderboard();
     }
 }
