@@ -8,10 +8,11 @@ public class UserHelper {
 
     public void checkIfUserExists(User user) {
 
-        String errorMessage = "User does not exist." +
+        String errorMessage = "User does not exist. " +
                 "Please register before playing!";
+
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                     String.format(errorMessage));
         }
     }

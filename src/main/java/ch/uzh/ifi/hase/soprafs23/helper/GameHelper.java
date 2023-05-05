@@ -13,6 +13,7 @@ import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.RUNNING;
 public class GameHelper {
 
     public void checkIfGameExists(Game game) {
+
         String errorMessage = "Game does not exist. Please try again with a different game!";
 
         if (game == null) {
@@ -22,7 +23,7 @@ public class GameHelper {
 
     public void checkIfGameIsOpen(Game game) {
 
-        String errorMessage = "Game not open." +
+        String errorMessage = "Game is not open. " +
                 "Please try again with a different pin!";
 
         if (!game.getStatus().equals(GameStatus.OPEN)) {

@@ -37,7 +37,6 @@ public class UserServiceIntegrationTest {
     @Autowired
     private UserService userService;
 
-
     @MockBean // Add this annotation to mock the QuoteService
     private QuoteService quoteService;
 
