@@ -113,7 +113,7 @@ public class GameService {
         Game gameToJoin = gameRepository.findByGamePin(gamePin);
 
         checkIfGameExists(gameToJoin);
-        checkIfGameIsRunning(gameToJoin);
+        checkIfGameIsOpen(gameToJoin);
 
         gameToJoin.addPlayer(user);
 
