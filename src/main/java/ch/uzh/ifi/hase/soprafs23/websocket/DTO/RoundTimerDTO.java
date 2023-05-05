@@ -1,7 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.websocket.DTO;
 
 public class RoundTimerDTO {
-    public static final String type="roundTimer";
+    public  final static String type="roundTimer";
 
     private int timeRemaining;
     public String getType(){

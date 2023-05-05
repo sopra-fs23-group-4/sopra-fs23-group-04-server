@@ -8,7 +8,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.game.*;
 import ch.uzh.ifi.hase.soprafs23.repository.*;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.VoteGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.VoteOptionsGetDTO;
-import ch.uzh.ifi.hase.soprafs23.websocket.DTO.RoundTimerDTO;
+import ch.uzh.ifi.hase.soprafs23.websocket.DTO.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +33,8 @@ public class VoteService {
     private final CategoryRepository categoryRepository;
     private final RoundRepository roundRepository;
     private final WebSocketService webSocketService;
+
+    private final String targetDestination="/topic/lobbies/";
 
 
     @Autowired
@@ -92,6 +94,73 @@ public class VoteService {
         timer.scheduleAtFixedRate(updateTask, 0, 3000);
     }*/
 
+
+    public void voteTimer(int gamePin){
+        Game game=gameRepository.findByGamePin(gamePin);
+        int numberOfVotingRounds=game.getCategories().size();
+        int currentVotingRound=0;
+
+        while (currentVotingRound< numberOfVotingRounds) {
+            Timer votingTimer = new Timer();
+            TimerTask votingTimerTask = new TimerTask() {
+                int timeRemaining = 12; // Time remaining in seconds
+
+                @Override
+                public void run() {
+                    timeRemaining -= 3;
+                    VotingTimerDTO votingTimerDTO=new VotingTimerDTO();
+                    votingTimerDTO.setTimeRemaining(timeRemaining);
+                    webSocketService.sendMessageToClients(targetDestination+gamePin,votingTimerDTO);
+
+                    if (timeRemaining <= 0) {
+                        VotingEndDTO votingEndDTO=new VotingEndDTO();
+                        webSocketService.sendMessageToClients(targetDestination+gamePin,votingEndDTO);
+                        votingTimer.cancel();
+                    }
+                }
+            };
+            votingTimer.schedule(votingTimerTask, 0, 3000);
+
+
+
+            final int finalCurrentVotingRound = currentVotingRound;
+            Timer showResults = new Timer();
+            TimerTask showResultsTask = new TimerTask() {
+                int timeRemaining = 5;
+
+
+
+                @Override
+                public void run() {
+
+
+                    timeRemaining -= 5;
+                    if (timeRemaining <= 0){
+                        if (finalCurrentVotingRound == numberOfVotingRounds - 1){
+                            ShowScoreBoardDTO showScoreBoardDTO=new ShowScoreBoardDTO();
+                            webSocketService.sendMessageToClients(targetDestination+gamePin,showScoreBoardDTO);
+
+                        }
+                        else {
+                            NextVotingDTO nextVotingDTO= new NextVotingDTO();
+                            webSocketService.sendMessageToClients(targetDestination+gamePin,nextVotingDTO);
+                        }
+
+                    }
+
+                    System.out.println("bye");
+
+
+                }
+            };
+
+            // Schedule votingTimerTask to run every 5 seconds
+            showResults.schedule(showResultsTask, 2000, 5000);
+            currentVotingRound+=1;
+        }
+
+
+    }
     public void saveVote(int gamePin, String categoryName, String userToken, Map<Long, String> votings) {
 
         Game game = gameRepository.findByGamePin(gamePin);
