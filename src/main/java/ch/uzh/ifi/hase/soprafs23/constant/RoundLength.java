@@ -1,7 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.constant;
 
 public enum RoundLength {
-    SHORT(45),
+    SHORT(5),
     MEDIUM(60),
     LONG(75);
 

@@ -68,19 +68,23 @@ public class VoteService {
 
                 @Override
                 public void run() {
-                    timeRemaining -= 3;
-                    VotingTimerDTO votingTimerDTO=new VotingTimerDTO();
-                    votingTimerDTO.setTimeRemaining(timeRemaining);
-                    webSocketService.sendMessageToClients(targetDestination+gamePin,votingTimerDTO);
+                    timeRemaining -= 1;
 
                     if (timeRemaining <= 0) {
                         VotingEndDTO votingEndDTO=new VotingEndDTO();
+                        votingEndDTO.setFiller("filler");
                         webSocketService.sendMessageToClients(targetDestination+gamePin,votingEndDTO);
                         votingTimer.cancel();
                     }
+                    else {
+                        VotingTimerDTO votingTimerDTO=new VotingTimerDTO();
+                        votingTimerDTO.setTimeRemaining(timeRemaining);
+                        webSocketService.sendMessageToClients(targetDestination+gamePin,votingTimerDTO);
+                    }
                 }
             };
-            votingTimer.schedule(votingTimerTask, 0, 3000);
+
+            votingTimer.schedule(votingTimerTask, 2000, 1000);
 
 
 
@@ -88,23 +92,23 @@ public class VoteService {
             Timer showResults = new Timer();
             TimerTask showResultsTask = new TimerTask() {
                 int timeRemaining = 5;
-
-
-
                 @Override
                 public void run() {
 
 
                     timeRemaining -= 5;
-                    if (timeRemaining <= 0){
+                    if (timeRemaining < 0){
                         if (finalCurrentVotingRound == numberOfVotingRounds - 1){
-                            ShowScoreBoardDTO showScoreBoardDTO=new ShowScoreBoardDTO();
-                            webSocketService.sendMessageToClients(targetDestination+gamePin,showScoreBoardDTO);
+                            VotingEndDTO votingEndDTO=new VotingEndDTO();
+                            votingEndDTO.setFiller("filler");
+                            webSocketService.sendMessageToClients(targetDestination+gamePin,votingEndDTO);
 
                         }
                         else {
-                            NextVotingDTO nextVotingDTO= new NextVotingDTO();
-                            webSocketService.sendMessageToClients(targetDestination+gamePin,nextVotingDTO);
+                            votingTimer.schedule(votingTimerTask, 2000, 1000);
+                            VotingEndDTO votingEndDTO=new VotingEndDTO();
+                            votingEndDTO.setFiller("filler");
+                            webSocketService.sendMessageToClients(targetDestination+gamePin,votingEndDTO);
                         }
 
                     }

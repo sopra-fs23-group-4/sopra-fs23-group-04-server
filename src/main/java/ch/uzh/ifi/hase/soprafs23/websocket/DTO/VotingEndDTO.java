@@ -6,4 +6,13 @@ public class VotingEndDTO {
     public static String getType() {
         return type;
     }
+    private String filler;
+
+    public String getFiller() {
+        return filler;
+    }
+
+    public void setFiller(String filler) {
+        this.filler = filler;
+    }
 }
