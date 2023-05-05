@@ -34,8 +34,6 @@ public class RoundController {
         webSocketService.sendMessageToClients(FinalDestination+gamePin,letterDTO);
 
         roundService.startRoundTime(gamePin);
-
-
     }
 
     @PutMapping("/games/{gamePin}/{roundNumber}/end")

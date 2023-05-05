@@ -23,4 +23,5 @@ public class LeaderboardGetDTO {
     public void setAccumulatedScore(int accumulatedScore) {
         this.accumulatedScore = accumulatedScore;
     }
+
 }
