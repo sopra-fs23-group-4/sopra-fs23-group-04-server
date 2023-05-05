@@ -334,14 +334,14 @@ public class GameService {
             if (entry.getValue() > maxScore) {
                 winners.clear();
                 WinnerGetDTO winnerDTO = new WinnerGetDTO();
-                winnerDTO.setUser(entry.getKey());
-                winnerDTO.setScore(entry.getValue().longValue());
+                winnerDTO.setUsername(entry.getKey().getUsername());
+                winnerDTO.setScore(entry.getValue());
                 winners.add(winnerDTO);
                 maxScore = entry.getValue();
             } else if (entry.getValue() == maxScore) {
                 WinnerGetDTO winnerDTO = new WinnerGetDTO();
-                winnerDTO.setUser(entry.getKey());
-                winnerDTO.setScore(entry.getValue().longValue());
+                winnerDTO.setUsername(entry.getKey().getUsername());
+                winnerDTO.setScore(entry.getValue());
                 winners.add(winnerDTO);
             }
         }
@@ -355,7 +355,7 @@ public class GameService {
         List<ScoreboardGetDTO> scoreboard = new ArrayList<>();
         for (Map.Entry<User, Integer> entry : userScores.entrySet()) {
             ScoreboardGetDTO scoreboardEntry = new ScoreboardGetDTO();
-            scoreboardEntry.setUser(entry.getKey());
+            scoreboardEntry.setUsername(entry.getKey().getUsername());
             scoreboardEntry.setScore(entry.getValue());
             scoreboard.add(scoreboardEntry);
         }
@@ -389,7 +389,7 @@ public class GameService {
                 .sorted(Map.Entry.<User, Integer>comparingByValue().reversed())
                 .map(entry -> {
                     LeaderboardGetDTO leaderboardGetDTO = new LeaderboardGetDTO();
-                    leaderboardGetDTO.setUser(entry.getKey());
+                    leaderboardGetDTO.setUsername(entry.getKey().getUsername());
                     leaderboardGetDTO.setAccumulatedScore(entry.getValue());
                     return leaderboardGetDTO;
                 })
