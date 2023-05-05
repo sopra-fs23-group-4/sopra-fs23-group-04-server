@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.constant.GameCategory;
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Answer;
@@ -14,6 +15,7 @@ import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.LeaderboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.WinnerGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.LetterDTO;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.GameUsersDTO;
 import org.slf4j.Logger;
@@ -32,25 +34,31 @@ import java.util.stream.Collectors;
 @Transactional
 public class GameService {
 
+    public static final String FinalDestination = "/topic/lobbies/";
+
     private final Logger log = LoggerFactory.getLogger(UserService.class);
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
     private final RoundRepository roundRepository;
-    private final RoundService roundService;
-
     private final AnswerRepository answerRepository;
+    private final RoundService roundService;
+    private final WebSocketService webSocketService;
 
     @Autowired
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository,
-                       @Qualifier("userRepository") UserRepository userRepository,
                        @Qualifier("roundRepository") RoundRepository roundRepository,
+                       @Qualifier("answerRepository") AnswerRepository answerRepository,
+                       @Qualifier("userRepository") UserRepository userRepository,
                        @Qualifier("roundService") RoundService roundService,
-                       @Qualifier("answerRepository") AnswerRepository answerRepository) {
+                       WebSocketService webSocketService) {
         this.gameRepository = gameRepository;
-        this.userRepository = userRepository;
         this.roundRepository = roundRepository;
-        this.roundService = roundService;
         this.answerRepository = answerRepository;
+        this.userRepository = userRepository;
+
+        this.roundService = roundService;
+
+        this.webSocketService = webSocketService;
     }
 
     public int createGame(Game newGame, String userToken) {
@@ -89,7 +97,7 @@ public class GameService {
         return letters.subList(0, numberOfRounds);
     }
 
-    public GameUsersDTO joinGame(int gamePin, String userToken) {
+    public void joinGame(int gamePin, String userToken) {
 
         User user = getUserByToken(userToken);
 
@@ -103,10 +111,12 @@ public class GameService {
 
         gameToJoin.addPlayer(user);
 
-        return getHostAndAllUserNamesOfGame(gameToJoin);
+        GameUsersDTO gameUsersDTO = getHostAndAllUserNamesOfGame(gameToJoin);
+
+        webSocketService.sendMessageToClients(FinalDestination + gamePin, gameUsersDTO);
     }
 
-    public GameUsersDTO leaveGame(int gamePin, String userToken) {
+    public void leaveGame(int gamePin, String userToken) {
 
         User user = getUserByToken(userToken);
 
@@ -124,16 +134,61 @@ public class GameService {
 
         Boolean gameHasUsers = checkIfGameHasUsers(game);
 
+        GameUsersDTO gameUsersDTO = new GameUsersDTO();
+
         if (userIsHost && gameHasUsers) {
             setNewHost(game);
+            gameUsersDTO = getHostAndAllUserNamesOfGame(game);
         } else if (!gameHasUsers) {
             deleteGameAndRounds(game);
-            return new GameUsersDTO();
         }
 
-        return getHostAndAllUserNamesOfGame(game);
+        try {
+            checkIfGameExists(getGameByGamePin(gamePin));
+            webSocketService.sendMessageToClients(FinalDestination + gamePin, gameUsersDTO);
+        }
+        catch (ResponseStatusException ignored) {}
     }
 
+    public void startGame(int gamePin){
+
+        Game game = gameRepository.findByGamePin(gamePin);
+        checkIfGameExists(game);
+
+        game.setStatus(GameStatus.RUNNING);
+
+        LetterDTO letterDTO = roundService.nextRound(gamePin);
+
+        webSocketService.sendMessageToClients(FinalDestination +gamePin, letterDTO);
+        roundService.startRoundTime(gamePin);
+    }
+
+    public GameCategoriesDTO getStandardCategories() {
+
+        GameCategoriesDTO gameCategoriesDTO = new GameCategoriesDTO();
+        gameCategoriesDTO.setCategories(GameCategory.getCategories());
+
+        return gameCategoriesDTO;
+    }
+
+    public GameCategoriesDTO getGameCategoriesByGamePin(int gamePin) {
+        Game game = getGameByGamePin(gamePin);
+
+        List<String> gameCategoryNames = getGameCategoryNames(game);
+
+        GameCategoriesDTO gameCategoriesDTO = new GameCategoriesDTO();
+        gameCategoriesDTO.setCategories(gameCategoryNames);
+
+        return gameCategoriesDTO;
+    }
+
+    public GameUsersDTO getGameUsersByGamePin(int gamePin) {
+
+        Game game = getGameByGamePin(gamePin);
+
+        return getHostAndAllUserNamesOfGame(game);
+
+    }
     public Game getGameByGamePin(int gamePin) {
 
         Game game = gameRepository.findByGamePin(gamePin);
@@ -156,17 +211,6 @@ public class GameService {
             gameCategoryNames.add(gameCategory.getName());
         }
         return gameCategoryNames;
-    }
-
-    public LetterDTO startGame(int gamePin){
-
-        Game game = gameRepository.findByGamePin(gamePin);
-        checkIfGameExists(game);
-
-        game.setStatus(GameStatus.RUNNING);
-
-        return roundService.nextRound(gamePin);
-
     }
 
     /**

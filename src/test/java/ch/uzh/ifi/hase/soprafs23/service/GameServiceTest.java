@@ -63,7 +63,9 @@ public class GameServiceTest {
         RoundService roundService = mock(RoundService.class);
         AnswerRepository answerRepository = mock(AnswerRepository.class);
 
-        GameService gameService = new GameService(gameRepository, userRepository, roundRepository, roundService, answerRepository);
+        WebSocketService webSocketService = mock (WebSocketService.class);
+
+        GameService gameService = new GameService(gameRepository, roundRepository, answerRepository, userRepository, roundService, webSocketService);
 
         assertNotNull(gameService);
     }
