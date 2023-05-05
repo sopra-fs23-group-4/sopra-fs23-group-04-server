@@ -97,7 +97,7 @@ public class AnswerService {
     }
 
     private void checkIfGameIsRunning(Game game) {
-        String errorMessage = "Game is not running anymore. Please try again with a different game!";
+        String errorMessage = "Game is not running. Please try again with a different game!";
 
         if (!game.getStatus().equals(RUNNING)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
@@ -168,17 +168,25 @@ public class AnswerService {
     }
 
     private void saveAnswersToDatabase(Map<String, String> answers, User user, Round round) {
-        for (Map.Entry<String, String> entry : answers.entrySet()) {
-            String categoryName = entry.getKey();
+        for (Map.Entry<String, String> answer : answers.entrySet()) {
+
+            String categoryName = answer.getKey();
             Category category = getCategory(categoryName);
-            String answer = entry.getValue();
+            String answerString = answer.getValue();
+
+            if (answerString == null) {
+                answerString = "";
+            }
+
             Answer newAnswer = new Answer();
+
             newAnswer.setRound(round);
             newAnswer.setUser(user);
-            newAnswer.setAnswerString(answer);
+            newAnswer.setAnswerString(answerString);
             newAnswer.setCategory(category);
             newAnswer.setScorePoint(INCORRECT);
-            newAnswer = answerRepository.save(newAnswer);
+
+            answerRepository.save(newAnswer);
         }
         answerRepository.flush();
     }

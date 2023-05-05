@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static ch.uzh.ifi.hase.soprafs23.constant.VoteOption.NO_VOTE;
+
 @Service
 @Transactional
 public class VoteService {
@@ -62,6 +64,10 @@ public class VoteService {
 
             int answerId = voting.getKey();
             Answer answer = getAnswerById(answerId);
+
+            System.out.println("\n------------------------------------");
+            System.out.println("answer: " + answer);
+            System.out.println("------------------------------------\n");
 
             checkIfCategoryMatches(answer, categoryName);
 
@@ -170,7 +176,7 @@ public class VoteService {
             List<User> allUsersFiltered = new ArrayList<>(users);
             allUsersFiltered.remove(user);
 
-            VoteGetDTO newVoteGetDTO = createVoteGetDTO(user.getUsername(), allUsersFiltered,answer);
+            VoteGetDTO newVoteGetDTO = createVoteGetDTO(user.getUsername(), allUsersFiltered, answer);
             voteGetDTOList.add(newVoteGetDTO);
         }
 
@@ -182,31 +188,36 @@ public class VoteService {
         int numberOfUnique = 0;
         int numberOfNotUnique = 0;
         int numberOfWrong = 0;
+        int numberOfNoVote = 0;
 
         VoteGetDTO voteGetDTO = new VoteGetDTO();
         voteGetDTO.setUsername(username);
         voteGetDTO.setAnswerString(answer.getAnswerString());
 
-
-
         for (User user : allUsersFiltered) {
 
             Vote vote = voteRepository.findByUserAndAnswer(user, answer);
 
-            if (vote.getVotedOption().equals(VoteOption.CORRECT_UNIQUE)) {
-                numberOfUnique++;
-            }
-            else if (vote.getVotedOption().equals(VoteOption.CORRECT_NOT_UNIQUE)) {
-                numberOfNotUnique++;
-            }
-            else {
-                numberOfWrong++;
+            if (vote != null) {
+                if (vote.getVotedOption().equals(VoteOption.CORRECT_UNIQUE)) {
+                    numberOfUnique++;
+                }
+                else if (vote.getVotedOption().equals(VoteOption.CORRECT_NOT_UNIQUE)) {
+                    numberOfNotUnique++;
+                }
+                else if (vote.getVotedOption().equals(VoteOption.WRONG)) {
+                    numberOfWrong++;
+                }
+                else {
+                    numberOfNoVote++;
+                }
             }
         }
 
         voteGetDTO.setNumberOfUnique(numberOfUnique);
         voteGetDTO.setNumberOfNotUnique(numberOfNotUnique);
         voteGetDTO.setNumberOfWrong(numberOfWrong);
+        voteGetDTO.setNumberOfNoVote(numberOfNoVote);
 
         voteGetDTO.setPoints(calculatePoints(numberOfUnique, numberOfNotUnique, numberOfWrong));
 
@@ -280,7 +291,11 @@ public class VoteService {
         String errorMessage = "At least one of the votes is invalid!";
 
         try {
-            newVote.setVotedOption(VoteOption.valueOf(vote));
+            if (vote == null) {
+                newVote.setVotedOption(NO_VOTE);
+            } else {
+                newVote.setVotedOption(VoteOption.valueOf(vote));
+            }
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format(errorMessage));
