@@ -8,6 +8,8 @@ import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
+import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
+import ch.uzh.ifi.hase.soprafs23.helper.UserHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.AnswerRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
@@ -43,6 +45,8 @@ public class GameService {
     private final AnswerRepository answerRepository;
     private final RoundService roundService;
     private final WebSocketService webSocketService;
+    private final GameHelper gameHelper;
+    private final UserHelper userHelper;
 
     @Autowired
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository,
@@ -50,7 +54,9 @@ public class GameService {
                        @Qualifier("answerRepository") AnswerRepository answerRepository,
                        @Qualifier("userRepository") UserRepository userRepository,
                        @Qualifier("roundService") RoundService roundService,
-                       WebSocketService webSocketService) {
+                       WebSocketService webSocketService,
+                       GameHelper gameHelper,
+                       UserHelper userHelper) {
         this.gameRepository = gameRepository;
         this.roundRepository = roundRepository;
         this.answerRepository = answerRepository;
@@ -59,13 +65,16 @@ public class GameService {
         this.roundService = roundService;
 
         this.webSocketService = webSocketService;
+
+        this.gameHelper = gameHelper;
+        this.userHelper = userHelper;
     }
 
     public int createGame(Game newGame, String userToken) {
 
         User user = getUserByToken(userToken);
 
-        checkIfUserExists(user);
+        userHelper.checkIfUserExists(user);
 
         checkIfHostIsEligible(user.getId());
 
@@ -101,13 +110,14 @@ public class GameService {
 
         User user = getUserByToken(userToken);
 
-        checkIfUserExists(user);
+        userHelper.checkIfUserExists(user);
 
         checkIfUserCanJoin(user.getId());
 
         Game gameToJoin = gameRepository.findByGamePin(gamePin);
 
-        checkIfGameExists(gameToJoin);
+        gameHelper.checkIfGameExists(gameToJoin);
+        gameHelper.checkIfGameIsRunning(gameToJoin);
 
         gameToJoin.addPlayer(user);
 
@@ -120,13 +130,13 @@ public class GameService {
 
         User user = getUserByToken(userToken);
 
-        checkIfUserExists(user);
+        userHelper.checkIfUserExists(user);
 
         Game game = gameRepository.findByGamePin(gamePin);
 
-        checkIfGameExists(game);
+        gameHelper.checkIfGameExists(game);
 
-        checkIfUserInGame(user, game);
+        gameHelper.checkIfUserIsInGame(game, user);
 
         Boolean userIsHost = checkIfUserIsHost(user, game);
 
@@ -144,7 +154,7 @@ public class GameService {
         }
 
         try {
-            checkIfGameExists(getGameByGamePin(gamePin));
+            gameHelper.checkIfGameExists(getGameByGamePin(gamePin));
             webSocketService.sendMessageToClients(FinalDestination + gamePin, gameUsersDTO);
         }
         catch (ResponseStatusException ignored) {}
@@ -153,7 +163,8 @@ public class GameService {
     public void startGame(int gamePin){
 
         Game game = gameRepository.findByGamePin(gamePin);
-        checkIfGameExists(game);
+        gameHelper.checkIfGameExists(game);
+        gameHelper.checkIfGameIsOpen(game);
 
         game.setStatus(GameStatus.RUNNING);
 
@@ -269,27 +280,6 @@ public class GameService {
         }
     }
 
-    void checkIfUserExists(User user) {
-
-        String errorMessage = "User does not exist." +
-                "Please register before playing!";
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
-    }
-
-    private void checkIfUserInGame(User user, Game game) {
-        List<User> gameUsers = game.getUsers();
-
-        String errorMessage = "You are not part of this game or the game is already running.";
-
-        if (!gameUsers.contains(user)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
-    }
-
     private Boolean checkIfUserIsHost(User user, Game game) {
         int hostId = game.getHostId();
 
@@ -314,16 +304,6 @@ public class GameService {
         Random rand = new Random();
         User hostCandidate = users.get(rand.nextInt(users.size()));
         game.setHostId(hostCandidate.getId());
-    }
-
-    public void checkIfGameExists(Game game) {
-
-        String errorMessage = "Game does not exist or is not open anymore." +
-                "Please try again with a different pin!";
-        if (game == null || !game.getStatus().equals(GameStatus.OPEN)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
     }
 
     public GameUsersDTO getHostAndAllUserNamesOfGame(Game gameToJoin) {

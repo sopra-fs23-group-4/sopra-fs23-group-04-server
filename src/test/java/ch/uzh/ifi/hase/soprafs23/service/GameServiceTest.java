@@ -2,6 +2,8 @@ package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
+import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
+import ch.uzh.ifi.hase.soprafs23.helper.UserHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.AnswerRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
@@ -58,14 +60,20 @@ public class GameServiceTest {
     @Test
     void constructor_initializesCorrectly() {
         GameRepository gameRepository = mock(GameRepository.class);
-        UserRepository userRepository = mock(UserRepository.class);
         RoundRepository roundRepository = mock(RoundRepository.class);
-        RoundService roundService = mock(RoundService.class);
         AnswerRepository answerRepository = mock(AnswerRepository.class);
+        UserRepository userRepository = mock(UserRepository.class);
 
-        WebSocketService webSocketService = mock (WebSocketService.class);
+        RoundService roundService = mock(RoundService.class);
+        WebSocketService webSocketService = mock(WebSocketService.class);
 
-        GameService gameService = new GameService(gameRepository, roundRepository, answerRepository, userRepository, roundService, webSocketService);
+        GameHelper gameHelper = mock(GameHelper.class);
+        UserHelper userHelper = mock(UserHelper.class);
+
+        GameService gameService = new GameService(
+                gameRepository, roundRepository, answerRepository, userRepository,
+                roundService, webSocketService,
+                gameHelper, userHelper);
 
         assertNotNull(gameService);
     }
