@@ -12,7 +12,7 @@ import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.RUNNING;
 
 public class GameHelper {
 
-    public void checkIfGameExists(Game game) {
+    public static void checkIfGameExists(Game game) {
 
         String errorMessage = "Game does not exist. Please try again with a different game!";
 
@@ -21,7 +21,7 @@ public class GameHelper {
         }
     }
 
-    public void checkIfGameIsOpen(Game game) {
+    public static void checkIfGameIsOpen(Game game) {
 
         String errorMessage = "Game is not open. " +
                 "Please try again with a different pin!";
@@ -32,7 +32,7 @@ public class GameHelper {
         }
     }
 
-    public void checkIfGameIsRunning(Game game) {
+    public static void checkIfGameIsRunning(Game game) {
         String errorMessage = "Game is not running. Please try again with a different game!";
 
         if (!game.getStatus().equals(RUNNING)) {
@@ -40,7 +40,7 @@ public class GameHelper {
         }
     }
 
-    public void checkIfUserIsInGame(Game game, User user) {
+    public static void checkIfUserIsInGame(Game game, User user) {
         List<User> users = game.getUsers();
 
         String errorMessage = "User is not part of this game.";

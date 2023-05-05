@@ -37,8 +37,8 @@ public class RoundService {
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
     private final WebSocketService webSocketService;
-    private final GameHelper gameHelper;
-    private final UserHelper userHelper;
+    private final GameHelper gameHelper= new GameHelper();
+    private final UserHelper userHelper= new UserHelper();
 
     private final String targetDestination="/topic/lobbies/";
 
@@ -46,16 +46,11 @@ public class RoundService {
     public RoundService(@Qualifier("roundRepository") RoundRepository roundRepository,
                         @Qualifier("gameRepository")GameRepository gameRepository,
                         @Qualifier("userRepository") UserRepository userRepository,
-                        WebSocketService webSocketService,
-                        GameHelper gameHelper,
-                        UserHelper userHelper) {
+                        WebSocketService webSocketService) {
         this.roundRepository = roundRepository;
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.webSocketService=webSocketService;
-
-        this.gameHelper = gameHelper;
-        this.userHelper = userHelper;
     }
 
     public void createAllRounds(Game game) {
@@ -76,8 +71,8 @@ public class RoundService {
     public LetterDTO startRound(int gamePin, int roundNumber){
 
         Game game = gameRepository.findByGamePin(gamePin);
-        gameHelper.checkIfGameExists(game);
-        gameHelper.checkIfGameIsRunning(game);
+        GameHelper.checkIfGameExists(game);
+        GameHelper.checkIfGameIsRunning(game);
 
         Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
         checkIfRoundExists(round);
@@ -92,7 +87,7 @@ public class RoundService {
     public void endRound(int gamePin, String userToken, int roundNumber) {
 
         Game game = gameRepository.findByGamePin(gamePin);
-        gameHelper.checkIfGameExists(game);
+        GameHelper.checkIfGameExists(game);
         gameHelper.checkIfGameIsRunning(game);
 
         User user = userRepository.findByToken(userToken);

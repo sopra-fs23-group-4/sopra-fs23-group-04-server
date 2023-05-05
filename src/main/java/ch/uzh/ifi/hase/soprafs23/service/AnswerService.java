@@ -30,17 +30,15 @@ public class AnswerService {
     private final RoundRepository roundRepository;
     private final AnswerRepository answerRepository;
     private final CategoryRepository categoryRepository;
-    private final GameHelper gameHelper;
-    private final UserHelper userHelper;
+    private final GameHelper gameHelper=new GameHelper();
+    private final UserHelper userHelper= new UserHelper();
 
     @Autowired
     public AnswerService(@Qualifier("gameRepository") GameRepository gameRepository,
                          @Qualifier("userRepository") UserRepository userRepository,
                          @Qualifier("roundRepository") RoundRepository roundRepository,
                          @Qualifier("answerRepository") AnswerRepository answerRepository,
-                         @Qualifier("categoryRepository") CategoryRepository categoryRepository,
-                         GameHelper gameHelper,
-                         UserHelper userHelper) {
+                         @Qualifier("categoryRepository") CategoryRepository categoryRepository) {
 
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
@@ -48,8 +46,6 @@ public class AnswerService {
         this.answerRepository = answerRepository;
         this.categoryRepository = categoryRepository;
 
-        this.gameHelper = gameHelper;
-        this.userHelper = userHelper;
     }
 
     public void saveAnswers(int gamePin, String userToken, int roundNumber, Map<String, String> answers) {

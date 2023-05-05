@@ -45,8 +45,8 @@ public class GameService {
     private final AnswerRepository answerRepository;
     private final RoundService roundService;
     private final WebSocketService webSocketService;
-    private final GameHelper gameHelper;
-    private final UserHelper userHelper;
+    private final GameHelper gameHelper = new GameHelper();
+    private final UserHelper userHelper= new UserHelper();
 
     @Autowired
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository,
@@ -54,9 +54,7 @@ public class GameService {
                        @Qualifier("answerRepository") AnswerRepository answerRepository,
                        @Qualifier("userRepository") UserRepository userRepository,
                        @Qualifier("roundService") RoundService roundService,
-                       WebSocketService webSocketService,
-                       GameHelper gameHelper,
-                       UserHelper userHelper) {
+                       WebSocketService webSocketService) {
         this.gameRepository = gameRepository;
         this.roundRepository = roundRepository;
         this.answerRepository = answerRepository;
@@ -65,9 +63,6 @@ public class GameService {
         this.roundService = roundService;
 
         this.webSocketService = webSocketService;
-
-        this.gameHelper = gameHelper;
-        this.userHelper = userHelper;
     }
 
     public int createGame(Game newGame, String userToken) {
