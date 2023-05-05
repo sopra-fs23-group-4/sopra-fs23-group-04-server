@@ -32,6 +32,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ch.uzh.ifi.hase.soprafs23.helper.GameHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
+
 @Service
 @Transactional
 public class GameService {
@@ -45,8 +48,6 @@ public class GameService {
     private final AnswerRepository answerRepository;
     private final RoundService roundService;
     private final WebSocketService webSocketService;
-    private final GameHelper gameHelper = new GameHelper();
-    private final UserHelper userHelper= new UserHelper();
 
     @Autowired
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository,
@@ -69,7 +70,7 @@ public class GameService {
 
         User user = getUserByToken(userToken);
 
-        userHelper.checkIfUserExists(user);
+        checkIfUserExists(user);
 
         checkIfHostIsEligible(user.getId());
 
@@ -105,14 +106,14 @@ public class GameService {
 
         User user = getUserByToken(userToken);
 
-        userHelper.checkIfUserExists(user);
+        checkIfUserExists(user);
 
         checkIfUserCanJoin(user.getId());
 
         Game gameToJoin = gameRepository.findByGamePin(gamePin);
 
-        gameHelper.checkIfGameExists(gameToJoin);
-        gameHelper.checkIfGameIsRunning(gameToJoin);
+        checkIfGameExists(gameToJoin);
+        checkIfGameIsRunning(gameToJoin);
 
         gameToJoin.addPlayer(user);
 
@@ -125,13 +126,13 @@ public class GameService {
 
         User user = getUserByToken(userToken);
 
-        userHelper.checkIfUserExists(user);
+        checkIfUserExists(user);
 
         Game game = gameRepository.findByGamePin(gamePin);
 
-        gameHelper.checkIfGameExists(game);
+        checkIfGameExists(game);
 
-        gameHelper.checkIfUserIsInGame(game, user);
+        checkIfUserIsInGame(game, user);
 
         Boolean userIsHost = checkIfUserIsHost(user, game);
 
@@ -149,7 +150,7 @@ public class GameService {
         }
 
         try {
-            gameHelper.checkIfGameExists(getGameByGamePin(gamePin));
+            checkIfGameExists(getGameByGamePin(gamePin));
             webSocketService.sendMessageToClients(FinalDestination + gamePin, gameUsersDTO);
         }
         catch (ResponseStatusException ignored) {}
@@ -158,8 +159,8 @@ public class GameService {
     public void startGame(int gamePin){
 
         Game game = gameRepository.findByGamePin(gamePin);
-        gameHelper.checkIfGameExists(game);
-        gameHelper.checkIfGameIsOpen(game);
+        checkIfGameExists(game);
+        checkIfGameIsOpen(game);
 
         game.setStatus(GameStatus.RUNNING);
 

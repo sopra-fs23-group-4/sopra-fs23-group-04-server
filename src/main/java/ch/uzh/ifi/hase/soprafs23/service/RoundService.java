@@ -4,8 +4,6 @@ import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
-import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
-import ch.uzh.ifi.hase.soprafs23.helper.UserHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
@@ -27,6 +25,8 @@ import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static ch.uzh.ifi.hase.soprafs23.constant.RoundStatus.NOT_STARTED;
+import static ch.uzh.ifi.hase.soprafs23.helper.GameHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 
 @Service
 @Transactional
@@ -37,8 +37,6 @@ public class RoundService {
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
     private final WebSocketService webSocketService;
-    private final GameHelper gameHelper= new GameHelper();
-    private final UserHelper userHelper= new UserHelper();
 
     private final String targetDestination="/topic/lobbies/";
 
@@ -71,8 +69,8 @@ public class RoundService {
     public LetterDTO startRound(int gamePin, int roundNumber){
 
         Game game = gameRepository.findByGamePin(gamePin);
-        GameHelper.checkIfGameExists(game);
-        GameHelper.checkIfGameIsRunning(game);
+        checkIfGameExists(game);
+        checkIfGameIsRunning(game);
 
         Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
         checkIfRoundExists(round);
@@ -87,12 +85,12 @@ public class RoundService {
     public void endRound(int gamePin, String userToken, int roundNumber) {
 
         Game game = gameRepository.findByGamePin(gamePin);
-        GameHelper.checkIfGameExists(game);
-        gameHelper.checkIfGameIsRunning(game);
+        checkIfGameExists(game);
+        checkIfGameIsRunning(game);
 
         User user = userRepository.findByToken(userToken);
-        userHelper.checkIfUserExists(user);
-        gameHelper.checkIfUserIsInGame(game, user);
+        checkIfUserExists(user);
+        checkIfUserIsInGame(game, user);
 
 
         Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);

@@ -82,36 +82,26 @@ public class VoteService {
             };
             votingTimer.schedule(votingTimerTask, 0, 3000);
 
-
-
             final int finalCurrentVotingRound = currentVotingRound;
             Timer showResults = new Timer();
             TimerTask showResultsTask = new TimerTask() {
                 int timeRemaining = 5;
 
-
-
                 @Override
                 public void run() {
-
 
                     timeRemaining -= 5;
                     if (timeRemaining <= 0){
                         if (finalCurrentVotingRound == numberOfVotingRounds - 1){
                             ShowScoreBoardDTO showScoreBoardDTO=new ShowScoreBoardDTO();
                             webSocketService.sendMessageToClients(targetDestination+gamePin,showScoreBoardDTO);
-
                         }
                         else {
                             NextVotingDTO nextVotingDTO= new NextVotingDTO();
                             webSocketService.sendMessageToClients(targetDestination+gamePin,nextVotingDTO);
                         }
-
                     }
-
                     System.out.println("bye");
-
-
                 }
             };
 
@@ -119,8 +109,6 @@ public class VoteService {
             showResults.schedule(showResultsTask, 2000, 5000);
             currentVotingRound+=1;
         }
-
-
     }
 
 
