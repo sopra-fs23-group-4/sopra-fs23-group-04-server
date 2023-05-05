@@ -1,10 +1,11 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
+import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
+import ch.uzh.ifi.hase.soprafs23.helper.UserHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
@@ -36,6 +37,8 @@ public class RoundService {
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
     private final WebSocketService webSocketService;
+    private final GameHelper gameHelper;
+    private final UserHelper userHelper;
 
     private final String targetDestination="/topic/lobbies/";
 
@@ -43,11 +46,16 @@ public class RoundService {
     public RoundService(@Qualifier("roundRepository") RoundRepository roundRepository,
                         @Qualifier("gameRepository")GameRepository gameRepository,
                         @Qualifier("userRepository") UserRepository userRepository,
-                        WebSocketService webSocketService) {
+                        WebSocketService webSocketService,
+                        GameHelper gameHelper,
+                        UserHelper userHelper) {
         this.roundRepository = roundRepository;
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.webSocketService=webSocketService;
+
+        this.gameHelper = gameHelper;
+        this.userHelper = userHelper;
     }
 
     public void createAllRounds(Game game) {
@@ -68,7 +76,8 @@ public class RoundService {
     public LetterDTO startRound(int gamePin, int roundNumber){
 
         Game game = gameRepository.findByGamePin(gamePin);
-        checkIfGameExistsAndRuns(game);
+        gameHelper.checkIfGameExists(game);
+        gameHelper.checkIfGameIsRunning(game);
 
         Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
         checkIfRoundExists(round);
@@ -81,12 +90,14 @@ public class RoundService {
     }
 
     public void endRound(int gamePin, String userToken, int roundNumber) {
+
         Game game = gameRepository.findByGamePin(gamePin);
-        checkIfGameExistsAndRuns(game);
+        gameHelper.checkIfGameExists(game);
+        gameHelper.checkIfGameIsRunning(game);
 
         User user = userRepository.findByToken(userToken);
-        checkIfUserExists(user);
-        checkIfUserIsInGame(game, user);
+        userHelper.checkIfUserExists(user);
+        gameHelper.checkIfUserIsInGame(game, user);
 
 
         Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
@@ -166,26 +177,6 @@ public class RoundService {
      * Helper methods to aid in the game creation, modification and deletion
      */
 
-    private void checkIfGameExistsAndRuns(Game game) {
-
-        String errorMessage = "Game does not exist or is not open anymore." +
-                "Please try again with a different pin!";
-        if (game == null || !game.getStatus().equals(GameStatus.RUNNING)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
-    }
-
-    private void checkIfUserIsInGame(Game game, User user) {
-        List<User> users = game.getUsers();
-
-        String errorMessage = "User is not part of this game.";
-
-        if(!users.contains(user)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
-        }
-    }
-
     private void checkIfRoundExists(Round round) {
         String errorMessage = "Round does not exist.";
 
@@ -202,13 +193,4 @@ public class RoundService {
         }
     }
 
-    private void checkIfUserExists(User user) {
-
-        String errorMessage = "User does not exist." +
-                "Please register before playing!";
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
-    }
 }

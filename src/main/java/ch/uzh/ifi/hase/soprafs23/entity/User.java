@@ -20,12 +20,12 @@ import java.time.LocalDate;
 @Table(name = "USER")
 public class User implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final Long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private Long id;
+    private int id;
 
     @Column(nullable = false, unique = true)
     private String username;
@@ -48,11 +48,11 @@ public class User implements Serializable {
     @Column
     private String profilePictureUrl;
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

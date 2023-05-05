@@ -1,11 +1,15 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.constant.GameCategory;
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
+import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Answer;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
+import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
+import ch.uzh.ifi.hase.soprafs23.helper.UserHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.AnswerRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
@@ -13,6 +17,7 @@ import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.LeaderboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.WinnerGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.LetterDTO;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.GameUsersDTO;
 import org.slf4j.Logger;
@@ -31,36 +36,49 @@ import java.util.stream.Collectors;
 @Transactional
 public class GameService {
 
+    public static final String FinalDestination = "/topic/lobbies/";
+
     private final Logger log = LoggerFactory.getLogger(UserService.class);
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
     private final RoundRepository roundRepository;
-    private final RoundService roundService;
-
     private final AnswerRepository answerRepository;
+    private final RoundService roundService;
+    private final WebSocketService webSocketService;
+    private final GameHelper gameHelper;
+    private final UserHelper userHelper;
 
     @Autowired
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository,
-                       @Qualifier("userRepository") UserRepository userRepository,
                        @Qualifier("roundRepository") RoundRepository roundRepository,
+                       @Qualifier("answerRepository") AnswerRepository answerRepository,
+                       @Qualifier("userRepository") UserRepository userRepository,
                        @Qualifier("roundService") RoundService roundService,
-                       @Qualifier("answerRepository") AnswerRepository answerRepository) {
+                       WebSocketService webSocketService,
+                       GameHelper gameHelper,
+                       UserHelper userHelper) {
         this.gameRepository = gameRepository;
-        this.userRepository = userRepository;
         this.roundRepository = roundRepository;
-        this.roundService = roundService;
         this.answerRepository = answerRepository;
+        this.userRepository = userRepository;
+
+        this.roundService = roundService;
+
+        this.webSocketService = webSocketService;
+
+        this.gameHelper = gameHelper;
+        this.userHelper = userHelper;
     }
 
     public int createGame(Game newGame, String userToken) {
 
         User user = getUserByToken(userToken);
 
-        checkIfUserExists(user);
+        userHelper.checkIfUserExists(user);
 
         checkIfHostIsEligible(user.getId());
 
-        newGame.setGamePin(generateGamePin());
+        newGame.setGamePin(generateUniqueGamePin());
         newGame.setStatus(GameStatus.OPEN);
         newGame.setHostId(user.getId());
         newGame.addPlayer(user);
@@ -76,7 +94,7 @@ public class GameService {
         return newGame.getGamePin();
     }
 
-    public List<Character> generateRandomLetters(Long numberOfRounds){
+    public List<Character> generateRandomLetters(int numberOfRounds){
         List<Character> letters = new ArrayList<>();
 
         for (char letter = 'A'; letter <= 'Z'; letter++) {
@@ -85,37 +103,40 @@ public class GameService {
 
         Collections.shuffle(letters);
 
-        return letters.subList(0, numberOfRounds.intValue());
+        return letters.subList(0, numberOfRounds);
     }
 
-    public GameUsersDTO joinGame(int gamePin, String userToken) {
+    public void joinGame(int gamePin, String userToken) {
 
         User user = getUserByToken(userToken);
 
-        checkIfUserExists(user);
+        userHelper.checkIfUserExists(user);
 
         checkIfUserCanJoin(user.getId());
 
         Game gameToJoin = gameRepository.findByGamePin(gamePin);
 
-        checkIfGameExists(gameToJoin);
+        gameHelper.checkIfGameExists(gameToJoin);
+        gameHelper.checkIfGameIsRunning(gameToJoin);
 
         gameToJoin.addPlayer(user);
 
-        return getHostAndAllUserNamesOfGame(gameToJoin);
+        GameUsersDTO gameUsersDTO = getHostAndAllUserNamesOfGame(gameToJoin);
+
+        webSocketService.sendMessageToClients(FinalDestination + gamePin, gameUsersDTO);
     }
 
-    public GameUsersDTO leaveGame(int gamePin, String userToken) {
+    public void leaveGame(int gamePin, String userToken) {
 
         User user = getUserByToken(userToken);
 
-        checkIfUserExists(user);
+        userHelper.checkIfUserExists(user);
 
         Game game = gameRepository.findByGamePin(gamePin);
 
-        checkIfGameExists(game);
+        gameHelper.checkIfGameExists(game);
 
-        checkIfUserInGame(user, game);
+        gameHelper.checkIfUserIsInGame(game, user);
 
         Boolean userIsHost = checkIfUserIsHost(user, game);
 
@@ -123,16 +144,62 @@ public class GameService {
 
         Boolean gameHasUsers = checkIfGameHasUsers(game);
 
+        GameUsersDTO gameUsersDTO = new GameUsersDTO();
+
         if (userIsHost && gameHasUsers) {
             setNewHost(game);
+            gameUsersDTO = getHostAndAllUserNamesOfGame(game);
         } else if (!gameHasUsers) {
             deleteGameAndRounds(game);
-            return new GameUsersDTO();
         }
 
-        return getHostAndAllUserNamesOfGame(game);
+        try {
+            gameHelper.checkIfGameExists(getGameByGamePin(gamePin));
+            webSocketService.sendMessageToClients(FinalDestination + gamePin, gameUsersDTO);
+        }
+        catch (ResponseStatusException ignored) {}
     }
 
+    public void startGame(int gamePin){
+
+        Game game = gameRepository.findByGamePin(gamePin);
+        gameHelper.checkIfGameExists(game);
+        gameHelper.checkIfGameIsOpen(game);
+
+        game.setStatus(GameStatus.RUNNING);
+
+        LetterDTO letterDTO = roundService.nextRound(gamePin);
+
+        webSocketService.sendMessageToClients(FinalDestination +gamePin, letterDTO);
+        roundService.startRoundTime(gamePin);
+    }
+
+    public GameCategoriesDTO getStandardCategories() {
+
+        GameCategoriesDTO gameCategoriesDTO = new GameCategoriesDTO();
+        gameCategoriesDTO.setCategories(GameCategory.getCategories());
+
+        return gameCategoriesDTO;
+    }
+
+    public GameCategoriesDTO getGameCategoriesByGamePin(int gamePin) {
+        Game game = getGameByGamePin(gamePin);
+
+        List<String> gameCategoryNames = getGameCategoryNames(game);
+
+        GameCategoriesDTO gameCategoriesDTO = new GameCategoriesDTO();
+        gameCategoriesDTO.setCategories(gameCategoryNames);
+
+        return gameCategoriesDTO;
+    }
+
+    public GameUsersDTO getGameUsersByGamePin(int gamePin) {
+
+        Game game = getGameByGamePin(gamePin);
+
+        return getHostAndAllUserNamesOfGame(game);
+
+    }
     public Game getGameByGamePin(int gamePin) {
 
         Game game = gameRepository.findByGamePin(gamePin);
@@ -146,7 +213,6 @@ public class GameService {
         return game;
     }
 
-
     public List<String> getGameCategoryNames(Game game) {
         List<Category> gameCategories = game.getCategories();
 
@@ -156,17 +222,6 @@ public class GameService {
             gameCategoryNames.add(gameCategory.getName());
         }
         return gameCategoryNames;
-    }
-
-    public LetterDTO startGame(int gamePin){
-
-        Game game = gameRepository.findByGamePin(gamePin);
-        checkIfGameExists(game);
-
-        game.setStatus(GameStatus.RUNNING);
-
-        return roundService.nextRound(gamePin);
-
     }
 
     /**
@@ -187,21 +242,21 @@ public class GameService {
         return openOrRunningGames;
     }
 
-    private List<Long> getGameUsersId(Game game) {
-        List<Long> usersId = new ArrayList<>();
+    private List<Integer> getGameUsersId(Game game) {
+        List<Integer> usersId = new ArrayList<>();
         for (User user : game.getUsers()) {
             usersId.add(user.getId());
         }
         return usersId;
     }
 
-    private void checkIfHostIsEligible(Long hostId) {
+    private void checkIfHostIsEligible(int hostId) {
         List<Game> openOrRunningGames = getOpenOrRunningGames();
 
         String errorMessage = "You are already part of a game." +
                 "You cannot host another game!";
         for (Game game : openOrRunningGames) {
-            List<Long> userIds = getGameUsersId(game);
+            List<Integer> userIds = getGameUsersId(game);
             if (userIds.contains(hostId)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         String.format(errorMessage));
@@ -209,7 +264,7 @@ public class GameService {
         }
     }
 
-    void checkIfUserCanJoin(Long userId) {
+    void checkIfUserCanJoin(int userId) {
 
         List<Game> openOrRunningGames = getOpenOrRunningGames();
 
@@ -217,7 +272,7 @@ public class GameService {
                 "You cannot join another game!";
 
         for (Game game : openOrRunningGames) {
-            List<Long> userIds = getGameUsersId(game);
+            List<Integer> userIds = getGameUsersId(game);
             if (userIds.contains(userId)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         String.format(errorMessage));
@@ -225,33 +280,10 @@ public class GameService {
         }
     }
 
-    void checkIfUserExists(User user) {
-
-        String errorMessage = "User does not exist." +
-                "Please register before playing!";
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
-    }
-
-    private void checkIfUserInGame(User user, Game game) {
-        List<User> gameUsers = game.getUsers();
-
-        String errorMessage = "You are not part of this game or the game is already running.";
-
-        if (!gameUsers.contains(user)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
-    }
-
     private Boolean checkIfUserIsHost(User user, Game game) {
-        Long hostId = game.getHostId();
+        int hostId = game.getHostId();
 
-        String errorMessage = "You are not part of this game or the game is already running.";
-
-        return hostId.equals(user.getId());
+        return hostId == user.getId();
     }
 
     private Boolean checkIfGameHasUsers(Game game) {
@@ -274,16 +306,6 @@ public class GameService {
         game.setHostId(hostCandidate.getId());
     }
 
-    public void checkIfGameExists(Game game) {
-
-        String errorMessage = "Game does not exist or is not open anymore." +
-                "Please try again with a different pin!";
-        if (game == null || !game.getStatus().equals(GameStatus.OPEN)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
-    }
-
     public GameUsersDTO getHostAndAllUserNamesOfGame(Game gameToJoin) {
         User host = userRepository.findById(gameToJoin.getHostId()).orElse(null);
         List<User> users = gameToJoin.getUsers();
@@ -301,6 +323,17 @@ public class GameService {
 
     private User getUserByToken(String userToken) {
         return userRepository.findByToken(userToken);
+    }
+
+
+    private int generateUniqueGamePin() {
+        int newGamePin = generateGamePin();
+        Game game = gameRepository.findByGamePin(newGamePin);
+        while (game != null) {
+            newGamePin = generateGamePin();
+            game = gameRepository.findByGamePin(newGamePin);
+        }
+        return newGamePin;
     }
 
     private int generateGamePin() {
@@ -334,14 +367,14 @@ public class GameService {
             if (entry.getValue() > maxScore) {
                 winners.clear();
                 WinnerGetDTO winnerDTO = new WinnerGetDTO();
-                winnerDTO.setUser(entry.getKey());
-                winnerDTO.setScore(entry.getValue().longValue());
+                winnerDTO.setUsername(entry.getKey().getUsername());
+                winnerDTO.setScore(entry.getValue());
                 winners.add(winnerDTO);
                 maxScore = entry.getValue();
             } else if (entry.getValue() == maxScore) {
                 WinnerGetDTO winnerDTO = new WinnerGetDTO();
-                winnerDTO.setUser(entry.getKey());
-                winnerDTO.setScore(entry.getValue().longValue());
+                winnerDTO.setUsername(entry.getKey().getUsername());
+                winnerDTO.setScore(entry.getValue());
                 winners.add(winnerDTO);
             }
         }
@@ -355,7 +388,7 @@ public class GameService {
         List<ScoreboardGetDTO> scoreboard = new ArrayList<>();
         for (Map.Entry<User, Integer> entry : userScores.entrySet()) {
             ScoreboardGetDTO scoreboardEntry = new ScoreboardGetDTO();
-            scoreboardEntry.setUser(entry.getKey());
+            scoreboardEntry.setUsername(entry.getKey().getUsername());
             scoreboardEntry.setScore(entry.getValue());
             scoreboard.add(scoreboardEntry);
         }
@@ -389,7 +422,7 @@ public class GameService {
                 .sorted(Map.Entry.<User, Integer>comparingByValue().reversed())
                 .map(entry -> {
                     LeaderboardGetDTO leaderboardGetDTO = new LeaderboardGetDTO();
-                    leaderboardGetDTO.setUser(entry.getKey());
+                    leaderboardGetDTO.setUsername(entry.getKey().getUsername());
                     leaderboardGetDTO.setAccumulatedScore(entry.getValue());
                     return leaderboardGetDTO;
                 })

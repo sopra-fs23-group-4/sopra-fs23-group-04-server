@@ -12,7 +12,7 @@ public class Vote {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vote_id")
-    private Long voteId;
+    private int voteId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "answer_id", nullable = false)
@@ -25,7 +25,7 @@ public class Vote {
     @Column(nullable = false)
     private VoteOption votedOption;
 
-    public Long getVoteId() {
+    public int getVoteId() {
         return voteId;
     }
 

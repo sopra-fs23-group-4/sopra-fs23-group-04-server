@@ -75,7 +75,7 @@ public class UserControllerTest {
   public void createUser_validInput_userCreated() throws Exception {
     // given
     User user = new User();
-    user.setId(1L);
+    user.setId(1);
     user.setUsername("testUsername");
     user.setToken("1");
     user.setStatus(UserStatus.ONLINE);
@@ -99,7 +99,7 @@ public class UserControllerTest {
         // then
         mockMvc.perform(postRequest)
             .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.id", is(user.getId().intValue())))
+            .andExpect(jsonPath("$.id", is(user.getId())))
             .andExpect(jsonPath("$.username", is(user.getUsername())))
             .andExpect(jsonPath("$.status", is(user.getStatus().toString())));
     }
@@ -108,7 +108,7 @@ public class UserControllerTest {
     public void logInUser_validInput_userLoggedIn() throws Exception {
         // given
         User user = new User();
-        user.setId(1L);
+        user.setId(1);
         user.setUsername("testUsername");
         user.setToken("1");
         user.setStatus(UserStatus.ONLINE);
@@ -131,7 +131,7 @@ public class UserControllerTest {
         // then
         mockMvc.perform(postRequest)
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", is(user.getId().intValue())))
+                .andExpect(jsonPath("$.id", is(user.getId())))
                 .andExpect(jsonPath("$.username", is(user.getUsername())))
                 .andExpect(jsonPath("$.status", is(user.getStatus().toString())))
                 .andExpect(header().string("Authorization", user.getToken()));
@@ -163,7 +163,7 @@ public class UserControllerTest {
     public void editUser_validInput_userEdited () throws Exception {
         // given
         User user = new User();
-        user.setId(1L);
+        user.setId(1);
         user.setUsername("testUsername");
         user.setStatus(UserStatus.ONLINE);
 
@@ -203,7 +203,7 @@ public class UserControllerTest {
     @Test
     public void getUserByID_correctInput_returnUser() throws Exception {
         // given
-        long userId = 1L;
+        int userId = 1;
         User user = new User();
         user.setId(userId);
         user.setUsername("testUsername");
@@ -217,7 +217,7 @@ public class UserControllerTest {
         // then
         mockMvc.perform(getRequest)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(user.getId().intValue())))
+                .andExpect(jsonPath("$.id", is(user.getId())))
                 .andExpect(jsonPath("$.username", is(user.getUsername())));
     }
     @Test
@@ -225,7 +225,7 @@ public class UserControllerTest {
         // given
         String username = "testUsername";
         User user = new User();
-        user.setId(1L);
+        user.setId(1);
         user.setUsername(username);
 
         given(userService.getUserByUsername(username)).willReturn(user);
@@ -237,7 +237,7 @@ public class UserControllerTest {
         // then
         mockMvc.perform(getRequest)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(user.getId().intValue())))
+                .andExpect(jsonPath("$.id", is(user.getId())))
                 .andExpect(jsonPath("$.username", is(user.getUsername())));
     }
 

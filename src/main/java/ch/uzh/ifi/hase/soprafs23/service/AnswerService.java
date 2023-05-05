@@ -2,6 +2,8 @@ package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.*;
+import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
+import ch.uzh.ifi.hase.soprafs23.helper.UserHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,30 +30,38 @@ public class AnswerService {
     private final RoundRepository roundRepository;
     private final AnswerRepository answerRepository;
     private final CategoryRepository categoryRepository;
+    private final GameHelper gameHelper;
+    private final UserHelper userHelper;
 
     @Autowired
     public AnswerService(@Qualifier("gameRepository") GameRepository gameRepository,
                          @Qualifier("userRepository") UserRepository userRepository,
                          @Qualifier("roundRepository") RoundRepository roundRepository,
                          @Qualifier("answerRepository") AnswerRepository answerRepository,
-                         @Qualifier("categoryRepository") CategoryRepository categoryRepository) {
+                         @Qualifier("categoryRepository") CategoryRepository categoryRepository,
+                         GameHelper gameHelper,
+                         UserHelper userHelper) {
+
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.roundRepository = roundRepository;
         this.answerRepository = answerRepository;
         this.categoryRepository = categoryRepository;
+
+        this.gameHelper = gameHelper;
+        this.userHelper = userHelper;
     }
 
     public void saveAnswers(int gamePin, String userToken, int roundNumber, Map<String, String> answers) {
 
         Game game = gameRepository.findByGamePin(gamePin);
-        checkIfGameExists(game);
-        checkIfGameIsRunning(game);
+        gameHelper.checkIfGameExists(game);
+        gameHelper.checkIfGameIsRunning(game);
 
         User user = userRepository.findByToken(userToken);
-        checkIfUserExists(user);
+        userHelper.checkIfUserExists(user);
 
-        checkIfUserIsInGame(game, user);
+        gameHelper.checkIfUserIsInGame(game, user);
 
         Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
         checkIfRoundExists(round);
@@ -62,15 +72,15 @@ public class AnswerService {
         saveAnswersToDatabase(answers, user, round);
     }
 
-    public List<Map<Long, String>> getAnswers(int gamePin, int roundNumber, String categoryName, String userToken) {
+    public List<Map<Integer, String>> getAnswers(int gamePin, int roundNumber, String categoryName, String userToken) {
         Game game = gameRepository.findByGamePin(gamePin);
-        checkIfGameExists(game);
-        checkIfGameIsRunning(game);
+        gameHelper.checkIfGameExists(game);
+        gameHelper.checkIfGameIsRunning(game);
 
         User user = userRepository.findByToken(userToken);
-        checkIfUserExists(user);
+        userHelper.checkIfUserExists(user);
 
-        checkIfUserIsInGame(game, user);
+        gameHelper.checkIfUserIsInGame(game, user);
 
         Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
         checkIfRoundExists(round);
@@ -87,42 +97,6 @@ public class AnswerService {
     /**
      * Helper methods to aid with the answer saving, creation and retrieval
      */
-
-    private void checkIfGameExists(Game game) {
-        String errorMessage = "Game does not exist. Please try again with a different game!";
-
-        if (game == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage);
-        }
-    }
-
-    private void checkIfGameIsRunning(Game game) {
-        String errorMessage = "Game is not running anymore. Please try again with a different game!";
-
-        if (!game.getStatus().equals(RUNNING)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
-        }
-    }
-
-    private void checkIfUserExists(User user) {
-
-        String errorMessage = "User does not exist." +
-                "Please register before playing!";
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format(errorMessage));
-        }
-    }
-
-    private void checkIfUserIsInGame(Game game, User user) {
-        List<User> users = game.getUsers();
-
-        String errorMessage = "User is not part of this game.";
-
-        if(!users.contains(user)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
-        }
-    }
 
     private void checkIfRoundExists(Round round) {
         String errorMessage = "Round does not exist.";
@@ -168,28 +142,36 @@ public class AnswerService {
     }
 
     private void saveAnswersToDatabase(Map<String, String> answers, User user, Round round) {
-        for (Map.Entry<String, String> entry : answers.entrySet()) {
-            String categoryName = entry.getKey();
+        for (Map.Entry<String, String> answer : answers.entrySet()) {
+
+            String categoryName = answer.getKey();
             Category category = getCategory(categoryName);
-            String answer = entry.getValue();
+            String answerString = answer.getValue();
+
+            if (answerString == null) {
+                answerString = "";
+            }
+
             Answer newAnswer = new Answer();
+
             newAnswer.setRound(round);
             newAnswer.setUser(user);
-            newAnswer.setAnswerString(answer);
+            newAnswer.setAnswerString(answerString);
             newAnswer.setCategory(category);
             newAnswer.setScorePoint(INCORRECT);
-            newAnswer = answerRepository.save(newAnswer);
+
+            answerRepository.save(newAnswer);
         }
         answerRepository.flush();
     }
 
-    private List<Map<Long, String>> filterAnswersByDeletingUser(List<Answer> answers, User user) {
+    private List<Map<Integer, String>> filterAnswersByDeletingUser(List<Answer> answers, User user) {
 
-        List<Map<Long, String>> filteredAnswers = new ArrayList<>();
+        List<Map<Integer, String>> filteredAnswers = new ArrayList<>();
 
         for (Answer answer : answers) {
             if (!answer.getUser().equals(user)) {
-                Map<Long, String> answerTuple = new HashMap<>();
+                Map<Integer, String> answerTuple = new HashMap<>();
                 answerTuple.put(answer.getAnswerId(), answer.getAnswerString());
                 filteredAnswers.add(answerTuple);
             }

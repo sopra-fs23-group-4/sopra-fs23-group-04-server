@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository("userRepository")
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Integer> {
 
-    Optional<User> findById(Long id);
+    Optional<User> findById(int id);
     User findByToken(String token);
     User findByUsername(String username);
     List<User> findAll();

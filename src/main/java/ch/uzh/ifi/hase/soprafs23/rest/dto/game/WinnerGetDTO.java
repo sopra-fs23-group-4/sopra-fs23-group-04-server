@@ -4,23 +4,14 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 
 public class WinnerGetDTO {
 
-    private User user;
-    private Long score;
+    private String username;
+    private int score;
 
+    public String getUsername() { return username; }
 
-    public User getUser() {
-        return user;
-    }
+    public void setUsername(String username) { this.username = username; }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+    public int getScore() { return score; }
 
-    public Long getScore() {
-        return score;
-    }
-
-    public void setScore(Long score) {
-        this.score = score;
-    }
+    public void setScore(int score) { this.score = score; }
 }
