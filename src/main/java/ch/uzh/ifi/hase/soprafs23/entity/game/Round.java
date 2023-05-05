@@ -10,12 +10,12 @@ import java.io.Serializable;
 @Table(name = "ROUND")
 public class Round implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final Long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "round_id")
-    private Long roundId;
+    private int roundId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_id", nullable = false)
@@ -30,7 +30,7 @@ public class Round implements Serializable {
     @Column(nullable = false)
     private Character letter;
 
-    public Long getRoundId() {
+    public int getRoundId() {
         return roundId;
     }
 

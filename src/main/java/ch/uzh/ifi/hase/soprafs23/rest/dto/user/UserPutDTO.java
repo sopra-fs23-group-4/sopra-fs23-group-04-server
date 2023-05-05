@@ -2,7 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.rest.dto.user;
 
 public class UserPutDTO {
 
-    private Long userId;
+    private int userId;
     private String token;
     private String username;
     private String password;
@@ -13,9 +13,9 @@ public class UserPutDTO {
     public UserPutDTO() {
     }
 
-    public Long getUserId() { return userId; }
+    public int getUserId() { return userId; }
 
-    public void setUserId(Long userId) { this.userId = userId; }
+    public void setUserId(int userId) { this.userId = userId; }
     public String getToken() {
         return token;
     }

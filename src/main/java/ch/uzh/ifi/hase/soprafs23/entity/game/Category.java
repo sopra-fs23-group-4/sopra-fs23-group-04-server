@@ -9,17 +9,17 @@ import java.io.Serializable;
 @Table(name = "CATEGORY")
 public class Category implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final Long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_id")
-    private Long categoryId;
+    private int categoryId;
 
     @Column(nullable = false, unique = true)
     private String name;
 
-    public Long getCategoryId() {
+    public int getCategoryId() {
         return categoryId;
     }
 

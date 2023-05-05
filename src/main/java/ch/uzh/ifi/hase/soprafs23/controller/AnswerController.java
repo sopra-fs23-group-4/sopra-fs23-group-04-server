@@ -38,7 +38,7 @@ public class AnswerController {
     @GetMapping("/games/{gamePin}/{roundNumber}/{categoryName}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public List<Map<Long, String>> getAnswers(@PathVariable("gamePin") int gamePin,
+    public List<Map<Integer, String>> getAnswers(@PathVariable("gamePin") int gamePin,
                                               @PathVariable("roundNumber") int roundNumber,
                                               @PathVariable("categoryName") String categoryName,
                                               @RequestHeader("Authorization") String userToken) {

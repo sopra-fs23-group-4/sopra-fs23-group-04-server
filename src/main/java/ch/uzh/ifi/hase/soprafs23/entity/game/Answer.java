@@ -11,7 +11,7 @@ public class Answer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "answer_id")
-    private Long id;
+    private int id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "round_id", nullable = false)
@@ -31,7 +31,7 @@ public class Answer {
     @Column(nullable = false)
     private ScorePoint scorePoint;
 
-    public Long getAnswerId() {
+    public int getAnswerId() {
         return id;
     }
 
