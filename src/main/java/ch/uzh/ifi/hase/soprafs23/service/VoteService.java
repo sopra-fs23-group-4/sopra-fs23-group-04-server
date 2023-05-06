@@ -82,9 +82,9 @@ public class VoteService {
                     }
                 }
             };
-            votingTimer.schedule(votingTimerTask, 0, 3000);
-
             votingTimer.schedule(votingTimerTask, 2000, 1000);
+
+
 
 
 
@@ -99,12 +99,12 @@ public class VoteService {
                     timeRemaining -= 5;
                     if (timeRemaining <= 0){
                         if (isLastCategory(finalVotingCategory, numberOfVotingRounds)){
-                            if (game.isLastRound()){
+                            /*if (game.isLastRound()){
                                 WebSocketDTO webSocketDTO=new WebSocketDTO();
                                 webSocketDTO.setType("resultWinner");
                                 webSocketService.sendMessageToClients(targetDestination+gamePin,webSocketDTO);
                             }
-                            else {
+                            else*/ {
                                 WebSocketDTO webSocketDTO=new WebSocketDTO();
                                 webSocketDTO.setType("resultScoreboard");
                                 webSocketService.sendMessageToClients(targetDestination+gamePin,webSocketDTO);
@@ -135,6 +135,7 @@ public class VoteService {
 
 
     }
+
 
     private static boolean isLastCategory(int finalVotingCategory, int numberOfVotingRounds) {
         return finalVotingCategory == numberOfVotingRounds - 1;

@@ -152,8 +152,6 @@ public class Game implements Serializable {
         rounds.remove(round);
     }
 
-    public boolean isLastRound(){
-        return currentRound==rounds.size();
-    }
+
 
 }
