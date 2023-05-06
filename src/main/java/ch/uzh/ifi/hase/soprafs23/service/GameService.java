@@ -8,8 +8,6 @@ import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
-import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
-import ch.uzh.ifi.hase.soprafs23.helper.UserHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.AnswerRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
@@ -32,6 +30,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ch.uzh.ifi.hase.soprafs23.helper.GameHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
+
 @Service
 @Transactional
 public class GameService {
@@ -45,8 +46,6 @@ public class GameService {
     private final AnswerRepository answerRepository;
     private final RoundService roundService;
     private final WebSocketService webSocketService;
-    private final GameHelper gameHelper = new GameHelper();
-    private final UserHelper userHelper= new UserHelper();
 
     @Autowired
     public GameService(@Qualifier("gameRepository") GameRepository gameRepository,
@@ -69,7 +68,7 @@ public class GameService {
 
         User user = getUserByToken(userToken);
 
-        userHelper.checkIfUserExists(user);
+        checkIfUserExists(user);
 
         checkIfHostIsEligible(user.getId());
 
@@ -89,30 +88,18 @@ public class GameService {
         return newGame.getGamePin();
     }
 
-    public List<Character> generateRandomLetters(int numberOfRounds){
-        List<Character> letters = new ArrayList<>();
-
-        for (char letter = 'A'; letter <= 'Z'; letter++) {
-            letters.add(letter);
-        }
-
-        Collections.shuffle(letters);
-
-        return letters.subList(0, numberOfRounds);
-    }
-
     public void joinGame(int gamePin, String userToken) {
 
         User user = getUserByToken(userToken);
 
-        userHelper.checkIfUserExists(user);
+        checkIfUserExists(user);
 
         checkIfUserCanJoin(user.getId());
 
         Game gameToJoin = gameRepository.findByGamePin(gamePin);
 
-        gameHelper.checkIfGameExists(gameToJoin);
-        gameHelper.checkIfGameIsRunning(gameToJoin);
+        checkIfGameExists(gameToJoin);
+        checkIfGameIsOpen(gameToJoin);
 
         gameToJoin.addPlayer(user);
 
@@ -125,13 +112,13 @@ public class GameService {
 
         User user = getUserByToken(userToken);
 
-        userHelper.checkIfUserExists(user);
+        checkIfUserExists(user);
 
         Game game = gameRepository.findByGamePin(gamePin);
 
-        gameHelper.checkIfGameExists(game);
+        checkIfGameExists(game);
 
-        gameHelper.checkIfUserIsInGame(game, user);
+        checkIfUserIsInGame(game, user);
 
         Boolean userIsHost = checkIfUserIsHost(user, game);
 
@@ -149,7 +136,7 @@ public class GameService {
         }
 
         try {
-            gameHelper.checkIfGameExists(getGameByGamePin(gamePin));
+            checkIfGameExists(getGameByGamePin(gamePin));
             webSocketService.sendMessageToClients(FinalDestination + gamePin, gameUsersDTO);
         }
         catch (ResponseStatusException ignored) {}
@@ -158,8 +145,8 @@ public class GameService {
     public void startGame(int gamePin){
 
         Game game = gameRepository.findByGamePin(gamePin);
-        gameHelper.checkIfGameExists(game);
-        gameHelper.checkIfGameIsOpen(game);
+        checkIfGameExists(game);
+        checkIfGameIsOpen(game);
 
         game.setStatus(GameStatus.RUNNING);
 
@@ -168,6 +155,10 @@ public class GameService {
         webSocketService.sendMessageToClients(FinalDestination +gamePin, letterDTO);
         roundService.startRoundTime(gamePin);
     }
+
+    /**
+     * Helper methods to aid in the game creation, modification and deletion
+     */
 
     public GameCategoriesDTO getStandardCategories() {
 
@@ -195,16 +186,13 @@ public class GameService {
         return getHostAndAllUserNamesOfGame(game);
 
     }
+
     public Game getGameByGamePin(int gamePin) {
 
         Game game = gameRepository.findByGamePin(gamePin);
 
-        String errorMessage = "Game does not exist!";
+        checkIfGameExists(game);
 
-        if (game == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format(errorMessage));
-        }
         return game;
     }
 
@@ -219,21 +207,20 @@ public class GameService {
         return gameCategoryNames;
     }
 
-    /**
-     * Helper methods to aid in the game creation, modification and deletion
-     */
-
     private List<Game> getOpenGames() {
         return gameRepository.findByStatus(GameStatus.OPEN);
     }
 
     private List<Game> getRunningGames() {
+
         return gameRepository.findByStatus(GameStatus.RUNNING);
     }
 
     private List<Game> getOpenOrRunningGames() {
+
         List<Game> openOrRunningGames = getOpenGames();
         openOrRunningGames.addAll(getRunningGames());
+
         return openOrRunningGames;
     }
 
@@ -257,6 +244,18 @@ public class GameService {
                         String.format(errorMessage));
             }
         }
+    }
+
+    public static List<Character> generateRandomLetters(int numberOfRounds){
+        List<Character> letters = new ArrayList<>();
+
+        for (char letter = 'A'; letter <= 'Z'; letter++) {
+            letters.add(letter);
+        }
+
+        Collections.shuffle(letters);
+
+        return letters.subList(0, numberOfRounds);
     }
 
     void checkIfUserCanJoin(int userId) {
@@ -302,17 +301,24 @@ public class GameService {
     }
 
     public GameUsersDTO getHostAndAllUserNamesOfGame(Game gameToJoin) {
+
         User host = userRepository.findById(gameToJoin.getHostId()).orElse(null);
+
         List<User> users = gameToJoin.getUsers();
         List<String> usernames = new ArrayList<>();
+
         for (User user : users) {
             if (!user.equals(host)) {
                 usernames.add(user.getUsername());
             }
         }
         GameUsersDTO gameUsersDTO = new GameUsersDTO();
+
+        checkIfUserExists(host);
+
         gameUsersDTO.setHostUsername(host.getUsername());
         gameUsersDTO.setUsernames(usernames);
+
         return gameUsersDTO;
     }
 
@@ -364,16 +370,17 @@ public class GameService {
                 WinnerGetDTO winnerDTO = new WinnerGetDTO();
                 winnerDTO.setUsername(entry.getKey().getUsername());
                 winnerDTO.setScore(entry.getValue());
+                winnerDTO.setQuote(entry.getKey().getQuote());
                 winners.add(winnerDTO);
                 maxScore = entry.getValue();
             } else if (entry.getValue() == maxScore) {
                 WinnerGetDTO winnerDTO = new WinnerGetDTO();
                 winnerDTO.setUsername(entry.getKey().getUsername());
                 winnerDTO.setScore(entry.getValue());
+                winnerDTO.setQuote(entry.getKey().getQuote());
                 winners.add(winnerDTO);
             }
         }
-
         return winners;
     }
 

@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.constant.ScorePoint;
 import ch.uzh.ifi.hase.soprafs23.constant.VoteOption;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
@@ -81,6 +82,7 @@ public class VoteService {
                     }
                 }
             };
+            votingTimer.schedule(votingTimerTask, 0, 3000);
 
             votingTimer.schedule(votingTimerTask, 2000, 1000);
 
@@ -95,7 +97,7 @@ public class VoteService {
 
 
                     timeRemaining -= 5;
-                    if (timeRemaining < 0){
+                    if (timeRemaining <= 0){
                         if (isLastCategory(finalVotingCategory, numberOfVotingRounds)){
                             if (game.isLastRound()){
                                 WebSocketDTO webSocketDTO=new WebSocketDTO();

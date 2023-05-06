@@ -14,14 +14,13 @@ import java.util.Map;
 public class AnswerController {
 
     private final AnswerService answerService;
-    private final SimpMessagingTemplate messagingTemplate;
-
     Logger log = LoggerFactory.getLogger(AnswerController.class);
 
 
-    AnswerController(AnswerService answerService, SimpMessagingTemplate messagingTemplate) {
+    AnswerController(AnswerService answerService) {
+
         this.answerService = answerService;
-        this.messagingTemplate = messagingTemplate;
+
     }
 
     @PostMapping("/games/{gamePin}/{roundNumber}")
@@ -42,7 +41,7 @@ public class AnswerController {
                                               @PathVariable("roundNumber") int roundNumber,
                                               @PathVariable("categoryName") String categoryName,
                                               @RequestHeader("Authorization") String userToken) {
-        log.info("Answer recieved from game : "+ gamePin +" " + roundNumber +categoryName);
+        log.info("Answer received from game : " + gamePin + " " + roundNumber +categoryName);
 
         return answerService.getAnswers(gamePin, roundNumber, categoryName, userToken);
     }

@@ -33,12 +33,9 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    private final QuoteService quoteService;
-
     @Autowired
-    public UserService(@Qualifier("userRepository") UserRepository userRepository, QuoteService quoteService) {
+    public UserService(@Qualifier("userRepository") UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.quoteService = quoteService;
     }
 
     public List<User> getUsers() {

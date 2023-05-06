@@ -2,8 +2,6 @@ package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.*;
-import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
-import ch.uzh.ifi.hase.soprafs23.helper.UserHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +14,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
-import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.*;
 import static ch.uzh.ifi.hase.soprafs23.constant.RoundStatus.FINISHED;
 import static ch.uzh.ifi.hase.soprafs23.constant.ScorePoint.INCORRECT;
+import static ch.uzh.ifi.hase.soprafs23.helper.GameHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 
 @Service
 @Transactional
@@ -30,8 +29,6 @@ public class AnswerService {
     private final RoundRepository roundRepository;
     private final AnswerRepository answerRepository;
     private final CategoryRepository categoryRepository;
-    private final GameHelper gameHelper=new GameHelper();
-    private final UserHelper userHelper= new UserHelper();
 
     @Autowired
     public AnswerService(@Qualifier("gameRepository") GameRepository gameRepository,
@@ -51,13 +48,13 @@ public class AnswerService {
     public void saveAnswers(int gamePin, String userToken, int roundNumber, Map<String, String> answers) {
 
         Game game = gameRepository.findByGamePin(gamePin);
-        gameHelper.checkIfGameExists(game);
-        gameHelper.checkIfGameIsRunning(game);
+        checkIfGameExists(game);
+        checkIfGameIsRunning(game);
 
         User user = userRepository.findByToken(userToken);
-        userHelper.checkIfUserExists(user);
+        checkIfUserExists(user);
 
-        gameHelper.checkIfUserIsInGame(game, user);
+        checkIfUserIsInGame(game, user);
 
         Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
         checkIfRoundExists(round);
@@ -70,13 +67,13 @@ public class AnswerService {
 
     public List<Map<Integer, String>> getAnswers(int gamePin, int roundNumber, String categoryName, String userToken) {
         Game game = gameRepository.findByGamePin(gamePin);
-        gameHelper.checkIfGameExists(game);
-        gameHelper.checkIfGameIsRunning(game);
+        checkIfGameExists(game);
+        checkIfGameIsRunning(game);
 
         User user = userRepository.findByToken(userToken);
-        userHelper.checkIfUserExists(user);
+        checkIfUserExists(user);
 
-        gameHelper.checkIfUserIsInGame(game, user);
+        checkIfUserIsInGame(game, user);
 
         Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
         checkIfRoundExists(round);
