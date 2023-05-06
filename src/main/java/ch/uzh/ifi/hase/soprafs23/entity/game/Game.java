@@ -37,6 +37,9 @@ public class Game implements Serializable {
     @Column(nullable = false)
     private GameStatus status;
 
+    @Column(nullable = false)
+    private int numberOfCategories;
+
     public int getCurrentRound() {
         return currentRound;
     }
@@ -71,6 +74,14 @@ public class Game implements Serializable {
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Round> rounds = new ArrayList<>();
+
+    public int getNumberOfCategories() {
+        return numberOfCategories;
+    }
+
+    public void setNumberOfCategories(int numberOfCategories) {
+        this.numberOfCategories = numberOfCategories;
+    }
 
     public int getGameId() {
         return gameId;

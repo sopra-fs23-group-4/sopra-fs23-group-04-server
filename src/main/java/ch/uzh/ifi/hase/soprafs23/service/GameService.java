@@ -77,6 +77,9 @@ public class GameService {
         newGame.addPlayer(user);
         newGame.setRoundLetters(generateRandomLetters(newGame.getRounds()));
         newGame.setCurrentRound(1);
+        newGame.setNumberOfCategories(newGame.getCategories().size());
+
+
 
         newGame = gameRepository.save(newGame);
         gameRepository.flush();

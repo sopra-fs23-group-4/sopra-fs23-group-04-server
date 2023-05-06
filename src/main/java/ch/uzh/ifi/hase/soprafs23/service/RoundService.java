@@ -106,7 +106,7 @@ public class RoundService {
         round.setStatus(RoundStatus.FINISHED);
 
         roundRepository.saveAndFlush(round);
-        voteService.voteTimer(gamePin);
+        voteService.voteTimeControl(gamePin);
     }
 
     public LetterDTO nextRound(int gamePin) {
@@ -139,7 +139,6 @@ public class RoundService {
 
             @Override
             public void run() {
-                System.out.println("was here");
                 int timeLeft = remainingTime.addAndGet(-1);
 
                 if (round.getStatus()==RoundStatus.FINISHED){
@@ -158,16 +157,12 @@ public class RoundService {
                     roundEndDTO.setRounded(fill);
                     webSocketService.sendMessageToClients(targetDestination+gamePin, roundEndDTO);
                     timer.cancel();
-                    voteService.voteTimer(gamePin);
-
-                }
-                else if (round.getStatus()==RoundStatus.FINISHED){
-                    timer.cancel();
+                    voteService.voteTimeControl(gamePin);
 
                 }
 
                 else{
-                    System.out.println(timeLeft);
+                    System.out.println("Timeleft to answer "+ timeLeft);
 
                     RoundTimerDTO roundTimerDTO = new RoundTimerDTO();
                     roundTimerDTO.setTimeRemaining(timeLeft);
