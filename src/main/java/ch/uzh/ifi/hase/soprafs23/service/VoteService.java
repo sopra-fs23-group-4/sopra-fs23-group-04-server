@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.constant.ScorePoint;
 import ch.uzh.ifi.hase.soprafs23.constant.VoteOption;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
@@ -21,6 +20,12 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.*;
 
 import static ch.uzh.ifi.hase.soprafs23.constant.VoteOption.NO_VOTE;
+import static ch.uzh.ifi.hase.soprafs23.helper.GameHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.RoundHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.CategoryHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.AnswerHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.VoteHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 
 @Service
 @Transactional
@@ -46,12 +51,14 @@ public class VoteService {
                        @Qualifier("categoryRepository") CategoryRepository categoryRepository,
                        @Qualifier("roundRepository") RoundRepository roundRepository,
                        WebSocketService webSocketService) {
+
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.answerRepository = answerRepository;
         this.voteRepository = voteRepository;
         this.categoryRepository = categoryRepository;
         this.roundRepository = roundRepository;
+
         this.webSocketService = webSocketService;
     }
 
@@ -95,7 +102,6 @@ public class VoteService {
                 @Override
                 public void run() {
 
-
                     timeRemaining -= 5;
                     if (timeRemaining <= 0){
                         if (isLastCategory(finalVotingCategory, numberOfVotingRounds)){
@@ -111,7 +117,6 @@ public class VoteService {
 
                             }
                         }
-
 
                         else {
                             WebSocketDTO webSocketDTO=new WebSocketDTO();
@@ -132,8 +137,6 @@ public class VoteService {
             showResults.schedule(showResultsTask, 7000, 5000);
             currentVotingRound+=1;
         }
-
-
     }
 
 

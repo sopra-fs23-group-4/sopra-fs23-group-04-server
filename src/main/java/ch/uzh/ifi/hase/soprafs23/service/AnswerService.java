@@ -14,9 +14,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
-import static ch.uzh.ifi.hase.soprafs23.constant.RoundStatus.FINISHED;
 import static ch.uzh.ifi.hase.soprafs23.constant.ScorePoint.INCORRECT;
 import static ch.uzh.ifi.hase.soprafs23.helper.GameHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.RoundHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.CategoryHelper.*;
 import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 
 @Service
@@ -91,22 +92,6 @@ public class AnswerService {
      * Helper methods to aid with the answer saving, creation and retrieval
      */
 
-    private void checkIfRoundExists(Round round) {
-        String errorMessage = "Round does not exist.";
-
-        if (round == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage);
-        }
-    }
-
-    private void checkIfRoundIsFinished(Round round) {
-        String errorMessage = "Round is not finished yet.";
-
-        if (!round.getStatus().equals(FINISHED)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
-        }
-    }
-
     private void checkIfAnswersAlreadyExist(Round round, User user) {
 
         List<Answer> answers = answerRepository.findByRoundAndUser(round, user);
@@ -122,16 +107,7 @@ public class AnswerService {
     private Category getCategory(String categoryName) {
 
         return categoryRepository.findByName(categoryName);
-    }
 
-    private void checkIfCategoryExists(Category category) {
-
-        String errorMessage = "There exists no such category.";
-
-        if (category == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format(errorMessage));
-        }
     }
 
     private void saveAnswersToDatabase(Map<String, String> answers, User user, Round round) {
