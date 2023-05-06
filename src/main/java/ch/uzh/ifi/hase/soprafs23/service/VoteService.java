@@ -207,55 +207,6 @@ public class VoteService {
         return voteOptionsGetDTO;
     }
 
-    private void checkIfGameExists(Game game) {
-
-        String errorMessage = "Game does not exist. Please try again with a different game!";
-
-        if (game == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage);
-        }
-    }
-
-    private void checkIfUserExists(User user) {
-
-        String errorMessage = "User does not exist." +
-                "Please register before playing!";
-
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
-    }
-
-    private void checkIfRoundExists(Round round) {
-
-        String errorMessage = "Round does not exist.";
-
-        if (round == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
-    }
-    private void checkIfCategoryExists(Category category) {
-
-        String errorMessage = "Category does not exist.";
-
-        if (category == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
-    }
-
-    private void checkIfUserIsInGame(Game game, User user) {
-        List<User> users = game.getUsers();
-
-        String errorMessage = "User is not part of this game.";
-
-        if(!users.contains(user)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
-        }
-    }
-
     private List<VoteGetDTO> getVoteGetDTOList(Game game, Round round, Category category, List<User> users) {
 
         List<VoteGetDTO> voteGetDTOList = new ArrayList<>();
@@ -339,6 +290,7 @@ public class VoteService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
         }
     }
+
     private Answer getAnswerById(int answerId) {
         return answerRepository.findById(answerId);
     }
@@ -347,27 +299,7 @@ public class VoteService {
 
         checkIfAnswerExists(answer);
 
-        checkIfVoteExists(vote);
-    }
-
-    private void checkIfAnswerExists(Answer answer) {
-
-        String errorMessage = "This answer does not exist.";
-
-        if (answer == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
-    }
-
-    private void checkIfVoteExists(Vote vote) {
-
-        String errorMessage = "This Voting has already been saved.";
-
-        if (vote != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
+        checkIfVotingAlreadyExists(vote);
     }
 
     private void saveVoting(Answer answer, User user, String votingString) {

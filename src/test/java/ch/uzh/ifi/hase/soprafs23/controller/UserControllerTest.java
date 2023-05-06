@@ -171,7 +171,7 @@ public class UserControllerTest {
         userPutDTO.setUsername("username");
         userPutDTO.setPassword("password");
 
-        given(userService.editUser(Mockito.any(),Mockito.any())).willReturn(user);
+        given(userService.editUser(Mockito.anyInt(),Mockito.any())).willReturn(user);
 
         MockHttpServletRequestBuilder putRequest = put("/users/1")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -190,7 +190,7 @@ public class UserControllerTest {
         userPutDTO.setPassword("password");
 
         // tell the method to do nothing when userService.editUser() is called
-        given(userService.editUser(Mockito.any(),Mockito.any())).willThrow(new ResponseStatusException(HttpStatus.NOT_FOUND));
+        given(userService.editUser(Mockito.anyInt(),Mockito.any())).willThrow(new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         // when
         MockHttpServletRequestBuilder putRequest = put("/users/1")
