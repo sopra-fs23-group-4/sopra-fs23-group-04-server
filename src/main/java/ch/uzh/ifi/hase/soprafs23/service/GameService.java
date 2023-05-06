@@ -370,16 +370,17 @@ public class GameService {
                 WinnerGetDTO winnerDTO = new WinnerGetDTO();
                 winnerDTO.setUsername(entry.getKey().getUsername());
                 winnerDTO.setScore(entry.getValue());
+                winnerDTO.setQuote(entry.getKey().getQuote());
                 winners.add(winnerDTO);
                 maxScore = entry.getValue();
             } else if (entry.getValue() == maxScore) {
                 WinnerGetDTO winnerDTO = new WinnerGetDTO();
                 winnerDTO.setUsername(entry.getKey().getUsername());
                 winnerDTO.setScore(entry.getValue());
+                winnerDTO.setQuote(entry.getKey().getQuote());
                 winners.add(winnerDTO);
             }
         }
-
         return winners;
     }
 
