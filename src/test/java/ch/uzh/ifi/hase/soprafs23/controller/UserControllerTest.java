@@ -25,7 +25,6 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -89,7 +88,7 @@ public class UserControllerTest {
     userPostDTO.setPassword("Test User");
     userPostDTO.setUsername("testUsername");
 
-        given(userService.createUser(Mockito.any())).willReturn(user);
+        given(userService.createAndReturnUser(Mockito.any())).willReturn(user);
 
         // when/then -> do the request + validate the result
         MockHttpServletRequestBuilder postRequest = post("/users")

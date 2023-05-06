@@ -63,7 +63,7 @@ public class GameService {
         this.webSocketService = webSocketService;
     }
 
-    public int createGame(Game newGame, String userToken) {
+    public Game createAndReturnGame(Game newGame, String userToken) {
 
         User user = getUserByToken(userToken);
 
@@ -84,7 +84,8 @@ public class GameService {
         roundService.createAllRounds(newGame);
 
         log.debug("Created following game: {}", newGame);
-        return newGame.getGamePin();
+
+        return newGame;
     }
 
     public void joinGame(int gamePin, String userToken) {
