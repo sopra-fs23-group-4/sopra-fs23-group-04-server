@@ -113,7 +113,7 @@ public class GameController {
 
     }
 
-    @GetMapping("/games/lobbies/Leaderboard")
+    @GetMapping("/games/lobbies/leaderboard")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public List<LeaderboardGetDTO> getLeaderboard() {

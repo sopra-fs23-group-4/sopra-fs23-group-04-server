@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static ch.uzh.ifi.hase.soprafs23.constant.VoteOption.NO_VOTE;
 
@@ -68,47 +67,78 @@ public class VoteService {
 
                 @Override
                 public void run() {
-                    timeRemaining -= 3;
-                    VotingTimerDTO votingTimerDTO=new VotingTimerDTO();
-                    votingTimerDTO.setTimeRemaining(timeRemaining);
-                    webSocketService.sendMessageToClients(targetDestination+gamePin,votingTimerDTO);
+                    timeRemaining -= 1;
 
                     if (timeRemaining <= 0) {
-                        VotingEndDTO votingEndDTO=new VotingEndDTO();
-                        webSocketService.sendMessageToClients(targetDestination+gamePin,votingEndDTO);
+                        WebSocketDTO webSocketDTO=new WebSocketDTO();
+                        webSocketDTO.setType("votingEnd");
+                        webSocketService.sendMessageToClients(targetDestination+gamePin,webSocketDTO);
                         votingTimer.cancel();
+                    }
+                    else {
+                        VotingTimerDTO votingTimerDTO=new VotingTimerDTO();
+                        votingTimerDTO.setTimeRemaining(timeRemaining);
+                        webSocketService.sendMessageToClients(targetDestination+gamePin,votingTimerDTO);
                     }
                 }
             };
-            votingTimer.schedule(votingTimerTask, 0, 3000);
+            votingTimer.schedule(votingTimerTask, 2000, 1000);
 
-            final int finalCurrentVotingRound = currentVotingRound;
+
+
+
+
+            final int finalVotingCategory = currentVotingRound;
             Timer showResults = new Timer();
             TimerTask showResultsTask = new TimerTask() {
                 int timeRemaining = 5;
-
                 @Override
                 public void run() {
 
+
                     timeRemaining -= 5;
                     if (timeRemaining <= 0){
-                        if (finalCurrentVotingRound == numberOfVotingRounds - 1){
-                            ShowScoreBoardDTO showScoreBoardDTO=new ShowScoreBoardDTO();
-                            webSocketService.sendMessageToClients(targetDestination+gamePin,showScoreBoardDTO);
+                        if (isLastCategory(finalVotingCategory, numberOfVotingRounds)){
+                            /*if (game.isLastRound()){
+                                WebSocketDTO webSocketDTO=new WebSocketDTO();
+                                webSocketDTO.setType("resultWinner");
+                                webSocketService.sendMessageToClients(targetDestination+gamePin,webSocketDTO);
+                            }
+                            else*/ {
+                                WebSocketDTO webSocketDTO=new WebSocketDTO();
+                                webSocketDTO.setType("resultScoreboard");
+                                webSocketService.sendMessageToClients(targetDestination+gamePin,webSocketDTO);
+
+                            }
                         }
+
+
                         else {
-                            NextVotingDTO nextVotingDTO= new NextVotingDTO();
-                            webSocketService.sendMessageToClients(targetDestination+gamePin,nextVotingDTO);
+                            WebSocketDTO webSocketDTO=new WebSocketDTO();
+                            webSocketDTO.setType("resultNextVote");
+                            webSocketService.sendMessageToClients(targetDestination+gamePin,webSocketDTO);
                         }
+
                     }
+
                     System.out.println("bye");
+                    showResults.cancel();
+
+
                 }
             };
 
             // Schedule votingTimerTask to run every 5 seconds
-            showResults.schedule(showResultsTask, 2000, 5000);
+            showResults.schedule(showResultsTask, 7000, 5000);
             currentVotingRound+=1;
         }
+
+
+    }
+
+
+    private static boolean isLastCategory(int finalVotingCategory, int numberOfVotingRounds) {
+        return finalVotingCategory == numberOfVotingRounds - 1;
     }
 
 
