@@ -49,4 +49,5 @@ public class VoteController {
         return voteService.getVoteOptions();
 
     }
+
 }
