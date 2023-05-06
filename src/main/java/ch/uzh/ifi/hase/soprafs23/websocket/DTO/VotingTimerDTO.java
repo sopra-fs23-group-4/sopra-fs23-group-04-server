@@ -1,13 +1,12 @@
 package ch.uzh.ifi.hase.soprafs23.websocket.DTO;
 
 public class VotingTimerDTO {
-    public static String type="votingTimer";
-
-    public static String getType() {
-        return type;
-    }
+    public  final static String type="votingTimer";
 
     private int timeRemaining;
+    public String getType(){
+        return type;
+    }
 
     public int getTimeRemaining() {
         return timeRemaining;

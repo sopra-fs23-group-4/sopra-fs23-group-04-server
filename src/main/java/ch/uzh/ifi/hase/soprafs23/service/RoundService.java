@@ -4,6 +4,8 @@ import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
+import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
+import ch.uzh.ifi.hase.soprafs23.helper.UserHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
@@ -37,6 +39,9 @@ public class RoundService {
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
     private final WebSocketService webSocketService;
+    private final GameHelper gameHelper= new GameHelper();
+    private final UserHelper userHelper= new UserHelper();
+    private final VoteService voteService;
 
     private final String targetDestination="/topic/lobbies/";
 
@@ -44,11 +49,13 @@ public class RoundService {
     public RoundService(@Qualifier("roundRepository") RoundRepository roundRepository,
                         @Qualifier("gameRepository")GameRepository gameRepository,
                         @Qualifier("userRepository") UserRepository userRepository,
+                        VoteService voteService,
                         WebSocketService webSocketService) {
         this.roundRepository = roundRepository;
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.webSocketService=webSocketService;
+        this.voteService=voteService;
     }
 
     public void createAllRounds(Game game) {
@@ -99,6 +106,7 @@ public class RoundService {
         round.setStatus(RoundStatus.FINISHED);
 
         roundRepository.saveAndFlush(round);
+        voteService.voteTimer(gamePin);
     }
 
     public LetterDTO nextRound(int gamePin) {
@@ -132,8 +140,13 @@ public class RoundService {
             @Override
             public void run() {
                 System.out.println("was here");
-                int timeLeft = remainingTime.addAndGet(-3);
-                if (timeLeft <= 0) {
+                int timeLeft = remainingTime.addAndGet(-1);
+
+                if (round.getStatus()==RoundStatus.FINISHED){
+                    timer.cancel();
+
+                }
+                else if (timeLeft <= 0) {
 
 
 
@@ -145,6 +158,7 @@ public class RoundService {
                     roundEndDTO.setRounded(fill);
                     webSocketService.sendMessageToClients(targetDestination+gamePin, roundEndDTO);
                     timer.cancel();
+                    voteService.voteTimer(gamePin);
 
                 }
                 else if (round.getStatus()==RoundStatus.FINISHED){
@@ -162,7 +176,7 @@ public class RoundService {
             }
         };
 
-        timer.scheduleAtFixedRate(updateTask, 0, 3000); // Schedule the task to run every 3 seconds (3000 ms)
+        timer.scheduleAtFixedRate(updateTask, 1500, 1000); // Schedule the task to run every 3 seconds (3000 ms)
     }
 
 
