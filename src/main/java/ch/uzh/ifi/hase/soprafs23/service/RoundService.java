@@ -104,6 +104,7 @@ public class RoundService {
         round.setStatus(RoundStatus.FINISHED);
 
         roundRepository.saveAndFlush(round);
+        voteService.voteTimer(gamePin);
     }
 
     public LetterDTO nextRound(int gamePin) {
