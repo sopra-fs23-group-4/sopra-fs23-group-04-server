@@ -1,11 +1,10 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.constant.Constant;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
-import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
-import ch.uzh.ifi.hase.soprafs23.helper.UserHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
@@ -39,11 +38,9 @@ public class RoundService {
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
     private final WebSocketService webSocketService;
-    private final GameHelper gameHelper= new GameHelper();
-    private final UserHelper userHelper= new UserHelper();
     private final VoteService voteService;
 
-    private final String targetDestination="/topic/lobbies/";
+
 
     @Autowired
     public RoundService(@Qualifier("roundRepository") RoundRepository roundRepository,
@@ -72,6 +69,7 @@ public class RoundService {
         }
         roundRepository.flush();
     }
+    //todo decide to use startRound or nextRound funciton
 
     public LetterDTO startRound(int gamePin, int roundNumber){
 
@@ -155,7 +153,7 @@ public class RoundService {
                     String fill="roundEnd";
                     RoundEndDTO roundEndDTO=new RoundEndDTO();
                     roundEndDTO.setRounded(fill);
-                    webSocketService.sendMessageToClients(targetDestination+gamePin, roundEndDTO);
+                    webSocketService.sendMessageToClients(Constant.defaultDestination +gamePin, roundEndDTO);
                     timer.cancel();
                     voteService.voteTimeControl(gamePin);
 
@@ -166,7 +164,7 @@ public class RoundService {
 
                     RoundTimerDTO roundTimerDTO = new RoundTimerDTO();
                     roundTimerDTO.setTimeRemaining(timeLeft);
-                    webSocketService.sendMessageToClients(targetDestination + gamePin, roundTimerDTO);
+                    webSocketService.sendMessageToClients(Constant.defaultDestination + gamePin, roundTimerDTO);
                 }
             }
         };

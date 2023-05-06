@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
+import ch.uzh.ifi.hase.soprafs23.constant.Constant;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
@@ -18,7 +19,7 @@ public class RoundController {
 
     private final RoundService roundService;
     private final WebSocketService webSocketService;
-    public static final String FinalDestination = "/topic/lobbies/";
+
 
     Logger log = LoggerFactory.getLogger(RoundController.class);
 
@@ -35,7 +36,9 @@ public class RoundController {
 
         LetterDTO letterDTO = roundService.startRound(gamePin, roundNumber);
 
-        webSocketService.sendMessageToClients(FinalDestination+gamePin,letterDTO);
+        webSocketService.sendMessageToClients(Constant.defaultDestination+gamePin,letterDTO);
+
+        log.info("Round " + roundNumber + "started in lobby " + gamePin);
 
         roundService.startRoundTime(gamePin);
     }
@@ -53,6 +56,7 @@ public class RoundController {
         String fill="roundEnd";
         RoundEndDTO roundEndDTO=new RoundEndDTO();
         roundEndDTO.setRounded(fill);
-        webSocketService.sendMessageToClients(FinalDestination+gamePin, roundEndDTO);
-    }
+        webSocketService.sendMessageToClients(Constant.defaultDestination+gamePin, roundEndDTO);
+        log.info("Round " + roundNumber + " ended in lobby " + gamePin);
+}
 }

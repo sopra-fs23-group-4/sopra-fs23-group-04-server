@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.constant.Constant;
 import ch.uzh.ifi.hase.soprafs23.constant.GameCategory;
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Answer;
@@ -35,8 +36,6 @@ import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 @Service
 @Transactional
 public class GameService {
-
-    public static final String FinalDestination = "/topic/lobbies/";
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
     private final GameRepository gameRepository;
@@ -108,7 +107,7 @@ public class GameService {
 
         GameUsersDTO gameUsersDTO = getHostAndAllUserNamesOfGame(gameToJoin);
 
-        webSocketService.sendMessageToClients(FinalDestination + gamePin, gameUsersDTO);
+        webSocketService.sendMessageToClients(Constant.defaultDestination + gamePin, gameUsersDTO);
     }
 
     public void leaveGame(int gamePin, String userToken) {
@@ -142,7 +141,7 @@ public class GameService {
 
         try {
             checkIfGameExists(getGameByGamePin(gamePin));
-            webSocketService.sendMessageToClients(FinalDestination + gamePin, gameUsersDTO);
+            webSocketService.sendMessageToClients(Constant.defaultDestination + gamePin, gameUsersDTO);
         }
         catch (ResponseStatusException ignored) {}
     }
@@ -156,8 +155,9 @@ public class GameService {
         game.setStatus(GameStatus.RUNNING);
 
         LetterDTO letterDTO = roundService.nextRound(gamePin);
+        gameRepository.saveAndFlush(game);
 
-        webSocketService.sendMessageToClients(FinalDestination +gamePin, letterDTO);
+        webSocketService.sendMessageToClients(Constant.defaultDestination +gamePin, letterDTO);
         roundService.startRoundTime(gamePin);
     }
 

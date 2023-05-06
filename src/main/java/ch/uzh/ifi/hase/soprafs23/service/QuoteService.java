@@ -1,6 +1,8 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.constant.ExtractApiCallData.FactJsonExtractor;
 import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
+import ch.uzh.ifi.hase.soprafs23.entity.quote.FactHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteCategoriesHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -21,10 +23,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import static ch.uzh.ifi.hase.soprafs23.constant.Constant.apiKey;
+
 @Service
 @Transactional
 public class QuoteService {
-    private final String apiKey="Jcn3zBSrMNcsCeGm5rSm5zUabLibdT4xZiliT2rX";
+
     private final Logger log = LoggerFactory.getLogger(QuoteService.class);
 
     public QuoteHolder generateQuote(String category)  {
@@ -33,16 +37,9 @@ public class QuoteService {
 
         try {
             URL url = new URL(quoteCategory.url);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestProperty("accept", "application/json");
-            connection.setRequestProperty("X-Api-Key", apiKey);
+            JsonNode apiResponse = callApi(url);
 
-            InputStream responseStream = connection.getInputStream();
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode jsonResponse = mapper.readTree(responseStream);
-            System.out.println(jsonResponse.toString());
-
-            return quoteCategory.extractJsonData.jsonToQuoteHolder(jsonResponse,quoteCategory);
+            return quoteCategory.extractJsonData.jsonToQuoteHolder(apiResponse,quoteCategory);
 
 
         } catch (MalformedURLException e) {
@@ -67,6 +64,47 @@ public class QuoteService {
         quoteCategoriesHolder.setCategories(categories);
 
         return  quoteCategoriesHolder;
+    }
+
+    public FactHolder generateFact(){
+        try {
+            URL url = new URL("https://api.api-ninjas.com/v1/facts?limit=1");
+            JsonNode apiResponse = callApi(url);
+
+            FactJsonExtractor factJsonExtractor= jsonResponse -> {
+                FactHolder factHolder=new FactHolder();
+                factHolder.setFact(jsonResponse.get(0).get("fact").asText());
+                return factHolder;
+            };
+            return factJsonExtractor.jsonToFactHolder(apiResponse);
+
+
+
+
+        } catch (MalformedURLException e) {
+            System.err.println("Error: Invalid URL for quote fact");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("Error: Problem connecting to the API for quote category: fact" + "possible reasons could be wrong api or no internet access");
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,"The server has an issue with the api key or not able to connect to api");
+        }
+        catch (Error e){
+            System.err.println("Something went wrong fact" );
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private JsonNode callApi(URL url) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestProperty("accept", "application/json");
+        connection.setRequestProperty("X-Api-Key", apiKey);
+
+        InputStream responseStream = connection.getInputStream();
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonResponse = mapper.readTree(responseStream);
+        System.out.println(jsonResponse.toString());
+        return jsonResponse;
     }
 
 }
