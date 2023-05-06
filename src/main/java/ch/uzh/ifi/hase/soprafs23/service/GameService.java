@@ -2,7 +2,6 @@ package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.GameCategory;
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
-import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Answer;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
@@ -133,6 +132,8 @@ public class GameService {
             gameUsersDTO = getHostAndAllUserNamesOfGame(game);
         } else if (!gameHasUsers) {
             deleteGameAndRounds(game);
+        } else {
+            gameUsersDTO = getHostAndAllUserNamesOfGame(game);
         }
 
         try {
