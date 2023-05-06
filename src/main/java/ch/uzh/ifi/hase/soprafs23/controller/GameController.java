@@ -29,8 +29,9 @@ public class GameController {
     public int createGame(@RequestBody GamePostDTO gamePostDTO, @RequestHeader("Authorization") String userToken) {
 
         Game newGame = GameDTOMapper.INSTANCE.convertGamePostDTOtoEntity(gamePostDTO);
+        Game game = gameService.createAndReturnGame(newGame, userToken);
 
-        return gameService.createGame(newGame, userToken);
+        return game.getGamePin();
     }
 
     @PostMapping("/games/{gamePin}/start")

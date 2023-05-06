@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
@@ -44,7 +43,7 @@ public class UserService {
 
     int token = 1;
 
-    public synchronized User createUser(User newUser) {
+    public synchronized User createAndReturnUser(User newUser) {
         // TODO change setToken back to random
         //newUser.setToken(UUID.randomUUID().toString());
         newUser.setToken(Integer.toString(token));

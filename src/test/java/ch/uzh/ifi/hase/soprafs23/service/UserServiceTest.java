@@ -1,11 +1,8 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
-import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -13,8 +10,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
@@ -23,11 +18,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class UserServiceTest {
 
@@ -63,7 +56,7 @@ public class UserServiceTest {
     public void createUser_validInputs_success() {
         // when -> any object is being save in the userRepository -> return the dummy
         // testUser
-        User createdUser = userService.createUser(testUser);
+        User createdUser = userService.createAndReturnUser(testUser);
 
         // then
         verify(userRepository, Mockito.times(1)).save(Mockito.any());
@@ -78,27 +71,27 @@ public class UserServiceTest {
     @Test
     public void createUser_duplicateName_throwsException() {
         // given -> a first user has already been created
-        userService.createUser(testUser);
+        userService.createAndReturnUser(testUser);
 
         // when -> setup additional mocks for UserRepository
         when(userRepository.findByUsername(Mockito.any())).thenReturn(testUser);
 
         // then -> attempt to create second user with same user -> check that an error
         // is thrown
-        assertThrows(ResponseStatusException.class, () -> userService.createUser(testUser));
+        assertThrows(ResponseStatusException.class, () -> userService.createAndReturnUser(testUser));
     }
 
     @Test
     public void createUser_duplicateInputs_throwsException() {
         // given -> a first user has already been created
-        userService.createUser(testUser);
+        userService.createAndReturnUser(testUser);
 
         // when -> setup additional mocks for UserRepository
         when(userRepository.findByUsername(Mockito.any())).thenReturn(testUser);
 
         // then -> attempt to create second user with same user -> check that an error
         // is thrown
-        assertThrows(ResponseStatusException.class, () -> userService.createUser(testUser));
+        assertThrows(ResponseStatusException.class, () -> userService.createAndReturnUser(testUser));
     }
 
     @Test

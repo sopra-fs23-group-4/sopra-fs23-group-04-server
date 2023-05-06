@@ -53,7 +53,7 @@ public class UserController {
         User userInput = UserDTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
 
         // create user
-        User createdUser = userService.createUser(userInput);
+        User createdUser = userService.createAndReturnUser(userInput);
 
         response.addHeader("Authorization", createdUser.getToken());
         log.info("The user " + createdUser.getUsername() + " with id " + createdUser.getId() + " has been created.");

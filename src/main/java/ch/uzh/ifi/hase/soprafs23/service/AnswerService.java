@@ -92,7 +92,7 @@ public class AnswerService {
      * Helper methods to aid with the answer saving, creation and retrieval
      */
 
-    private void checkIfAnswersAlreadyExist(Round round, User user) {
+    void checkIfAnswersAlreadyExist(Round round, User user) {
 
         List<Answer> answers = answerRepository.findByRoundAndUser(round, user);
 
@@ -110,7 +110,7 @@ public class AnswerService {
 
     }
 
-    private void saveAnswersToDatabase(Map<String, String> answers, User user, Round round) {
+    void saveAnswersToDatabase(Map<String, String> answers, User user, Round round) {
         for (Map.Entry<String, String> answer : answers.entrySet()) {
 
             String categoryName = answer.getKey();
