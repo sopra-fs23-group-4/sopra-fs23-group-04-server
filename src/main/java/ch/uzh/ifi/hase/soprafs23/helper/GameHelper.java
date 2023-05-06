@@ -6,6 +6,8 @@ import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.RUNNING;
@@ -49,4 +51,17 @@ public class GameHelper {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
         }
     }
+
+    public static List<Character> generateRandomLetters(int numberOfRounds){
+        List<Character> letters = new ArrayList<>();
+
+        for (char letter = 'A'; letter <= 'Z'; letter++) {
+            letters.add(letter);
+        }
+
+        Collections.shuffle(letters);
+
+        return letters.subList(0, numberOfRounds);
+    }
+
 }

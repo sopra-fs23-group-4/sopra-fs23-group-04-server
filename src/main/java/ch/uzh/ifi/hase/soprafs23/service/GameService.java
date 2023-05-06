@@ -8,8 +8,6 @@ import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
-import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
-import ch.uzh.ifi.hase.soprafs23.helper.UserHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.AnswerRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
@@ -90,18 +88,6 @@ public class GameService {
         return newGame.getGamePin();
     }
 
-    public List<Character> generateRandomLetters(int numberOfRounds){
-        List<Character> letters = new ArrayList<>();
-
-        for (char letter = 'A'; letter <= 'Z'; letter++) {
-            letters.add(letter);
-        }
-
-        Collections.shuffle(letters);
-
-        return letters.subList(0, numberOfRounds);
-    }
-
     public void joinGame(int gamePin, String userToken) {
 
         User user = getUserByToken(userToken);
@@ -170,6 +156,10 @@ public class GameService {
         roundService.startRoundTime(gamePin);
     }
 
+    /**
+     * Helper methods to aid in the game creation, modification and deletion
+     */
+
     public GameCategoriesDTO getStandardCategories() {
 
         GameCategoriesDTO gameCategoriesDTO = new GameCategoriesDTO();
@@ -196,16 +186,13 @@ public class GameService {
         return getHostAndAllUserNamesOfGame(game);
 
     }
+
     public Game getGameByGamePin(int gamePin) {
 
         Game game = gameRepository.findByGamePin(gamePin);
 
-        String errorMessage = "Game does not exist!";
+        checkIfGameExists(game);
 
-        if (game == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format(errorMessage));
-        }
         return game;
     }
 
@@ -220,21 +207,20 @@ public class GameService {
         return gameCategoryNames;
     }
 
-    /**
-     * Helper methods to aid in the game creation, modification and deletion
-     */
-
     private List<Game> getOpenGames() {
         return gameRepository.findByStatus(GameStatus.OPEN);
     }
 
     private List<Game> getRunningGames() {
+
         return gameRepository.findByStatus(GameStatus.RUNNING);
     }
 
     private List<Game> getOpenOrRunningGames() {
+
         List<Game> openOrRunningGames = getOpenGames();
         openOrRunningGames.addAll(getRunningGames());
+
         return openOrRunningGames;
     }
 
@@ -303,17 +289,24 @@ public class GameService {
     }
 
     public GameUsersDTO getHostAndAllUserNamesOfGame(Game gameToJoin) {
+
         User host = userRepository.findById(gameToJoin.getHostId()).orElse(null);
+
         List<User> users = gameToJoin.getUsers();
         List<String> usernames = new ArrayList<>();
+
         for (User user : users) {
             if (!user.equals(host)) {
                 usernames.add(user.getUsername());
             }
         }
         GameUsersDTO gameUsersDTO = new GameUsersDTO();
+
+        checkIfUserExists(host);
+
         gameUsersDTO.setHostUsername(host.getUsername());
         gameUsersDTO.setUsernames(usernames);
+
         return gameUsersDTO;
     }
 
