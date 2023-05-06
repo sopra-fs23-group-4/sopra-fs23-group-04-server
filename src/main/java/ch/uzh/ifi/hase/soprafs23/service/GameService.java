@@ -246,6 +246,18 @@ public class GameService {
         }
     }
 
+    public static List<Character> generateRandomLetters(int numberOfRounds){
+        List<Character> letters = new ArrayList<>();
+
+        for (char letter = 'A'; letter <= 'Z'; letter++) {
+            letters.add(letter);
+        }
+
+        Collections.shuffle(letters);
+
+        return letters.subList(0, numberOfRounds);
+    }
+
     void checkIfUserCanJoin(int userId) {
 
         List<Game> openOrRunningGames = getOpenOrRunningGames();

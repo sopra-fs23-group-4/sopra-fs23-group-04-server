@@ -51,17 +51,4 @@ public class GameHelper {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
         }
     }
-
-    public static List<Character> generateRandomLetters(int numberOfRounds){
-        List<Character> letters = new ArrayList<>();
-
-        for (char letter = 'A'; letter <= 'Z'; letter++) {
-            letters.add(letter);
-        }
-
-        Collections.shuffle(letters);
-
-        return letters.subList(0, numberOfRounds);
-    }
-
 }
