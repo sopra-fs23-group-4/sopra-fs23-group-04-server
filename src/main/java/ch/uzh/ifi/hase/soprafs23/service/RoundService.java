@@ -139,11 +139,12 @@ public class RoundService {
             public void run() {
                 int timeLeft = remainingTime.addAndGet(-1);
 
-                if (round.getStatus()==RoundStatus.FINISHED){
+                if (isRoundFinished(gamePin)){
                     System.out.println("Timer canceled");
                     timer.cancel();
 
                 }
+                //no more time remaining
                 else if (timeLeft <= 0) {
 
 
@@ -171,6 +172,12 @@ public class RoundService {
         };
 
         timer.scheduleAtFixedRate(updateTask, 1500, 1000); // Schedule the task to run every 3 seconds (3000 ms)
+    }
+
+    private boolean isRoundFinished(int gamePin){
+        Game game = gameRepository.findByGamePin(gamePin);
+        Round round = roundRepository.findByGameAndRoundNumber(game, game.getCurrentRound());
+        return round.getStatus()==RoundStatus.FINISHED;
     }
 
 
