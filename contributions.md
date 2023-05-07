@@ -32,8 +32,18 @@
 
 | Person                | Last Week     | Next Week        | Description                                          |
 |-----------------------|---------------|------------------|------------------------------------------------------|
-| Alexandre Bacmann     |     |                  |    |
+| Alexandre Bacmann     |               |                  |                                                      |
 | Valentin Meyer        | #161, #162    | #158, #159       | improved voting and enabled starting and ending rounds |
-| Christopher Narayanan |     |                  |                                             |
-| Lennart Töllke        | #21, #26, #27 |     |  |
-| Remo Wiget            | #22, #24 |          |      |
+| Christopher Narayanan |               |                  |                                                      |
+| Lennart Töllke        | #21, #26, #27 |                  |                                                      |
+| Remo Wiget            | #22, #24      |                  |                                                      |
+
+09.05.2023
+
+| Person                | Last Week     | Next Week        | Description                                          |
+|-----------------------|---------------|------------------|------------------------------------------------------|
+| Alexandre Bacmann     |               |                  |                                                      |
+| Valentin Meyer        | #158, #159    | #160, #163       | create utility classes and handled exceptional calls, plus other trouble shooting |
+| Christopher Narayanan |               |                  |                                                      |
+| Lennart Töllke        |               |                  |                                                      |
+| Remo Wiget            |               |                  |                                                      |
