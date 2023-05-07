@@ -79,8 +79,6 @@ public class QuoteService {
             return factJsonExtractor.jsonToFactHolder(apiResponse);
 
 
-
-
         } catch (MalformedURLException e) {
             System.err.println("Error: Invalid URL for quote fact");
             e.printStackTrace();

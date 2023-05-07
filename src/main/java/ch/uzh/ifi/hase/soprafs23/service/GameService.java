@@ -335,6 +335,7 @@ public class GameService {
     private int generateUniqueGamePin() {
         int newGamePin = generateGamePin();
         Game game = gameRepository.findByGamePin(newGamePin);
+        //todo what about games that have already been played;
         while (game != null) {
             newGamePin = generateGamePin();
             game = gameRepository.findByGamePin(newGamePin);

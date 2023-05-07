@@ -127,7 +127,7 @@ public class RoundService {
         System.out.println("starting");
         Game game = gameRepository.findByGamePin(gamePin);
         Round round = roundRepository.findByGameAndRoundNumber(game, game.getCurrentRound());
-        round.setStatus(RoundStatus.RUNNING);
+        assert round.getStatus()==RoundStatus.RUNNING;
         int roundLength = game.getRoundLength().getDuration();
         System.out.println(roundLength);
         AtomicInteger remainingTime = new AtomicInteger(roundLength);
@@ -140,6 +140,7 @@ public class RoundService {
                 int timeLeft = remainingTime.addAndGet(-1);
 
                 if (round.getStatus()==RoundStatus.FINISHED){
+                    System.out.println("Timer canceled");
                     timer.cancel();
 
                 }
@@ -160,7 +161,7 @@ public class RoundService {
                 }
 
                 else{
-                    System.out.println("Timeleft to answer "+ timeLeft);
+                    System.out.println("Timeleft to answer "+ timeLeft + " current round Status " + round.getStatus());
 
                     RoundTimerDTO roundTimerDTO = new RoundTimerDTO();
                     roundTimerDTO.setTimeRemaining(timeLeft);
