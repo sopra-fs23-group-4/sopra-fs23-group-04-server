@@ -34,7 +34,7 @@
 |-----------------------|---------------|---------------------|--------------------------------------------------------|
 | Alexandre Bacmann     |#179,#180,#181 | #33,#37,#38,#39,#40 | Frontend Leaderboard, testing                          |
 | Valentin Meyer        | #161, #162    | #158, #159          | improved voting and enabled starting and ending rounds |
-| Christopher Narayanan |               |                     |                                                        |
+| Christopher Narayanan |               |                     |websocket working on page                                              |
 | Lennart Töllke        | #17, #18      | #27, #28            | lobby page, settings page, game creation               |
 | Remo Wiget            | #22, #24      | #26                 | pages: Letter, Voting                                  |
 
@@ -44,6 +44,6 @@
 |-----------------------|---------------------|------------|-----------------------------------------------------------------------------------|
 | Alexandre Bacmann     | #33,#37,#38,#39,#40 |            | Rules page, Backend leaderboard, testing                                          |
 | Valentin Meyer        | #158, #159          | #160, #163 | create utility classes and handled exceptional calls, plus other trouble shooting |
-| Christopher Narayanan |                     |            |                                                                                   |
+| Christopher Narayanan |                     |            | implementing fact api, websocket working locally, timer implementedn                                                                                  |
 | Lennart Töllke        | #27, #28            | #15, #16   | Score page, Winner page, improved lobby and settings page                         |
 | Remo Wiget            | #26, #5             |            | VotingResults page, add custom Category, redesign Dashboard, ws, fix bug Answer   |
