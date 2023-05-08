@@ -32,7 +32,7 @@
 
 | Person                | Last Week     | Next Week        | Description                                          |
 |-----------------------|---------------|------------------|------------------------------------------------------|
-| Alexandre Bacmann     |               |                  |                                                      |
+| Alexandre Bacmann     |#179,#180,#181 |#33,#37,#38,#39,#40|Frontend Leaderboard, testing                        |
 | Valentin Meyer        | #161, #162    | #158, #159       | improved voting and enabled starting and ending rounds |
 | Christopher Narayanan |               |                  |                                                      |
 | Lennart Töllke        | #21, #26, #27 |                  |                                                      |
@@ -42,7 +42,7 @@
 
 | Person                | Last Week     | Next Week        | Description                                          |
 |-----------------------|---------------|------------------|------------------------------------------------------|
-| Alexandre Bacmann     |               |                  |                                                      |
+| Alexandre Bacmann     |#33,#37,#38,#39,#40|              |Rules page, Backend leaderboard, testing              |
 | Valentin Meyer        | #158, #159    | #160, #163       | create utility classes and handled exceptional calls, plus other trouble shooting |
 | Christopher Narayanan |               |                  |                                                      |
 | Lennart Töllke        |               |                  |                                                      |
