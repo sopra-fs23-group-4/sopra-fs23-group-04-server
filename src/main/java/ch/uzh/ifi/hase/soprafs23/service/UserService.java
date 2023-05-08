@@ -142,7 +142,7 @@ public class UserService {
         }
     }
 
-    private void changeProfile (User userDB, User editedUser) {
+    private void changeProfile(User userDB, User editedUser) {
         String newUsername = editedUser.getUsername();
         String newPassword = editedUser.getPassword();
         String newQuote = editedUser.getQuote();
