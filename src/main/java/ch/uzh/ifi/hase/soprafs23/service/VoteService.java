@@ -7,6 +7,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.game.*;
 import ch.uzh.ifi.hase.soprafs23.repository.*;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.VoteGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.VoteOptionsGetDTO;
+import ch.uzh.ifi.hase.soprafs23.websocket.DTO.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static ch.uzh.ifi.hase.soprafs23.constant.VoteOption.NO_VOTE;
+import static ch.uzh.ifi.hase.soprafs23.helper.GameHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.RoundHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.CategoryHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.AnswerHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.VoteHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 
 @Service
 @Transactional
@@ -32,6 +38,10 @@ public class VoteService {
     private final VoteRepository voteRepository;
     private final CategoryRepository categoryRepository;
     private final RoundRepository roundRepository;
+    private final WebSocketService webSocketService;
+
+    private final String targetDestination="/topic/lobbies/";
+
 
     @Autowired
     public VoteService(@Qualifier("userRepository") UserRepository userRepository,
@@ -39,16 +49,110 @@ public class VoteService {
                        @Qualifier("answerRepository") AnswerRepository answerRepository,
                        @Qualifier("voteRepository") VoteRepository voteRepository,
                        @Qualifier("categoryRepository") CategoryRepository categoryRepository,
-                       @Qualifier("roundRepository") RoundRepository roundRepository) {
+                       @Qualifier("roundRepository") RoundRepository roundRepository,
+                       WebSocketService webSocketService) {
+
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.answerRepository = answerRepository;
         this.voteRepository = voteRepository;
         this.categoryRepository = categoryRepository;
         this.roundRepository = roundRepository;
+
+        this.webSocketService = webSocketService;
     }
 
-    public void saveVote(int gamePin, String categoryName, String userToken, Map<Long, String> votings) {
+    public void voteTimeControl(int gamePin){
+        Game game=gameRepository.findByGamePin(gamePin);
+        int currentVotingRound=1;
+
+
+        votingTimer(gamePin,currentVotingRound);
+
+    }
+
+
+    private void resultTimer(int gamePin, int currentVotingRound) {
+        System.out.println("started");
+        //final int finalVotingCategory = currentVotingRound;
+        Timer resultTimer = new Timer();
+        TimerTask resultTimerTask = new TimerTask() {
+
+            @Override
+            public void run() {
+
+                   if (isLastCategory(gamePin,currentVotingRound)){
+
+                        if (isFinalRound(gamePin)){
+                            WebSocketDTO webSocketDTO=new WebSocketDTO();
+                            webSocketDTO.setType("resultWinner");
+                            webSocketService.sendMessageToClients(targetDestination+gamePin,webSocketDTO);
+                        }
+                        else{
+                        WebSocketDTO webSocketDTO=new WebSocketDTO();
+                            webSocketDTO.setType("resultScoreboard");
+                            webSocketService.sendMessageToClients(targetDestination+ gamePin,webSocketDTO);
+                        }
+                   }
+
+                   else {
+                        WebSocketDTO webSocketDTO=new WebSocketDTO();
+                        webSocketDTO.setType("resultNextVote");
+                        webSocketService.sendMessageToClients(targetDestination+ gamePin,webSocketDTO);
+                        int currentVotingRoundIncremented = currentVotingRound+1;
+                        votingTimer(gamePin,currentVotingRoundIncremented);
+
+                   }
+                System.out.println("Result End go to next");
+                }
+        };
+
+        // Schedule votingTimerTask to run every 5 seconds
+        resultTimer.schedule(resultTimerTask, 6000);
+    }
+
+    private boolean isFinalRound(int gamePin) {
+        Game game= gameRepository.findByGamePin(gamePin);
+        return game.getRounds()==game.getCurrentRound();
+    }
+
+    private void votingTimer(int gamePin, int currentVotingRound) {
+        Timer votingTimer = new Timer();
+        TimerTask votingTimerTask = new TimerTask() {
+            int timeRemaining = 12; // Time remaining in seconds
+
+            @Override
+            public void run() {
+                timeRemaining -= 1;
+
+                if (timeRemaining <= 0) {
+                    WebSocketDTO webSocketDTO=new WebSocketDTO();
+                    webSocketDTO.setType("votingEnd");
+                    webSocketService.sendMessageToClients(targetDestination+ gamePin,webSocketDTO);
+                    votingTimer.cancel();
+                    System.out.println("voting End");
+                    resultTimer(gamePin,currentVotingRound);
+                }
+                else {
+                    VotingTimerDTO votingTimerDTO=new VotingTimerDTO();
+                    votingTimerDTO.setTimeRemaining(timeRemaining);
+                    webSocketService.sendMessageToClients(targetDestination+ gamePin,votingTimerDTO);
+                    System.out.println("Timeleft for voting: "+ timeRemaining);
+                }
+            }
+        };
+        votingTimer.schedule(votingTimerTask, 2000, 1000);
+    }
+
+
+    private boolean isLastCategory(int gamePin, int currentVotingRound) {
+        Game game=gameRepository.findByGamePin(gamePin);
+        return currentVotingRound==game.getNumberOfCategories();
+    }
+
+
+
+    public void saveVote(int gamePin, String categoryName, String userToken, Map<Integer, String> votings) {
 
         Game game = gameRepository.findByGamePin(gamePin);
         User user = userRepository.findByToken(userToken);
@@ -58,9 +162,9 @@ public class VoteService {
 
         checkIfUserIsInGame(game, user);
 
-        for (Map.Entry<Long, String> voting : votings.entrySet()) {
+        for (Map.Entry<Integer, String> voting : votings.entrySet()) {
 
-            Long answerId = voting.getKey();
+            int answerId = voting.getKey();
             Answer answer = getAnswerById(answerId);
 
             checkIfCategoryMatches(answer, categoryName);
@@ -109,55 +213,6 @@ public class VoteService {
         return voteOptionsGetDTO;
     }
 
-    private void checkIfGameExists(Game game) {
-
-        String errorMessage = "Game does not exist. Please try again with a different game!";
-
-        if (game == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage);
-        }
-    }
-
-    private void checkIfUserExists(User user) {
-
-        String errorMessage = "User does not exist." +
-                "Please register before playing!";
-
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
-    }
-
-    private void checkIfRoundExists(Round round) {
-
-        String errorMessage = "Round does not exist.";
-
-        if (round == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
-    }
-    private void checkIfCategoryExists(Category category) {
-
-        String errorMessage = "Category does not exist.";
-
-        if (category == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
-    }
-
-    private void checkIfUserIsInGame(Game game, User user) {
-        List<User> users = game.getUsers();
-
-        String errorMessage = "User is not part of this game.";
-
-        if(!users.contains(user)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
-        }
-    }
-
     private List<VoteGetDTO> getVoteGetDTOList(Game game, Round round, Category category, List<User> users) {
 
         List<VoteGetDTO> voteGetDTOList = new ArrayList<>();
@@ -170,7 +225,7 @@ public class VoteService {
             List<User> allUsersFiltered = new ArrayList<>(users);
             allUsersFiltered.remove(user);
 
-            VoteGetDTO newVoteGetDTO = createVoteGetDTO(user.getUsername(), allUsersFiltered,answer);
+            VoteGetDTO newVoteGetDTO = createVoteGetDTO(user.getUsername(), allUsersFiltered, answer);
             voteGetDTOList.add(newVoteGetDTO);
         }
 
@@ -182,31 +237,36 @@ public class VoteService {
         int numberOfUnique = 0;
         int numberOfNotUnique = 0;
         int numberOfWrong = 0;
+        int numberOfNoVote = 0;
 
         VoteGetDTO voteGetDTO = new VoteGetDTO();
         voteGetDTO.setUsername(username);
         voteGetDTO.setAnswerString(answer.getAnswerString());
 
-
-
         for (User user : allUsersFiltered) {
 
             Vote vote = voteRepository.findByUserAndAnswer(user, answer);
 
-            if (vote.getVotedOption().equals(VoteOption.CORRECT_UNIQUE)) {
-                numberOfUnique++;
-            }
-            else if (vote.getVotedOption().equals(VoteOption.CORRECT_NOT_UNIQUE)) {
-                numberOfNotUnique++;
-            }
-            else {
-                numberOfWrong++;
+            if (vote != null) {
+                if (vote.getVotedOption().equals(VoteOption.CORRECT_UNIQUE)) {
+                    numberOfUnique++;
+                }
+                else if (vote.getVotedOption().equals(VoteOption.CORRECT_NOT_UNIQUE)) {
+                    numberOfNotUnique++;
+                }
+                else if (vote.getVotedOption().equals(VoteOption.WRONG)) {
+                    numberOfWrong++;
+                }
+                else {
+                    numberOfNoVote++;
+                }
             }
         }
 
         voteGetDTO.setNumberOfUnique(numberOfUnique);
         voteGetDTO.setNumberOfNotUnique(numberOfNotUnique);
         voteGetDTO.setNumberOfWrong(numberOfWrong);
+        voteGetDTO.setNumberOfNoVote(numberOfNoVote);
 
         voteGetDTO.setPoints(calculatePoints(numberOfUnique, numberOfNotUnique, numberOfWrong));
 
@@ -236,7 +296,8 @@ public class VoteService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
         }
     }
-    private Answer getAnswerById(Long answerId) {
+
+    private Answer getAnswerById(int answerId) {
         return answerRepository.findById(answerId);
     }
 
@@ -244,27 +305,7 @@ public class VoteService {
 
         checkIfAnswerExists(answer);
 
-        checkIfVoteExists(vote);
-    }
-
-    private void checkIfAnswerExists(Answer answer) {
-
-        String errorMessage = "This answer does not exist.";
-
-        if (answer == null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
-    }
-
-    private void checkIfVoteExists(Vote vote) {
-
-        String errorMessage = "This Voting has already been saved.";
-
-        if (vote != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    String.format(errorMessage));
-        }
+        checkIfVotingAlreadyExists(vote);
     }
 
     private void saveVoting(Answer answer, User user, String votingString) {
@@ -280,7 +321,11 @@ public class VoteService {
         String errorMessage = "At least one of the votes is invalid!";
 
         try {
-            newVote.setVotedOption(VoteOption.valueOf(vote));
+            if (vote == null) {
+                newVote.setVotedOption(NO_VOTE);
+            } else {
+                newVote.setVotedOption(VoteOption.valueOf(vote));
+            }
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format(errorMessage));

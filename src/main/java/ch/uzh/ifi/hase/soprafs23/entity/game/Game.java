@@ -15,15 +15,15 @@ import java.util.List;
 public class Game implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final int serialVersionUID = 1;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "game_id")
-    private Long gameId;
+    private int gameId;
 
     @Column(nullable = false, unique = true)
-    private Long hostId;
+    private int hostId;
 
     @Column(nullable = false, unique = true)
     private int gamePin;
@@ -32,10 +32,13 @@ public class Game implements Serializable {
     private RoundLength roundLength;
 
     @Column(nullable = false)
-    private Long roundAmount;
+    private int roundAmount;
 
     @Column(nullable = false)
     private GameStatus status;
+
+    @Column(nullable = false)
+    private int numberOfCategories;
 
     public int getCurrentRound() {
         return currentRound;
@@ -72,15 +75,23 @@ public class Game implements Serializable {
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Round> rounds = new ArrayList<>();
 
-    public Long getGameId() {
+    public int getNumberOfCategories() {
+        return numberOfCategories;
+    }
+
+    public void setNumberOfCategories(int numberOfCategories) {
+        this.numberOfCategories = numberOfCategories;
+    }
+
+    public int getGameId() {
         return gameId;
     }
 
-    public Long getHostId() {
+    public int getHostId() {
         return hostId;
     }
 
-    public void setHostId(Long hostId) {
+    public void setHostId(int hostId) {
         this.hostId = hostId;
     }
 
@@ -100,11 +111,11 @@ public class Game implements Serializable {
         this.roundLength = roundLength;
     }
 
-    public Long getRounds() {
+    public int getRounds() {
         return roundAmount;
     }
 
-    public void setRounds(Long roundAmount) {
+    public void setRounds(int roundAmount) {
         this.roundAmount = roundAmount;
     }
 
@@ -151,5 +162,7 @@ public class Game implements Serializable {
     public void removeRound(Round round) {
         rounds.remove(round);
     }
+
+
 
 }

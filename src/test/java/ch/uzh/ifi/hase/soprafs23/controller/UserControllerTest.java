@@ -25,7 +25,6 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -75,7 +74,7 @@ public class UserControllerTest {
   public void createUser_validInput_userCreated() throws Exception {
     // given
     User user = new User();
-    user.setId(1L);
+    user.setId(1);
     user.setUsername("testUsername");
     user.setToken("1");
     user.setStatus(UserStatus.ONLINE);
@@ -89,7 +88,7 @@ public class UserControllerTest {
     userPostDTO.setPassword("Test User");
     userPostDTO.setUsername("testUsername");
 
-        given(userService.createUser(Mockito.any())).willReturn(user);
+        given(userService.createAndReturnUser(Mockito.any())).willReturn(user);
 
         // when/then -> do the request + validate the result
         MockHttpServletRequestBuilder postRequest = post("/users")
@@ -99,7 +98,7 @@ public class UserControllerTest {
         // then
         mockMvc.perform(postRequest)
             .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.id", is(user.getId().intValue())))
+            .andExpect(jsonPath("$.id", is(user.getId())))
             .andExpect(jsonPath("$.username", is(user.getUsername())))
             .andExpect(jsonPath("$.status", is(user.getStatus().toString())));
     }
@@ -108,7 +107,7 @@ public class UserControllerTest {
     public void logInUser_validInput_userLoggedIn() throws Exception {
         // given
         User user = new User();
-        user.setId(1L);
+        user.setId(1);
         user.setUsername("testUsername");
         user.setToken("1");
         user.setStatus(UserStatus.ONLINE);
@@ -131,7 +130,7 @@ public class UserControllerTest {
         // then
         mockMvc.perform(postRequest)
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", is(user.getId().intValue())))
+                .andExpect(jsonPath("$.id", is(user.getId())))
                 .andExpect(jsonPath("$.username", is(user.getUsername())))
                 .andExpect(jsonPath("$.status", is(user.getStatus().toString())))
                 .andExpect(header().string("Authorization", user.getToken()));
@@ -163,7 +162,7 @@ public class UserControllerTest {
     public void editUser_validInput_userEdited () throws Exception {
         // given
         User user = new User();
-        user.setId(1L);
+        user.setId(1);
         user.setUsername("testUsername");
         user.setStatus(UserStatus.ONLINE);
 
@@ -171,7 +170,7 @@ public class UserControllerTest {
         userPutDTO.setUsername("username");
         userPutDTO.setPassword("password");
 
-        given(userService.editUser(Mockito.any(),Mockito.any())).willReturn(user);
+        given(userService.editUser(Mockito.anyInt(),Mockito.any())).willReturn(user);
 
         MockHttpServletRequestBuilder putRequest = put("/users/1")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -190,7 +189,7 @@ public class UserControllerTest {
         userPutDTO.setPassword("password");
 
         // tell the method to do nothing when userService.editUser() is called
-        given(userService.editUser(Mockito.any(),Mockito.any())).willThrow(new ResponseStatusException(HttpStatus.NOT_FOUND));
+        given(userService.editUser(Mockito.anyInt(),Mockito.any())).willThrow(new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         // when
         MockHttpServletRequestBuilder putRequest = put("/users/1")
@@ -203,7 +202,7 @@ public class UserControllerTest {
     @Test
     public void getUserByID_correctInput_returnUser() throws Exception {
         // given
-        long userId = 1L;
+        int userId = 1;
         User user = new User();
         user.setId(userId);
         user.setUsername("testUsername");
@@ -217,7 +216,7 @@ public class UserControllerTest {
         // then
         mockMvc.perform(getRequest)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(user.getId().intValue())))
+                .andExpect(jsonPath("$.id", is(user.getId())))
                 .andExpect(jsonPath("$.username", is(user.getUsername())));
     }
     @Test
@@ -225,7 +224,7 @@ public class UserControllerTest {
         // given
         String username = "testUsername";
         User user = new User();
-        user.setId(1L);
+        user.setId(1);
         user.setUsername(username);
 
         given(userService.getUserByUsername(username)).willReturn(user);
@@ -237,7 +236,7 @@ public class UserControllerTest {
         // then
         mockMvc.perform(getRequest)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(user.getId().intValue())))
+                .andExpect(jsonPath("$.id", is(user.getId())))
                 .andExpect(jsonPath("$.username", is(user.getUsername())));
     }
 

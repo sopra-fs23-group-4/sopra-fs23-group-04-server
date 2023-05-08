@@ -23,7 +23,7 @@ public class VoteController {
     public void saveVote(@PathVariable("gamePin") int gamePin,
                          @PathVariable("categoryName") String categoryName,
                          @RequestHeader("Authorization") String userToken,
-                         @RequestBody Map<Long, String> votings){
+                         @RequestBody Map<Integer, String> votings){
 
         voteService.saveVote(gamePin, categoryName, userToken, votings);
 
@@ -49,4 +49,5 @@ public class VoteController {
         return voteService.getVoteOptions();
 
     }
+
 }

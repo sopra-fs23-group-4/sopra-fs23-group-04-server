@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository("categoryRepository")
-public interface CategoryRepository extends JpaRepository<Category, Long> {
+public interface CategoryRepository extends JpaRepository<Category, Integer> {
     Category findByName(String categoryName);
 
 }

@@ -138,7 +138,7 @@ ij_java_parameter_annotation_wrap = off
 ij_java_parentheses_expression_new_line_after_left_paren = false
 ij_java_parentheses_expression_right_paren_on_new_line = false
 ij_java_place_assignment_sign_on_next_line = false
-ij_java_prefer_longer_names = true
+ij_java_prefer_inter_names = true
 ij_java_prefer_parameters_wrap = false
 ij_java_repeat_synchronized = true
 ij_java_replace_instanceof_and_cast = false
@@ -238,7 +238,7 @@ ij_java_while_brace_force = never
 ij_java_while_on_new_line = false
 ij_java_wrap_comments = false
 ij_java_wrap_first_method_in_call_chain = false
-ij_java_wrap_long_lines = false
+ij_java_wrap_int_lines = false
 
 [*.json]
 indent_size = 2
@@ -251,7 +251,7 @@ ij_json_space_before_colon = true
 ij_json_space_before_comma = false
 ij_json_spaces_within_braces = false
 ij_json_spaces_within_brackets = false
-ij_json_wrap_long_lines = false
+ij_json_wrap_int_lines = false
 
 [*.properties]
 ij_properties_align_group_field_declarations = false
@@ -428,7 +428,7 @@ ij_groovy_use_relative_indents = false
 ij_groovy_variable_annotation_wrap = off
 ij_groovy_while_brace_force = never
 ij_groovy_while_on_new_line = false
-ij_groovy_wrap_long_lines = false
+ij_groovy_wrap_int_lines = false
 
 [{*.html,*.shtm,*.sht,*.shtml,*.htm}]
 ij_html_add_new_line_before_tags = body,div,p,form,h1,h2,h3

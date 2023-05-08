@@ -1,11 +1,8 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
-import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -13,8 +10,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
@@ -23,11 +18,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class UserServiceTest {
 
@@ -48,7 +41,7 @@ public class UserServiceTest {
 
         // given
         testUser = new User();
-        testUser.setId(1L);
+        testUser.setId(1);
         testUser.setUsername("username");
         testUser.setPassword("password");
         testUser.setToken("valid-token");
@@ -63,7 +56,7 @@ public class UserServiceTest {
     public void createUser_validInputs_success() {
         // when -> any object is being save in the userRepository -> return the dummy
         // testUser
-        User createdUser = userService.createUser(testUser);
+        User createdUser = userService.createAndReturnUser(testUser);
 
         // then
         verify(userRepository, Mockito.times(1)).save(Mockito.any());
@@ -78,42 +71,42 @@ public class UserServiceTest {
     @Test
     public void createUser_duplicateName_throwsException() {
         // given -> a first user has already been created
-        userService.createUser(testUser);
+        userService.createAndReturnUser(testUser);
 
         // when -> setup additional mocks for UserRepository
         when(userRepository.findByUsername(Mockito.any())).thenReturn(testUser);
 
         // then -> attempt to create second user with same user -> check that an error
         // is thrown
-        assertThrows(ResponseStatusException.class, () -> userService.createUser(testUser));
+        assertThrows(ResponseStatusException.class, () -> userService.createAndReturnUser(testUser));
     }
 
     @Test
     public void createUser_duplicateInputs_throwsException() {
         // given -> a first user has already been created
-        userService.createUser(testUser);
+        userService.createAndReturnUser(testUser);
 
         // when -> setup additional mocks for UserRepository
         when(userRepository.findByUsername(Mockito.any())).thenReturn(testUser);
 
         // then -> attempt to create second user with same user -> check that an error
         // is thrown
-        assertThrows(ResponseStatusException.class, () -> userService.createUser(testUser));
+        assertThrows(ResponseStatusException.class, () -> userService.createAndReturnUser(testUser));
     }
 
     @Test
     public void editUser_validInputs_success() {
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        when(userRepository.findById(1)).thenReturn(Optional.of(testUser));
         User editedUser = new User();
-        editedUser.setId(1L);
+        editedUser.setId(1);
         editedUser.setUsername("new-username");
         editedUser.setPassword("new-password");
         editedUser.setToken("valid-token");
         editedUser.setQuote("new-quote"); // Add a new quote for the edited user
 
         // When
-        User resultUser = userService.editUser(1L, editedUser);
+        User resultUser = userService.editUser(1, editedUser);
 
         // Then
         assertEquals(editedUser.getId(), resultUser.getId());
@@ -126,29 +119,29 @@ public class UserServiceTest {
     @Test
     public void editUser_userNotFound_throwResponseStatusException() {
         // Given
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        when(userRepository.findById(1)).thenReturn(Optional.empty());
         User editedUser = new User();
-        editedUser.setId(1L);
+        editedUser.setId(1);
         editedUser.setUsername("new-username");
         editedUser.setPassword("new-password");
         editedUser.setToken("valid-token");
 
         // Then (expect exception)
-        assertThrows(ResponseStatusException.class, () -> userService.editUser(1L, editedUser));
+        assertThrows(ResponseStatusException.class, () -> userService.editUser(1, editedUser));
     }
 
     @Test
     public void editUser_invalidToken_throwResponseStatusException() {
         // Given
-        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        when(userRepository.findById(1)).thenReturn(Optional.of(testUser));
         User editedUser = new User();
-        editedUser.setId(1L);
+        editedUser.setId(1);
         editedUser.setUsername("new-username");
         editedUser.setPassword("new-password");
         editedUser.setToken("invalid-token");
 
         // Then (expect exception)
-        assertThrows(ResponseStatusException.class, () -> userService.editUser(1L, editedUser));
+        assertThrows(ResponseStatusException.class, () -> userService.editUser(1, editedUser));
     }
 
     @Test
@@ -225,7 +218,7 @@ public class UserServiceTest {
     public void getUsers_usersExistInRepository_success() {
         // Given
         User anotherTestUser = new User();
-        anotherTestUser.setId(2L);
+        anotherTestUser.setId(2);
         anotherTestUser.setUsername("anotherUsername");
         anotherTestUser.setPassword("anotherPassword");
 
@@ -267,7 +260,7 @@ public class UserServiceTest {
     @Test
     public void getUserById_validId_returnsUser() {
         // Given
-        Long userId = 1L;
+        int userId = 1;
         when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
 
         // When
@@ -282,7 +275,7 @@ public class UserServiceTest {
     @Test
     public void getUserById_invalidId_throwsResponseStatusException() {
         // Given
-        Long userId = 1L;
+        int userId = 1;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // Then

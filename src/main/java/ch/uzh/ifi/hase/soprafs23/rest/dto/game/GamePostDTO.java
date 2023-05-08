@@ -5,16 +5,16 @@ import ch.uzh.ifi.hase.soprafs23.constant.RoundLength;
 import java.util.List;
 
 public class GamePostDTO {
-    private Long hostId;
+    private int hostId;
     private int rounds;
     private RoundLength roundLength;
     private List<String> categories;
 
-    public Long getHostId() {
+    public int getHostId() {
         return hostId;
     }
 
-    public void setHostId(Long hostId) {
+    public void setHostId(int hostId) {
         this.hostId = hostId;
     }
 

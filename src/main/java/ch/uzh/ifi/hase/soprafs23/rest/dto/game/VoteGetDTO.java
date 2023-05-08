@@ -6,6 +6,7 @@ public class VoteGetDTO {
     private int numberOfUnique;
     private int numberOfNotUnique;
     private int numberOfWrong;
+    private int numberOfNoVote;
     private int points;
 
     public String getUsername() {
@@ -46,6 +47,14 @@ public class VoteGetDTO {
 
     public void setNumberOfWrong(int numberOfWrong) {
         this.numberOfWrong = numberOfWrong;
+    }
+
+    public int getNumberOfNoVote() {
+        return numberOfNoVote;
+    }
+
+    public void setNumberOfNoVote(int numberOfNoVote) {
+        this.numberOfNoVote = numberOfNoVote;
     }
 
     public int getPoints() {

@@ -53,7 +53,7 @@ public class UserController {
         User userInput = UserDTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
 
         // create user
-        User createdUser = userService.createUser(userInput);
+        User createdUser = userService.createAndReturnUser(userInput);
 
         response.addHeader("Authorization", createdUser.getToken());
         log.info("The user " + createdUser.getUsername() + " with id " + createdUser.getId() + " has been created.");
@@ -77,7 +77,7 @@ public class UserController {
 
     @PutMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void editUser(@PathVariable("userId") Long userId, @RequestBody UserPutDTO userPutDTO){
+    public void editUser(@PathVariable("userId") int userId, @RequestBody UserPutDTO userPutDTO){
 
         User userCredentials = UserDTOMapper.INSTANCE.convertUserPutDTOToEntity(userPutDTO);
 
@@ -88,7 +88,7 @@ public class UserController {
     @GetMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public UserGetDTO getUserByID(@PathVariable("userId") long userId){
+    public UserGetDTO getUserByID(@PathVariable("userId") int userId){
 
         // retrieve User entity using ID
         User user = userService.getUserById(userId);

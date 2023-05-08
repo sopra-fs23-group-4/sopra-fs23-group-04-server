@@ -122,7 +122,7 @@ public class DTOMapperTest {
     public void testCreateGetUserDTO_fromUser_success() {
         // create User
         User user = new User();
-        user.setId(1L);
+        user.setId(1);
         user.setUsername("username");
         user.setStatus(UserStatus.ONLINE);
         user.setCreationDate(LocalDate.EPOCH);

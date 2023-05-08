@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
@@ -33,12 +32,9 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    private final QuoteService quoteService;
-
     @Autowired
-    public UserService(@Qualifier("userRepository") UserRepository userRepository, QuoteService quoteService) {
+    public UserService(@Qualifier("userRepository") UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.quoteService = quoteService;
     }
 
     public List<User> getUsers() {
@@ -47,13 +43,13 @@ public class UserService {
 
     int token = 1;
 
-    public synchronized User createUser(User newUser) {
+    public synchronized User createAndReturnUser(User newUser) {
         // TODO change setToken back to random
         //newUser.setToken(UUID.randomUUID().toString());
         newUser.setToken(Integer.toString(token));
         token++;
         newUser.setStatus(UserStatus.ONLINE);
-        checkIfUserExists(newUser);
+        checkIfUsernameAlreadyExists(newUser);
         checkIfUsernameValid(newUser);
         newUser.setCreationDate((LocalDate.now()));
         newUser.setProfilePictureUrl("https://storage.googleapis.com/sorpa-fs23-gr-leetfive-server.appspot.com/DefaultProfilePicture100x100.jpg");
@@ -86,7 +82,7 @@ public class UserService {
 
     }
 
-    public User getUserById(Long id) {
+    public User getUserById(int id) {
         return userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
@@ -98,7 +94,7 @@ public class UserService {
         return user;
     }
 
-    public synchronized User editUser (Long userId, User editedUser) {
+    public synchronized User editUser (int userId, User editedUser) {
 
         User userDB = userRepository.findById(userId).orElse(null);
 
@@ -126,10 +122,12 @@ public class UserService {
     * @throws org.springframework.web.server.ResponseStatusException
     * @see User
     */
-    private void checkIfUserExists(User userToBeCreated) {
+    private void checkIfUsernameAlreadyExists(User userToBeCreated) {
+
         User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
 
         String baseErrorMessage = "The username provided is not unique. Therefore, the user could not be created or updated!";
+
         if (userByUsername != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format(baseErrorMessage));
@@ -150,7 +148,7 @@ public class UserService {
         String newQuote = editedUser.getQuote();
         // Byte[] newPic = editedUser.getP
         if (!Objects.equals(newUsername, null)) {
-            checkIfUserExists(editedUser);
+            checkIfUsernameAlreadyExists(editedUser);
             checkIfUsernameValid(editedUser);
             userDB.setUsername(newUsername);
         }

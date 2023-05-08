@@ -14,9 +14,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
-import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.*;
-import static ch.uzh.ifi.hase.soprafs23.constant.RoundStatus.FINISHED;
 import static ch.uzh.ifi.hase.soprafs23.constant.ScorePoint.INCORRECT;
+import static ch.uzh.ifi.hase.soprafs23.helper.GameHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.RoundHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.CategoryHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 
 @Service
 @Transactional
@@ -35,11 +37,13 @@ public class AnswerService {
                          @Qualifier("roundRepository") RoundRepository roundRepository,
                          @Qualifier("answerRepository") AnswerRepository answerRepository,
                          @Qualifier("categoryRepository") CategoryRepository categoryRepository) {
+
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.roundRepository = roundRepository;
         this.answerRepository = answerRepository;
         this.categoryRepository = categoryRepository;
+
     }
 
     public void saveAnswers(int gamePin, String userToken, int roundNumber, Map<String, String> answers) {
@@ -62,7 +66,7 @@ public class AnswerService {
         saveAnswersToDatabase(answers, user, round);
     }
 
-    public List<Map<Long, String>> getAnswers(int gamePin, int roundNumber, String categoryName, String userToken) {
+    public List<Map<Integer, String>> getAnswers(int gamePin, int roundNumber, String categoryName, String userToken) {
         Game game = gameRepository.findByGamePin(gamePin);
         checkIfGameExists(game);
         checkIfGameIsRunning(game);
@@ -88,59 +92,7 @@ public class AnswerService {
      * Helper methods to aid with the answer saving, creation and retrieval
      */
 
-    private void checkIfGameExists(Game game) {
-        String errorMessage = "Game does not exist. Please try again with a different game!";
-
-        if (game == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage);
-        }
-    }
-
-    private void checkIfGameIsRunning(Game game) {
-        String errorMessage = "Game is not running anymore. Please try again with a different game!";
-
-        if (!game.getStatus().equals(RUNNING)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
-        }
-    }
-
-    private void checkIfUserExists(User user) {
-
-        String errorMessage = "User does not exist." +
-                "Please register before playing!";
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format(errorMessage));
-        }
-    }
-
-    private void checkIfUserIsInGame(Game game, User user) {
-        List<User> users = game.getUsers();
-
-        String errorMessage = "User is not part of this game.";
-
-        if(!users.contains(user)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
-        }
-    }
-
-    private void checkIfRoundExists(Round round) {
-        String errorMessage = "Round does not exist.";
-
-        if (round == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage);
-        }
-    }
-
-    private void checkIfRoundIsFinished(Round round) {
-        String errorMessage = "Round is not finished yet.";
-
-        if (!round.getStatus().equals(FINISHED)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
-        }
-    }
-
-    private void checkIfAnswersAlreadyExist(Round round, User user) {
+    void checkIfAnswersAlreadyExist(Round round, User user) {
 
         List<Answer> answers = answerRepository.findByRoundAndUser(round, user);
 
@@ -155,41 +107,40 @@ public class AnswerService {
     private Category getCategory(String categoryName) {
 
         return categoryRepository.findByName(categoryName);
+
     }
 
-    private void checkIfCategoryExists(Category category) {
+    void saveAnswersToDatabase(Map<String, String> answers, User user, Round round) {
+        for (Map.Entry<String, String> answer : answers.entrySet()) {
 
-        String errorMessage = "There exists no such category.";
-
-        if (category == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format(errorMessage));
-        }
-    }
-
-    private void saveAnswersToDatabase(Map<String, String> answers, User user, Round round) {
-        for (Map.Entry<String, String> entry : answers.entrySet()) {
-            String categoryName = entry.getKey();
+            String categoryName = answer.getKey();
             Category category = getCategory(categoryName);
-            String answer = entry.getValue();
+            String answerString = answer.getValue();
+
+            if (answerString == null) {
+                answerString = "";
+            }
+
             Answer newAnswer = new Answer();
+
             newAnswer.setRound(round);
             newAnswer.setUser(user);
-            newAnswer.setAnswerString(answer);
+            newAnswer.setAnswerString(answerString);
             newAnswer.setCategory(category);
             newAnswer.setScorePoint(INCORRECT);
-            newAnswer = answerRepository.save(newAnswer);
+
+            answerRepository.save(newAnswer);
         }
         answerRepository.flush();
     }
 
-    private List<Map<Long, String>> filterAnswersByDeletingUser(List<Answer> answers, User user) {
+    private List<Map<Integer, String>> filterAnswersByDeletingUser(List<Answer> answers, User user) {
 
-        List<Map<Long, String>> filteredAnswers = new ArrayList<>();
+        List<Map<Integer, String>> filteredAnswers = new ArrayList<>();
 
         for (Answer answer : answers) {
             if (!answer.getUser().equals(user)) {
-                Map<Long, String> answerTuple = new HashMap<>();
+                Map<Integer, String> answerTuple = new HashMap<>();
                 answerTuple.put(answer.getAnswerId(), answer.getAnswerString());
                 filteredAnswers.add(answerTuple);
             }

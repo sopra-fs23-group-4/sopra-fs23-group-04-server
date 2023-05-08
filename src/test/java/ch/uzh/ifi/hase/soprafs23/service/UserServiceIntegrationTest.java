@@ -1,12 +1,9 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
-import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 /**
  * Test class for the UserResource REST resource.
@@ -36,7 +32,6 @@ public class UserServiceIntegrationTest {
 
     @Autowired
     private UserService userService;
-
 
     @MockBean // Add this annotation to mock the QuoteService
     private QuoteService quoteService;
@@ -56,7 +51,7 @@ public class UserServiceIntegrationTest {
     testUser.setCreationDate(LocalDate.EPOCH);
 
     // when
-    User createdUser = userService.createUser(testUser);
+    User createdUser = userService.createAndReturnUser(testUser);
 
     // then
     assertEquals(testUser.getId(), createdUser.getId());
@@ -75,7 +70,7 @@ public class UserServiceIntegrationTest {
     testUser.setCreationDate(LocalDate.EPOCH);
 
     testUser.setUsername("testUsername");
-    User createdUser = userService.createUser(testUser);
+    User createdUser = userService.createAndReturnUser(testUser);
 
     // attempt to create second user with same username
     User testUser2 = new User();
@@ -85,6 +80,6 @@ public class UserServiceIntegrationTest {
     testUser2.setUsername("testUsername");
 
     // check that an error is thrown
-    assertThrows(ResponseStatusException.class, () -> userService.createUser(testUser2));
+    assertThrows(ResponseStatusException.class, () -> userService.createAndReturnUser(testUser2));
     }
 }

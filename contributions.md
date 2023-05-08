@@ -20,11 +20,30 @@
 
 25.04.2023
 
-
 | Person                | Last Week     | Next Week        | Description                                          |
 |-----------------------|---------------|------------------|------------------------------------------------------|
 | Alexandre Bacmann     | #123, #124    |                  | websocket scorebaord, last round, quote for winner   |
-| Valentin Meyer        | #114, #118    |                  | added the answer and voting functionality            |
+| Valentin Meyer        | #114, #118    | #161, #162       | added the answer and voting functionality            |
 | Christopher Narayanan | #119, #120    |                  | websocket                                            |
 | Lennart Töllke        | #17, #18      | #21, #26, #27    | pages: Settings, Lobby, struggle with websockets/sse |
 | Remo Wiget            | #17, #20, #23 | #22, #24         | storageManager, pages: Categories, Board, Answer     |
+
+02.05.2023
+
+| Person                | Last Week     | Next Week        | Description                                          |
+|-----------------------|---------------|------------------|------------------------------------------------------|
+| Alexandre Bacmann     |               |                  |                                                      |
+| Valentin Meyer        | #161, #162    | #158, #159       | improved voting and enabled starting and ending rounds |
+| Christopher Narayanan |               |                  |                                                      |
+| Lennart Töllke        | #21, #26, #27 |                  |                                                      |
+| Remo Wiget            | #22, #24      |                  |                                                      |
+
+09.05.2023
+
+| Person                | Last Week     | Next Week        | Description                                          |
+|-----------------------|---------------|------------------|------------------------------------------------------|
+| Alexandre Bacmann     |               |                  |                                                      |
+| Valentin Meyer        | #158, #159    | #160, #163       | create utility classes and handled exceptional calls, plus other trouble shooting |
+| Christopher Narayanan |               |                  |                                                      |
+| Lennart Töllke        |               |                  |                                                      |
+| Remo Wiget            |               |                  |                                                      |

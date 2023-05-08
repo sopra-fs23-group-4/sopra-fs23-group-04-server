@@ -1,6 +1,8 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
+import ch.uzh.ifi.hase.soprafs23.constant.ExtractApiCallData.FactJsonExtractor;
 import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
+import ch.uzh.ifi.hase.soprafs23.entity.quote.FactHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteCategoriesHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,9 +43,7 @@ public class QuoteServiceTest {
     @Test
     public void testInvalidCategory(){
         String invalidCategory = "invalidCategory";
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            quoteService.generateQuote(invalidCategory);
-        });
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> quoteService.generateQuote(invalidCategory));
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
     }
 
@@ -54,6 +54,12 @@ public class QuoteServiceTest {
             assertNotNull(quoteHolder);
             assertNotNull(quoteHolder.getQuote());
         }
+    }
+
+    @Test
+    public void testFactApi(){
+        FactHolder factHolder=quoteService.generateFact();
+        System.out.println(factHolder.getFact());
     }
 
 
