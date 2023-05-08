@@ -45,5 +45,5 @@
 | Alexandre Bacmann     |#33,#37,#38,#39,#40|              |Rules page, Backend leaderboard, testing              |
 | Valentin Meyer        | #158, #159    | #160, #163       | create utility classes and handled exceptional calls, plus other trouble shooting |
 | Christopher Narayanan |               |                  |                                                      |
-| Lennart Töllke        | #27, #28      |                  | Score page, Winner page, imporved lobby and settings page |
+| Lennart Töllke        | #27, #28      | #15, #16         | Score page, Winner page, imporved lobby and settings page |
 | Remo Wiget            |               |                  |                                                      |
