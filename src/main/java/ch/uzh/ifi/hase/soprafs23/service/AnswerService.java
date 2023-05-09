@@ -118,7 +118,7 @@ public class AnswerService {
             String answerString = answer.getValue();
 
             if (answerString == null) {
-                answerString = "";
+                answerString = "-";
             }
 
             Answer newAnswer = new Answer();
