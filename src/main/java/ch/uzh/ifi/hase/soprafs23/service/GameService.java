@@ -351,7 +351,7 @@ public class GameService {
     }
 
 
-    Map<User, Integer> calculateUserScores(int gamePin) {
+    public Map<User, Integer> calculateUserScores(int gamePin) {
         List<Answer> answers = answerRepository.findAllByGamePin(gamePin);
 
         Map<User, Integer> userScores = new HashMap<>();
@@ -373,18 +373,18 @@ public class GameService {
         for (Map.Entry<User, Integer> entry : userScores.entrySet()) {
             if (entry.getValue() > maxScore) {
                 winners.clear();
-                WinnerGetDTO winnerDTO = new WinnerGetDTO();
-                winnerDTO.setUsername(entry.getKey().getUsername());
-                winnerDTO.setScore(entry.getValue());
-                winnerDTO.setQuote(entry.getKey().getQuote());
-                winners.add(winnerDTO);
+                WinnerGetDTO winnerGetDTO = new WinnerGetDTO();
+                winnerGetDTO.setUsername(entry.getKey().getUsername());
+                winnerGetDTO.setScore(entry.getValue());
+                winnerGetDTO.setQuote(entry.getKey().getQuote());
+                winners.add(winnerGetDTO);
                 maxScore = entry.getValue();
             } else if (entry.getValue() == maxScore) {
-                WinnerGetDTO winnerDTO = new WinnerGetDTO();
-                winnerDTO.setUsername(entry.getKey().getUsername());
-                winnerDTO.setScore(entry.getValue());
-                winnerDTO.setQuote(entry.getKey().getQuote());
-                winners.add(winnerDTO);
+                WinnerGetDTO winnerGetDTO = new WinnerGetDTO();
+                winnerGetDTO.setUsername(entry.getKey().getUsername());
+                winnerGetDTO.setScore(entry.getValue());
+                winnerGetDTO.setQuote(entry.getKey().getQuote());
+                winners.add(winnerGetDTO);
             }
         }
         return winners;
@@ -395,11 +395,14 @@ public class GameService {
 
         List<ScoreboardGetDTO> scoreboard = new ArrayList<>();
         for (Map.Entry<User, Integer> entry : userScores.entrySet()) {
-            ScoreboardGetDTO scoreboardEntry = new ScoreboardGetDTO();
-            scoreboardEntry.setUsername(entry.getKey().getUsername());
-            scoreboardEntry.setScore(entry.getValue());
-            scoreboard.add(scoreboardEntry);
+            ScoreboardGetDTO scoreboardGetDTO = new ScoreboardGetDTO();
+            scoreboardGetDTO.setUsername(entry.getKey().getUsername());
+            scoreboardGetDTO.setScore(entry.getValue());
+            scoreboard.add(scoreboardGetDTO);
         }
+
+        // Sort the scoreboard in descending order of score
+        scoreboard.sort((dto1, dto2) -> dto2.getScore() - dto1.getScore());
 
         return scoreboard;
     }
@@ -409,11 +412,6 @@ public class GameService {
         List<User> users = userRepository.findAll();
 
         Map<User, Integer> leaderboard = new HashMap<>();
-
-        // Initialize all users with a score of 0
-        for (User user : users) {
-            leaderboard.put(user, 0);
-        }
 
         for (User user: users){
             int totalUserScore = 0;
