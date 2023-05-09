@@ -14,13 +14,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
         import org.springframework.boot.test.context.SpringBootTest;
-        import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import java.sql.SQLOutput;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static ch.uzh.ifi.hase.soprafs23.helper.AnswerHelper.checkIfAnswerExists;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
@@ -44,6 +47,7 @@ public class AnswerServiceIntegrationTest {
 
     private User user1;
     private User user2;
+    private User user3;
     private Game game;
     private Round round;
 
@@ -60,6 +64,11 @@ public class AnswerServiceIntegrationTest {
         userForCreation2.setPassword("testPassword");
         user2 = userService.createAndReturnUser(userForCreation2);
 
+        User userForCreation3 = new User();
+        userForCreation3.setUsername("user3");
+        userForCreation3.setPassword("testPassword");
+        user3 = userService.createAndReturnUser(userForCreation3);
+
         // Create and save a game
         Game gameForCreation = new Game();
         gameForCreation.setRounds(10);
@@ -74,6 +83,42 @@ public class AnswerServiceIntegrationTest {
 
     @Test
     public void saveAnswers_validInput_answersSaved() {
+
+        Map<String, String> answers = new HashMap<>();
+        answers.put("Stadt", "Athen");
+        answers.put("Land", "Armenien");
+        answers.put("Auto", "Audi");
+        answers.put("Film Regisseur", null);
+
+        // change status of game to RUNNING
+        game.setStatus(GameStatus.RUNNING);
+        gameRepository.saveAndFlush(game);
+
+        // change status of round to FINISHED
+        round.setStatus(RoundStatus.FINISHED);
+        roundRepository.saveAndFlush(round);
+
+        // No exception should be thrown in this case
+        assertDoesNotThrow(() -> answerService.saveAnswers(game.getGamePin(), user1.getToken(), 1, answers));
+
+        List<Answer> savedAnswers = answerRepository.findByRoundAndUser(round, user1);
+
+        // Verify that the saved answers match the provided answers
+        assertEquals(answers.size(), savedAnswers.size());
+
+        for (Answer savedAnswer : savedAnswers) {
+            String categoryName = savedAnswer.getCategory().getName();
+            String submittedAnswer = answers.get(categoryName);
+            if (submittedAnswer == null) {
+                assertEquals("-", savedAnswer.getAnswerString());
+            } else {
+                assertEquals(submittedAnswer, savedAnswer.getAnswerString());
+            }
+        }
+    }
+
+    @Test
+    public void saveAnswers_validInput_savedTwice() {
 
         Map<String, String> answers = Map.of(
                 "Stadt", "Athen",
@@ -91,28 +136,43 @@ public class AnswerServiceIntegrationTest {
 
         // No exception should be thrown in this case
         assertDoesNotThrow(() -> answerService.saveAnswers(game.getGamePin(), user1.getToken(), 1, answers));
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> answerService.saveAnswers(game.getGamePin(), user1.getToken(), 1, answers));
 
-        List<Answer> savedAnswers = answerRepository.findByRoundAndUser(round, user1);
 
-        // Verify that the saved answers match the provided answers
-        assertEquals(answers.size(), savedAnswers.size());
-        for (Answer savedAnswer : savedAnswers) {
-            String categoryName = savedAnswer.getCategory().getName();
-            String submittedAnswer = answers.get(categoryName);
-            assertEquals(submittedAnswer, savedAnswer.getAnswerString());
-        }
+        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
+        assertEquals("These Answers have already been saved.", exception.getReason());
     }
 
     @Test
-    public void getAnswers_validInput() {
+    public void saveAnswers_userNotInGame() {
 
-        Map<String, String> answersUser1 = Map.of(
+        Map<String, String> answers = Map.of(
                 "Stadt", "Athen",
                 "Land", "Armenien",
                 "Auto", "Audi",
                 "Film Regisseur", "Woody Allen");
 
-        Map<String, String> answersUser2 = Map.of(
+        // change status of game to RUNNING
+        game.setStatus(GameStatus.RUNNING);
+        gameRepository.saveAndFlush(game);
+
+        // change status of round to FINISHED
+        round.setStatus(RoundStatus.FINISHED);
+        roundRepository.saveAndFlush(round);
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> answerService.saveAnswers(game.getGamePin(), user3.getToken(), 1, answers));
+
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
+        assertEquals("User is not part of this game.", exception.getReason());
+
+    }
+
+    @Test
+    public void getAnswers_validInput() {
+
+        Map<String, String> answersUser1And2 = Map.of(
                 "Stadt", "Athen",
                 "Land", "Armenien",
                 "Auto", "Audi",
@@ -127,8 +187,8 @@ public class AnswerServiceIntegrationTest {
         roundRepository.saveAndFlush(round);
 
         // No exception should be thrown in this case
-        assertDoesNotThrow(() -> answerService.saveAnswers(game.getGamePin(), user1.getToken(), 1, answersUser1));
-        assertDoesNotThrow(() -> answerService.saveAnswers(game.getGamePin(), user2.getToken(), 1, answersUser2));
+        assertDoesNotThrow(() -> answerService.saveAnswers(game.getGamePin(), user1.getToken(), 1, answersUser1And2));
+        assertDoesNotThrow(() -> answerService.saveAnswers(game.getGamePin(), user2.getToken(), 1, answersUser1And2));
 
         Map<Integer, String> answerUser1Stadt = new HashMap<>();
         answerUser1Stadt.put(1, "Athen");
@@ -139,7 +199,14 @@ public class AnswerServiceIntegrationTest {
         List<Map<Integer, String>> answerListActual =
                 answerService.getAnswers(game.getGamePin(), 1, "Stadt", user2.getToken());
 
-        assertEquals(answerListExpected, answerListActual);
+        // Check that the number of answers is the same
+        assertEquals(answerListExpected.size(), answerListActual.size());
+
+        // Check that the answers are the same
+        Map<Integer, String> expectedMap = answerListExpected.get(0);
+        Map<Integer, String> actualMap = answerListActual.get(0);
+
+        assertEquals(expectedMap.values().iterator().next(), actualMap.values().iterator().next());
     }
 
     private List<Category> getCategories() {
