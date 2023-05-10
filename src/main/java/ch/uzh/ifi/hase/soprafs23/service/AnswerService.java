@@ -127,7 +127,7 @@ public class AnswerService {
             newAnswer.setUser(user);
             newAnswer.setAnswerString(answerString);
             newAnswer.setCategory(category);
-            newAnswer.setScorePoint(INCORRECT);
+            //newAnswer.setScorePoint(INCORRECT);
 
             answerRepository.save(newAnswer);
         }

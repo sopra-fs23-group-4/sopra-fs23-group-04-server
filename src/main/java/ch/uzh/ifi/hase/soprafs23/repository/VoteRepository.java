@@ -15,4 +15,8 @@ public interface VoteRepository extends JpaRepository<Vote, Integer> {
     List<Vote> findByUser(User user);
     Vote findByUserAndAnswer(User user, Answer answer);
     List<Vote> findByAnswer(Answer answer);
+
+    List<Vote> findAllByGamePin(int gamePin);
+
+    List<Vote> findAllByUser(User user);
 }
