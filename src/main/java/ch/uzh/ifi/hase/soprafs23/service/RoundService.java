@@ -162,7 +162,7 @@ public class RoundService {
                 }
 
                 else{
-                    logger.log("Timeleft to answer "+ timeLeft + " current round Status " + round.getStatus());
+                    System.out.println("Timeleft to answer "+ timeLeft + " current round Status " + round.getStatus());
 
                     RoundTimerDTO roundTimerDTO = new RoundTimerDTO();
                     roundTimerDTO.setTimeRemaining(timeLeft);

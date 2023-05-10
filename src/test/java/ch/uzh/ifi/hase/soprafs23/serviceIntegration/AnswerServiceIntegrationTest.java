@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs23.service;
+package ch.uzh.ifi.hase.soprafs23.serviceIntegration;
 
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundLength;
@@ -9,6 +9,9 @@ import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
 import ch.uzh.ifi.hase.soprafs23.repository.*;
+import ch.uzh.ifi.hase.soprafs23.service.AnswerService;
+import ch.uzh.ifi.hase.soprafs23.service.GameService;
+import ch.uzh.ifi.hase.soprafs23.service.UserService;
 import net.minidev.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -135,12 +138,12 @@ class AnswerServiceIntegrationTest {
         roundRepository.saveAndFlush(round);
 
         int gamePing = game.getGamePin();
-        String user3Token = user3.getToken();
+        String user1Token = user1.getToken();
 
         // No exception should be thrown in this case
-        assertDoesNotThrow(() -> answerService.saveAnswers(game.getGamePin(), user1.getToken(), 1, answers));
+        assertDoesNotThrow(() -> answerService.saveAnswers(gamePing, user1Token, 1, answers));
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> answerService.saveAnswers(gamePing, user3Token, 1, answers));
+                () -> answerService.saveAnswers(gamePing, user1Token, 1, answers));
 
 
         assertEquals(HttpStatus.CONFLICT, exception.getStatus());
