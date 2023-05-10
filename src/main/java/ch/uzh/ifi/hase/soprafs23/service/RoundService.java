@@ -140,7 +140,7 @@ public class RoundService {
                 int timeLeft = remainingTime.addAndGet(-1);
 
                 if (isRoundFinished(gamePin)){
-                    System.out.println("Timer canceled");
+                    logger.info("Round is finsihed");
                     timer.cancel();
 
                 }
@@ -162,7 +162,7 @@ public class RoundService {
                 }
 
                 else{
-                    logger.log("Timeleft to answer "+ timeLeft + " current round Status " + round.getStatus());
+                    logger.info("Timeleft to answer "+ timeLeft + " current round Status " + round.getStatus());
 
                     RoundTimerDTO roundTimerDTO = new RoundTimerDTO();
                     roundTimerDTO.setTimeRemaining(timeLeft);
