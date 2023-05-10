@@ -162,6 +162,10 @@ public class Game implements Serializable {
     public void removeRound(Round round) {
         rounds.remove(round);
     }
+    public int incrementRound(){
+        this.currentRound+=1;
+        return currentRound;
+    }
 
 
 
