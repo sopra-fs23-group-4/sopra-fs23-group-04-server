@@ -348,34 +348,33 @@ public class GameService {
         return rnd.nextInt(9000) + 1000;
     }
 
-    public Map<User, Integer> calculateUserScores(int gamePin){
-        List<Vote> votes = voteRepository.findAllByGamePin(gamePin);
-
-        // Group votes by answer
-        Map<Answer, List<Vote>> votesByAnswer = votes.stream()
-                .collect(Collectors.groupingBy(Vote::getAnswer));
+    public Map<User, Integer> calculateUserScores(int gamePin) {
+        Game game = gameRepository.findByGamePin(gamePin);
+        List<Round> rounds = roundRepository.findByGame(game);
 
         Map<User, Integer> userScores = new HashMap<>();
 
-        // Iterate over each answer and its votes
-        for (Map.Entry<Answer, List<Vote>> answerVotesEntry : votesByAnswer.entrySet()) {
-            Answer answer = answerVotesEntry.getKey();
-            User user = answer.getUser();
-            List<Vote> votesForAnswer = answerVotesEntry.getValue();
+        for (Round round : rounds) {
+            List<Answer> answers = answerRepository.findByRound(round);
+            for (Answer answer : answers) {
+                List<Vote> votesForAnswer = voteRepository.findByAnswer(answer);
+                int answerScore = calculateScore(votesForAnswer);
+                User user = answer.getUser();
 
-            int answerScore = calculateScore(votesForAnswer);
-
-            // If user already has a score, add to it, else put the current answer score
-            userScores.merge(user, answerScore, Integer::sum);
+                // If user already has a score, add to it, else put the current answer score
+                userScores.merge(user, answerScore, Integer::sum);
+            }
         }
 
         return userScores;
     }
 
+
     int calculateScore(List<Vote> votesForAnswer) {
         int numberOfUnique = 0;
         int numberOfNotUnique = 0;
         int numberOfWrong = 0;
+        int numberOfNoVote = 0;
 
         for (Vote vote : votesForAnswer) {
             if (vote.getVotedOption().equals(VoteOption.CORRECT_UNIQUE)) {
@@ -386,6 +385,9 @@ public class GameService {
             }
             else if (vote.getVotedOption().equals(VoteOption.WRONG)) {
                 numberOfWrong++;
+            }
+            else if (vote.getVotedOption().equals(VoteOption.NO_VOTE)) {
+                numberOfNoVote++;
             }
         }
 

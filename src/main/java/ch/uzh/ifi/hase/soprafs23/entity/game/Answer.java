@@ -28,8 +28,6 @@ public class Answer {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @Column(nullable = false)
-    private ScorePoint scorePoint;
 
     public int getAnswerId() {
         return id;
@@ -67,11 +65,4 @@ public class Answer {
         this.category = category;
     }
 
-    public ScorePoint getScorePoint() {
-        return scorePoint;
-    }
-
-    public void setScorePoint(ScorePoint scorePoint) {
-        this.scorePoint = scorePoint;
-    }
 }
