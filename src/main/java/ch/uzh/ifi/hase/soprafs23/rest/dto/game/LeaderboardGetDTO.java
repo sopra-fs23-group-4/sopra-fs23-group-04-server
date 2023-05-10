@@ -14,9 +14,7 @@ public class LeaderboardGetDTO {
         this.username = username;
     }
 
-    public int getAccumulatedScore() {
-        return accumulatedScore;
-    }
+    public int getAccumulatedScore() { return accumulatedScore; }
 
     public void setAccumulatedScore(int accumulatedScore) {
         this.accumulatedScore = accumulatedScore;
