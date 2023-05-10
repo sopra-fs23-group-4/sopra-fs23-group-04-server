@@ -8,10 +8,10 @@ import org.springframework.web.server.ResponseStatusException;
 import static ch.uzh.ifi.hase.soprafs23.helper.AnswerHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AnswerHelperTest {
+class AnswerHelperTest {
 
     @Test
-    public void test_checkIfAnswerExists_answerIsNull() {
+    void test_checkIfAnswerExists_answerIsNull() {
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> checkIfAnswerExists(null));
 
@@ -21,7 +21,7 @@ public class AnswerHelperTest {
     }
 
     @Test
-    public void test_checkIfAnswerExists_answerExists_noException() {
+    void test_checkIfAnswerExists_answerExists_noException() {
 
         Answer answer = new Answer();
 

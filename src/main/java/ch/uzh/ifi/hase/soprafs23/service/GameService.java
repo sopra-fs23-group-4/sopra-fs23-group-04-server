@@ -38,6 +38,7 @@ import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 public class GameService {
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
+    private Random rand = new Random();
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
     private final RoundRepository roundRepository;
@@ -287,7 +288,7 @@ public class GameService {
 
     private Boolean checkIfGameHasUsers(Game game) {
         List<User> users = game.getUsers();
-        return users.size() > 0;
+        return !users.isEmpty();
     }
 
     private void deleteGameAndRounds(Game game) {
@@ -300,7 +301,6 @@ public class GameService {
 
     private void setNewHost(Game game) {
         List<User> users = game.getUsers();
-        Random rand = new Random();
         User hostCandidate = users.get(rand.nextInt(users.size()));
         game.setHostId(hostCandidate.getId());
     }
@@ -335,7 +335,6 @@ public class GameService {
     private int generateUniqueGamePin() {
         int newGamePin = generateGamePin();
         Game game = gameRepository.findByGamePin(newGamePin);
-        //todo what about games that have already been played;
         while (game != null) {
             newGamePin = generateGamePin();
             game = gameRepository.findByGamePin(newGamePin);
@@ -345,9 +344,7 @@ public class GameService {
 
     private int generateGamePin() {
 
-        Random rnd = new Random();
-
-        return rnd.nextInt(9000) + 1000;
+        return rand.nextInt(9000) + 1000;
     }
 
 

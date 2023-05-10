@@ -19,9 +19,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
 import static ch.uzh.ifi.hase.soprafs23.constant.Constant.apiKey;
 

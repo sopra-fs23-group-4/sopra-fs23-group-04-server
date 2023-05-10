@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class AnswerServiceIntegrationTest {
+class AnswerServiceIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
@@ -52,7 +52,7 @@ public class AnswerServiceIntegrationTest {
     private Round round;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         // Create and save a user
         User userForCreation = new User();
         userForCreation.setUsername("user1");
@@ -82,7 +82,7 @@ public class AnswerServiceIntegrationTest {
     }
 
     @Test
-    public void saveAnswers_validInput_answersSaved() {
+    void saveAnswers_validInput_answersSaved() {
 
         Map<String, String> answers = new HashMap<>();
         answers.put("Stadt", "Athen");
@@ -118,7 +118,7 @@ public class AnswerServiceIntegrationTest {
     }
 
     @Test
-    public void saveAnswers_validInput_savedTwice() {
+    void saveAnswers_validInput_savedTwice() {
 
         Map<String, String> answers = Map.of(
                 "Stadt", "Athen",
@@ -134,10 +134,13 @@ public class AnswerServiceIntegrationTest {
         round.setStatus(RoundStatus.FINISHED);
         roundRepository.saveAndFlush(round);
 
+        int gamePing = game.getGamePin();
+        String user3Token = user3.getToken();
+
         // No exception should be thrown in this case
         assertDoesNotThrow(() -> answerService.saveAnswers(game.getGamePin(), user1.getToken(), 1, answers));
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> answerService.saveAnswers(game.getGamePin(), user1.getToken(), 1, answers));
+                () -> answerService.saveAnswers(gamePing, user3Token, 1, answers));
 
 
         assertEquals(HttpStatus.CONFLICT, exception.getStatus());
@@ -145,7 +148,7 @@ public class AnswerServiceIntegrationTest {
     }
 
     @Test
-    public void saveAnswers_userNotInGame() {
+    void saveAnswers_userNotInGame() {
 
         Map<String, String> answers = Map.of(
                 "Stadt", "Athen",
@@ -161,8 +164,11 @@ public class AnswerServiceIntegrationTest {
         round.setStatus(RoundStatus.FINISHED);
         roundRepository.saveAndFlush(round);
 
+        int gamePing = game.getGamePin();
+        String user3Token = user3.getToken();
+
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> answerService.saveAnswers(game.getGamePin(), user3.getToken(), 1, answers));
+                () -> answerService.saveAnswers(gamePing, user3Token, 1, answers));
 
         assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
         assertEquals("User is not part of this game.", exception.getReason());
@@ -170,7 +176,7 @@ public class AnswerServiceIntegrationTest {
     }
 
     @Test
-    public void getAnswers_validInput() {
+    void getAnswers_validInput() {
 
         Map<String, String> answersUser1And2 = Map.of(
                 "Stadt", "Athen",

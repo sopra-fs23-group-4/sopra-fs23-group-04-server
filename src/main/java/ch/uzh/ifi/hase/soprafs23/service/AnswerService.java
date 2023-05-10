@@ -98,7 +98,7 @@ public class AnswerService {
 
         String errorMessage = "These Answers have already been saved.";
 
-        if (answers.size() > 0) {
+        if (!answers.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format(errorMessage));
         }

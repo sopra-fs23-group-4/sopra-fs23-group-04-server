@@ -2,7 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.websocket.DTO;
 
 public class LetterDTO {
 
-    public final static String type="letter";
+    public static final String type="letter";
 
     public String getType(){
         return type;

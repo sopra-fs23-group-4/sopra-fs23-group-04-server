@@ -10,10 +10,10 @@ import org.springframework.web.server.ResponseStatusException;
 import static ch.uzh.ifi.hase.soprafs23.helper.GameHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class GameHelperTest {
+class GameHelperTest {
 
     @Test
-    public void test_checkIfGameExists_gameIsNull() {
+    void test_checkIfGameExists_gameIsNull() {
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> checkIfGameExists(null));
 
@@ -23,7 +23,7 @@ public class GameHelperTest {
     }
 
     @Test
-    public void test_CheckIfGameExists_gameExists_noException() {
+    void test_CheckIfGameExists_gameExists_noException() {
 
         Game game = new Game();
 
@@ -31,7 +31,7 @@ public class GameHelperTest {
     }
 
     @Test
-    public void test_CheckIfGameIsOpen_gameIsNotOpen() {
+    void test_CheckIfGameIsOpen_gameIsNotOpen() {
 
         Game game = new Game();
         game.setStatus(GameStatus.RUNNING);
@@ -45,7 +45,7 @@ public class GameHelperTest {
     }
 
     @Test
-    public void test_CheckIfGameIsOpen_gameIsOpen_noException() {
+    void test_CheckIfGameIsOpen_gameIsOpen_noException() {
 
         Game game = new Game();
         game.setStatus(GameStatus.OPEN);
@@ -54,7 +54,7 @@ public class GameHelperTest {
     }
 
     @Test
-    public void test_checkIfGameIsRunning_gameIsNotRunning() {
+    void test_checkIfGameIsRunning_gameIsNotRunning() {
 
         Game game = new Game();
         game.setStatus(GameStatus.CLOSED);
@@ -68,7 +68,7 @@ public class GameHelperTest {
     }
 
     @Test
-    public void test_checkIfGameIsRunning_gameIsRunning_noException() {
+    void test_checkIfGameIsRunning_gameIsRunning_noException() {
 
         Game game = new Game();
         game.setStatus(GameStatus.RUNNING);
@@ -77,7 +77,7 @@ public class GameHelperTest {
     }
 
     @Test
-    public void test_checkIfUserIsInGame_userIsNotInGame() {
+    void test_checkIfUserIsInGame_userIsNotInGame() {
 
         Game game = new Game();
         User user = new User();
@@ -92,7 +92,7 @@ public class GameHelperTest {
     }
 
     @Test
-    public void test_checkIfUserIsInGame_userIsInGame_noException() {
+    void test_checkIfUserIsInGame_userIsInGame_noException() {
 
         Game game = new Game();
         User user = new User();

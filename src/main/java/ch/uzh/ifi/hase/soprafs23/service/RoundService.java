@@ -33,7 +33,7 @@ import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 @Transactional
 public class RoundService {
 
-    private final Logger log = LoggerFactory.getLogger(UserService.class);
+    private final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final RoundRepository roundRepository;
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
@@ -64,7 +64,7 @@ public class RoundService {
             newRound.setRoundNumber(roundCounter);
             newRound.setStatus(NOT_STARTED);
             newRound.setLetter(letter);
-            newRound = roundRepository.save(newRound);
+            roundRepository.save(newRound);
             roundCounter++;
         }
         roundRepository.flush();
@@ -162,7 +162,7 @@ public class RoundService {
                 }
 
                 else{
-                    System.out.println("Timeleft to answer "+ timeLeft + " current round Status " + round.getStatus());
+                    logger.log("Timeleft to answer "+ timeLeft + " current round Status " + round.getStatus());
 
                     RoundTimerDTO roundTimerDTO = new RoundTimerDTO();
                     roundTimerDTO.setTimeRemaining(timeLeft);

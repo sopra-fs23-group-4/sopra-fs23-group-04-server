@@ -9,9 +9,9 @@ import org.springframework.web.server.ResponseStatusException;
 import static ch.uzh.ifi.hase.soprafs23.helper.CategoryHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CategoryHelperTest {
+class CategoryHelperTest {
     @Test
-    public void test_checkIfCategoryExists_categoryIsNull() {
+    void test_checkIfCategoryExists_categoryIsNull() {
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> checkIfCategoryExists(null));
 
@@ -21,7 +21,7 @@ public class CategoryHelperTest {
     }
 
     @Test
-    public void test_checkIfCategoryExists_categoryExists_noException() {
+    void test_checkIfCategoryExists_categoryExists_noException() {
 
         Category category = new Category();
 

@@ -14,7 +14,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-public class GameRepositoryIntegrationTest {
+class GameRepositoryIntegrationTest {
 
     @Autowired
     private TestEntityManager entityManager;
@@ -23,7 +23,7 @@ public class GameRepositoryIntegrationTest {
     private GameRepository gameRepository;
 
     @Test
-    public void findByGamePin_success() {
+    void findByGamePin_success() {
         // given
         Game game = new Game();
 
@@ -48,7 +48,7 @@ public class GameRepositoryIntegrationTest {
         assertEquals(found.getStatus(), game.getStatus());
     }
     @Test
-    public void findByStatus_success() {
+    void findByStatus_success() {
         // given
         Game game1 = new Game();
         game1.setHostId(1);
@@ -78,7 +78,7 @@ public class GameRepositoryIntegrationTest {
     }
 
     @Test
-    public void findByGameId_success() {
+    void findByGameId_success() {
         // given
         Game game = new Game();
         game.setHostId(1);
@@ -102,7 +102,7 @@ public class GameRepositoryIntegrationTest {
         assertEquals(found.getStatus(), game.getStatus());
     }
     @Test
-    public void findByStatus_notFound() {
+    void findByStatus_notFound() {
         // given
         Game game1 = new Game();
         game1.setHostId(1);
@@ -122,7 +122,7 @@ public class GameRepositoryIntegrationTest {
     }
 
     @Test
-    public void findByGameId_notFound() {
+    void findByGameId_notFound() {
         // given
         Game game = new Game();
         game.setHostId(1);

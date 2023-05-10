@@ -8,10 +8,10 @@ import org.springframework.web.server.ResponseStatusException;
 import static ch.uzh.ifi.hase.soprafs23.helper.VoteHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class VoteHelperTest {
+class VoteHelperTest {
 
     @Test
-    public void test_checkIfVotingExists_voteIsNull() {
+    void test_checkIfVotingExists_voteIsNull() {
 
         Vote vote = new Vote();
 
@@ -23,7 +23,7 @@ public class VoteHelperTest {
     }
 
     @Test
-    public void test_checkIfVotingExists_voteExists_noException() {
+    void test_checkIfVotingExists_voteExists_noException() {
 
         assertDoesNotThrow(() -> checkIfVotingAlreadyExists(null));
     }
