@@ -348,45 +348,25 @@ public class GameService {
         return rnd.nextInt(9000) + 1000;
     }
 
-
-    //public Map<User, Integer> calculateUserScores(int gamePin) {
-    //    List<Answer> answers = answerRepository.findAllByGamePin(gamePin);
-//
-    //    Map<User, Integer> userScores = new HashMap<>();
-    //    for (Answer answer : answers) {
-    //        User user = answer.getUser();
-    //        int currentScore = userScores.getOrDefault(user, 0);
-    //        currentScore += answer.getScorePoint().getPoints();
-    //        userScores.put(user, currentScore);
-    //    }
-//
-    //    return userScores;
-    //}
-
     public Map<User, Integer> calculateUserScores(int gamePin){
         List<Vote> votes = voteRepository.findAllByGamePin(gamePin);
 
-        // Group votes by user and answer
-        Map<User, Map<Answer, List<Vote>>> votesByUserAndAnswer = votes.stream()
-                .collect(Collectors.groupingBy(Vote::getUser,
-                        Collectors.groupingBy(Vote::getAnswer)));
+        // Group votes by answer
+        Map<Answer, List<Vote>> votesByAnswer = votes.stream()
+                .collect(Collectors.groupingBy(Vote::getAnswer));
 
         Map<User, Integer> userScores = new HashMap<>();
 
-        // Iterate over each user and their votes
-        for (Map.Entry<User, Map<Answer, List<Vote>>> userVotesEntry : votesByUserAndAnswer.entrySet()) {
-            User user = userVotesEntry.getKey();
-            Map<Answer, List<Vote>> votesByAnswer = userVotesEntry.getValue();
+        // Iterate over each answer and its votes
+        for (Map.Entry<Answer, List<Vote>> answerVotesEntry : votesByAnswer.entrySet()) {
+            Answer answer = answerVotesEntry.getKey();
+            User user = answer.getUser();
+            List<Vote> votesForAnswer = answerVotesEntry.getValue();
 
-            int totalUserScore = 0;
+            int answerScore = calculateScore(votesForAnswer);
 
-            // Iterate over each answer and its votes
-            for (List<Vote> votesForAnswer : votesByAnswer.values()) {
-                int answerScore = calculateScore(votesForAnswer);
-                totalUserScore += answerScore;
-            }
-
-            userScores.put(user, totalUserScore);
+            // If user already has a score, add to it, else put the current answer score
+            userScores.merge(user, answerScore, Integer::sum);
         }
 
         return userScores;
@@ -474,17 +454,15 @@ public class GameService {
 
         Map<User, Integer> leaderboard = new HashMap<>();
 
-        for (User user: users){
-            List<Vote> votes = voteRepository.findAllByUser(user);
-
-            // Group votes by answer
-            Map<Answer, List<Vote>> votesByAnswer = votes.stream()
-                    .collect(Collectors.groupingBy(Vote::getAnswer));
-
+        for (User user : users) {
             int totalUserScore = 0;
 
-            // Iterate over each answer and its votes
-            for (List<Vote> votesForAnswer : votesByAnswer.values()) {
+            // Get all answers provided by the user
+            List<Answer> userAnswers = answerRepository.findAllByUser(user);
+
+            // For each answer, get the votes by other users and calculate the score
+            for (Answer answer : userAnswers) {
+                List<Vote> votesForAnswer = voteRepository.findAllByAnswer(answer);
                 int answerScore = calculateScore(votesForAnswer);
                 totalUserScore += answerScore;
             }
