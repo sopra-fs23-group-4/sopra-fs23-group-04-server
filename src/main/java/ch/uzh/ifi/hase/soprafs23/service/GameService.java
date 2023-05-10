@@ -367,7 +367,7 @@ public class GameService {
         int numberOfUnique = 0;
         int numberOfNotUnique = 0;
         int numberOfWrong = 0;
-        int numberOfNoVote = 0;
+
 
         for (Vote vote : votesForAnswer) {
             if (vote.getVotedOption().equals(VoteOption.CORRECT_UNIQUE)) {
@@ -378,9 +378,6 @@ public class GameService {
             }
             else if (vote.getVotedOption().equals(VoteOption.WRONG)) {
                 numberOfWrong++;
-            }
-            else if (vote.getVotedOption().equals(VoteOption.NO_VOTE)) {
-                numberOfNoVote++;
             }
         }
 
