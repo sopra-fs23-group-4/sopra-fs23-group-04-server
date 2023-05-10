@@ -59,8 +59,8 @@ public class VoteService {
         this.answerRepository = answerRepository;
         this.voteRepository = voteRepository;
         this.categoryRepository = categoryRepository;
-        this.roundRepository = roundRepository;
         this.webSocketService = webSocketService;
+        this.roundRepository=roundRepository;
     }
 
 

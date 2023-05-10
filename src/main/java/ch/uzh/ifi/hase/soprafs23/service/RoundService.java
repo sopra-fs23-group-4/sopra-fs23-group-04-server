@@ -45,7 +45,6 @@ public class RoundService {
     public RoundService(@Qualifier("roundRepository") RoundRepository roundRepository,
                         @Qualifier("gameRepository")GameRepository gameRepository,
                         @Qualifier("userRepository") UserRepository userRepository,
-                        VoteService voteService,
                         WebSocketService webSocketService) {
         this.roundRepository = roundRepository;
         this.gameRepository = gameRepository;

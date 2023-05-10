@@ -7,6 +7,8 @@ import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -23,13 +25,15 @@ public class TimeControlService {
     private final WebSocketService webSocketService;
 
     private final RoundRepository roundRepository;
+    private final RoundService roundService;
+    private final Logger log = LoggerFactory.getLogger(TimeControlService.class);
 
     public TimeControlService(@Qualifier("gameRepository") GameRepository gameRepository, WebSocketService webSocketService,
                               RoundService roundService,@Qualifier("roundRepository") RoundRepository roundRepository){
         this.gameRepository=gameRepository;
         this.webSocketService=webSocketService;
         this.roundRepository=roundRepository;
-        this.
+        this.roundService=roundService;
 
     }
 
@@ -52,7 +56,7 @@ public class TimeControlService {
                 int timeLeft = remainingTime.addAndGet(-1);
 
                 if (isRoundFinished(gamePin)){
-                    System.out.println("Timer canceled");
+                    log.info("time stopped so standard timer stopped in " + gamePin);
                     roundTimer.cancel();
 
                 }
@@ -72,7 +76,7 @@ public class TimeControlService {
 
                 else{
                     //
-                    System.out.println("Timeleft to answer "+ timeLeft + " current round Status " + round.getStatus());
+                    log.info("Timeleft to answer "+ timeLeft + " current round Status " + round.getStatus());
 
                     RoundTimerDTO roundTimerDTO = new RoundTimerDTO();
                     roundTimerDTO.setTimeRemaining(timeLeft);
@@ -84,10 +88,10 @@ public class TimeControlService {
         roundTimer.scheduleAtFixedRate(roundTimerTask,1500, 1000); // Schedule the task to run every 3 seconds (3000 ms)
     }
     public void voteTimeControl(int gamePin){
+        log.info("Voting starting for " + gamePin);
         Game game=gameRepository.findByGamePin(gamePin);
         int currentVotingRound=1;
         votingTimer(gamePin,currentVotingRound);
-        System.out.println("Was here at voting");
 
     }
 
@@ -125,7 +129,7 @@ public class TimeControlService {
                     votingTimer(gamePin,currentVotingRoundIncremented);
 
                 }
-                System.out.println("Result End go to next");
+
             }
         };
 
@@ -147,14 +151,14 @@ public class TimeControlService {
                     webSocketDTO.setType("votingEnd");
                     webSocketService.sendMessageToClients(Constant.defaultDestination+ gamePin,webSocketDTO);
                     votingTimer.cancel();
-                    System.out.println("voting End");
+                    log.info("voting End");
                     resultTimer(gamePin,currentVotingRound);
                 }
                 else {
                     VotingTimerDTO votingTimerDTO=new VotingTimerDTO();
                     votingTimerDTO.setTimeRemaining(timeRemaining);
                     webSocketService.sendMessageToClients(Constant.defaultDestination+ gamePin,votingTimerDTO);
-                    System.out.println("Timeleft for voting: "+ timeRemaining);
+                    log.info("Timeleft for voting: "+ timeRemaining);
                 }
             }
         };
@@ -165,7 +169,7 @@ public class TimeControlService {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                nextRound(gamePin);
+                roundService.nextRound(gamePin);
                 startRoundTime(gamePin);
             }
         };
@@ -187,22 +191,5 @@ public class TimeControlService {
         Round round = roundRepository.findByGameAndRoundNumber(game, game.getCurrentRound());
         return round.getStatus()==RoundStatus.FINISHED;
     }
-    public void nextRound(int gamePin) {
-
-        Game game = gameRepository.findByGamePin(gamePin);
-        int currentRound= game.incrementRound();
-        Round round = roundRepository.findByGameAndRoundNumber(game,currentRound);
-
-        round.setStatus(RoundStatus.RUNNING);
-        roundRepository.save(round);
-        gameRepository.saveAndFlush(game);
-
-        LetterDTO letterDTO = new LetterDTO();
-        letterDTO.setLetter(round.getLetter());
-        letterDTO.setRound(round.getRoundNumber());
-        webSocketService.sendMessageToClients(Constant.defaultDestination+gamePin, letterDTO);
-    }
-//todo move time control from roundservice and voteservice to timecontrol
-// todo make sure to also
 
 }

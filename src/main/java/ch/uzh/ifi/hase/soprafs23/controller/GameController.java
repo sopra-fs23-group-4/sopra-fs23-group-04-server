@@ -43,7 +43,7 @@ public class GameController {
 
         gameService.setUpGameForStart(gamePin);
         roundService.nextRound(gamePin);
-        timeControlService.voteTimeControl(gamePin);
+        timeControlService.startRoundTime(gamePin);
 
     }
 
