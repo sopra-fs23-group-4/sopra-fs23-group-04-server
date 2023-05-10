@@ -66,23 +66,7 @@ public class RoundService {
         }
         roundRepository.flush();
     }
-    //todo decide to use startRound or nextRound funciton
 
-    /*public LetterDTO startRound(int gamePin, int roundNumber){
-
-        Game game = gameRepository.findByGamePin(gamePin);
-        checkIfGameExists(game);
-        checkIfGameIsRunning(game);
-
-        Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
-        checkIfRoundExists(round);
-
-        round.setStatus(RoundStatus.RUNNING);
-        roundRepository.save(round);
-
-        return nextRound(gamePin);
-
-    }*/
 
     //stopRound
     public void endRound(int gamePin, String userToken, int roundNumber) {
@@ -121,17 +105,6 @@ public class RoundService {
         webSocketService.sendMessageToClients(Constant.defaultDestination+gamePin, letterDTO);
     }
 
-
-    private boolean isRoundFinished(int gamePin){
-        Game game = gameRepository.findByGamePin(gamePin);
-        Round round = roundRepository.findByGameAndRoundNumber(game, game.getCurrentRound());
-        return round.getStatus()==RoundStatus.FINISHED;
-    }
-
-
-    /**
-     * Helper methods to aid in the game creation, modification and deletion
-     */
 
     private void checkIfRoundExists(Round round) {
         String errorMessage = "Round does not exist.";

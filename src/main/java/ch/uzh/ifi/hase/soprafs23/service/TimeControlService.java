@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.Constant;
+import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
@@ -10,7 +11,6 @@ import ch.uzh.ifi.hase.soprafs23.websocket.DTO.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,9 +96,9 @@ public class TimeControlService {
     }
 
 
-    private void resultTimer(int gamePin, int currentVotingRound) {
+    private void scoreBoardTimer(int gamePin, int currentVotingRound) {
         System.out.println("started");
-        //final int finalVotingCategory = currentVotingRound;
+
         Timer resultTimer = new Timer();
         TimerTask resultTimerTask = new TimerTask() {
 
@@ -111,7 +111,7 @@ public class TimeControlService {
                         WebSocketDTO webSocketDTO=new WebSocketDTO();
                         webSocketDTO.setType("resultWinner");
                         webSocketService.sendMessageToClients(Constant.defaultDestination+gamePin,webSocketDTO);
-                        //todo add function that ends game and makes it closed add it here
+                        endGame(gamePin);
                     }
                     else{
                         WebSocketDTO webSocketDTO=new WebSocketDTO();
@@ -145,14 +145,14 @@ public class TimeControlService {
             @Override
             public void run() {
                 timeRemaining -= 1;
-
+//todo @vale you want to see the scoreboard and or statement which assures that all players want to continue
                 if (timeRemaining <= 0) {
                     WebSocketDTO webSocketDTO=new WebSocketDTO();
                     webSocketDTO.setType("votingEnd");
                     webSocketService.sendMessageToClients(Constant.defaultDestination+ gamePin,webSocketDTO);
                     votingTimer.cancel();
-                    log.info("voting End");
-                    resultTimer(gamePin,currentVotingRound);
+                    log.info("voting End now the users see votingresults");
+                    scoreBoardTimer(gamePin,currentVotingRound);
                 }
                 else {
                     VotingTimerDTO votingTimerDTO=new VotingTimerDTO();
@@ -160,6 +160,7 @@ public class TimeControlService {
                     webSocketService.sendMessageToClients(Constant.defaultDestination+ gamePin,votingTimerDTO);
                     log.info("Timeleft for voting: "+ timeRemaining);
                 }
+
             }
         };
         votingTimer.schedule(votingTimerTask, 2000, 1000);
@@ -190,6 +191,12 @@ public class TimeControlService {
         Game game = gameRepository.findByGamePin(gamePin);
         Round round = roundRepository.findByGameAndRoundNumber(game, game.getCurrentRound());
         return round.getStatus()==RoundStatus.FINISHED;
+    }
+
+    private void endGame(int gamePin){
+        Game game=gameRepository.findByGamePin(gamePin);
+        game.setStatus(GameStatus.CLOSED);
+        gameRepository.saveAndFlush(game);
     }
 
 }
