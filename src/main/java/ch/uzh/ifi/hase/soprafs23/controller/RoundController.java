@@ -30,7 +30,7 @@ public class RoundController {
         this.webSocketService=webSocketService;
     }
 
-    @PutMapping("/games/{gamePin}/{roundNumber}/start")
+    /*@PutMapping("/games/{gamePin}/{roundNumber}/start")
     public void gameStart(@PathVariable("gamePin") int gamePin,
                           @PathVariable("roundNumber") int roundNumber) {
 
@@ -41,7 +41,7 @@ public class RoundController {
         log.info("Round " + roundNumber + "started in lobby " + gamePin);
 
         roundService.startRoundTime(gamePin);
-    }
+    }*/
 
     @PutMapping("/games/{gamePin}/{roundNumber}/end")
     @ResponseStatus(HttpStatus.OK)

@@ -40,6 +40,7 @@ public class VoteService {
     private final RoundRepository roundRepository;
     private final WebSocketService webSocketService;
 
+
     private final String targetDestination="/topic/lobbies/";
 
 
@@ -50,7 +51,8 @@ public class VoteService {
                        @Qualifier("voteRepository") VoteRepository voteRepository,
                        @Qualifier("categoryRepository") CategoryRepository categoryRepository,
                        @Qualifier("roundRepository") RoundRepository roundRepository,
-                       WebSocketService webSocketService) {
+                       WebSocketService webSocketService,
+                       RoundService roundService) {
 
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
@@ -58,96 +60,7 @@ public class VoteService {
         this.voteRepository = voteRepository;
         this.categoryRepository = categoryRepository;
         this.roundRepository = roundRepository;
-
         this.webSocketService = webSocketService;
-    }
-
-    public void voteTimeControl(int gamePin){
-        Game game=gameRepository.findByGamePin(gamePin);
-        int currentVotingRound=1;
-
-
-        votingTimer(gamePin,currentVotingRound);
-
-    }
-
-
-    private void resultTimer(int gamePin, int currentVotingRound) {
-        System.out.println("started");
-        //final int finalVotingCategory = currentVotingRound;
-        Timer resultTimer = new Timer();
-        TimerTask resultTimerTask = new TimerTask() {
-
-            @Override
-            public void run() {
-
-                   if (isLastCategory(gamePin,currentVotingRound)){
-
-                        if (isFinalRound(gamePin)){
-                            WebSocketDTO webSocketDTO=new WebSocketDTO();
-                            webSocketDTO.setType("resultWinner");
-                            webSocketService.sendMessageToClients(targetDestination+gamePin,webSocketDTO);
-                        }
-                        else{
-                        WebSocketDTO webSocketDTO=new WebSocketDTO();
-                            webSocketDTO.setType("resultScoreboard");
-                            webSocketService.sendMessageToClients(targetDestination+ gamePin,webSocketDTO);
-                        }
-                   }
-
-                   else {
-                        WebSocketDTO webSocketDTO=new WebSocketDTO();
-                        webSocketDTO.setType("resultNextVote");
-                        webSocketService.sendMessageToClients(targetDestination+ gamePin,webSocketDTO);
-                        int currentVotingRoundIncremented = currentVotingRound+1;
-                        votingTimer(gamePin,currentVotingRoundIncremented);
-
-                   }
-                System.out.println("Result End go to next");
-                }
-        };
-
-        // Schedule votingTimerTask to run every 5 seconds
-        resultTimer.schedule(resultTimerTask, 6000);
-    }
-
-    private boolean isFinalRound(int gamePin) {
-        Game game= gameRepository.findByGamePin(gamePin);
-        return game.getRounds()==game.getCurrentRound();
-    }
-
-    private void votingTimer(int gamePin, int currentVotingRound) {
-        Timer votingTimer = new Timer();
-        TimerTask votingTimerTask = new TimerTask() {
-            int timeRemaining = 12; // Time remaining in seconds
-
-            @Override
-            public void run() {
-                timeRemaining -= 1;
-
-                if (timeRemaining <= 0) {
-                    WebSocketDTO webSocketDTO=new WebSocketDTO();
-                    webSocketDTO.setType("votingEnd");
-                    webSocketService.sendMessageToClients(targetDestination+ gamePin,webSocketDTO);
-                    votingTimer.cancel();
-                    System.out.println("voting End");
-                    resultTimer(gamePin,currentVotingRound);
-                }
-                else {
-                    VotingTimerDTO votingTimerDTO=new VotingTimerDTO();
-                    votingTimerDTO.setTimeRemaining(timeRemaining);
-                    webSocketService.sendMessageToClients(targetDestination+ gamePin,votingTimerDTO);
-                    System.out.println("Timeleft for voting: "+ timeRemaining);
-                }
-            }
-        };
-        votingTimer.schedule(votingTimerTask, 2000, 1000);
-    }
-
-
-    private boolean isLastCategory(int gamePin, int currentVotingRound) {
-        Game game=gameRepository.findByGamePin(gamePin);
-        return currentVotingRound==game.getNumberOfCategories();
     }
 
 

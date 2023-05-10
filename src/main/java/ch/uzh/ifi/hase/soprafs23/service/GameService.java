@@ -16,7 +16,6 @@ import ch.uzh.ifi.hase.soprafs23.rest.dto.game.LeaderboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.WinnerGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
-import ch.uzh.ifi.hase.soprafs23.websocket.DTO.LetterDTO;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.GameUsersDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +74,7 @@ public class GameService {
         newGame.setHostId(user.getId());
         newGame.addPlayer(user);
         newGame.setRoundLetters(generateRandomLetters(newGame.getRounds()));
-        newGame.setCurrentRound(1);
+        newGame.setCurrentRound(0);
         newGame.setNumberOfCategories(newGame.getCategories().size());
 
 
@@ -146,7 +145,7 @@ public class GameService {
         catch (ResponseStatusException ignored) {}
     }
 
-    public void startGame(int gamePin){
+    public void setUpGameForStart(int gamePin){
 
         Game game = gameRepository.findByGamePin(gamePin);
         checkIfGameExists(game);
@@ -154,11 +153,8 @@ public class GameService {
 
         game.setStatus(GameStatus.RUNNING);
 
-        LetterDTO letterDTO = roundService.nextRound(gamePin);
         gameRepository.saveAndFlush(game);
 
-        webSocketService.sendMessageToClients(Constant.defaultDestination +gamePin, letterDTO);
-        roundService.startRoundTime(gamePin);
     }
 
     /**
