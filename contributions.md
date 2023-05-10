@@ -42,7 +42,7 @@
 
 | Person                | Last Week           | Next Week  | Description                                                                       |
 |-----------------------|---------------------|------------|-----------------------------------------------------------------------------------|
-| Alexandre Bacmann     | #33,#37,#38,#39,#40 |            | Rules page, Backend leaderboard, testing                                          |
+| Alexandre Bacmann     | #33,#37,#38,#39,#40 |#46,#46          | Rules page, Backend leaderboard, testing                                          |
 | Valentin Meyer        | #158, #159          | #160, #163 | create utility classes and handled exceptional calls, plus other trouble shooting |
 | Christopher Narayanan |                     |            | implementing fact api, websocket working locally, timer implementedn                                                                                  |
 | Lennart Töllke        | #27, #28            | #15, #16   | Score page, Winner page, improved lobby and settings page                         |
