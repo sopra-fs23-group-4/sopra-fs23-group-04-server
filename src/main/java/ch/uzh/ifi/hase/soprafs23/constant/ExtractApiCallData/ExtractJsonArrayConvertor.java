@@ -1,7 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.constant.ExtractApiCallData;
 
 import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
-import ch.uzh.ifi.hase.soprafs23.entity.quote.FactHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import com.fasterxml.jackson.databind.JsonNode;
 

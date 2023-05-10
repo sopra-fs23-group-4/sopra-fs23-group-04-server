@@ -1,7 +1,9 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
+import ch.uzh.ifi.hase.soprafs23.entity.quote.FactHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteCategoriesHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.quote.FactGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.quote.QuoteCategoriesGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.quote.QuoteGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.UserDTOMapper;
@@ -35,5 +37,15 @@ public class QuoteController {
 
           return UserDTOMapper.INSTANCE.convertEntityToQuoteCategoriesGetDTO(quoteCategories);
     }
+    @GetMapping(value = "/facts")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public FactGetDTO getFact(){
+
+        FactHolder factHolder= quoteService.generateFact();
+
+        return UserDTOMapper.INSTANCE.convertEntityToFactGetDTO(factHolder);
+    }
+
 
 }

@@ -23,14 +23,14 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 @WebMvcTest(QuoteController.class)
-public class QuoteControllerTest {
+class QuoteControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockBean
     private QuoteService quoteService;
 
     @Test
-    public void givenCategory_whenGetQuote_thenReturnJson() throws Exception {
+    void givenCategory_whenGetQuote_thenReturnJson() throws Exception {
 
         // Given
         String category = "inspirational";
@@ -54,7 +54,7 @@ public class QuoteControllerTest {
 
     }
     @Test
-    public void invalidCategory() throws Exception {
+    void invalidCategory() throws Exception {
         String category = "invalid";
 
 

@@ -61,7 +61,7 @@ public class RoundService {
             newRound.setRoundNumber(roundCounter);
             newRound.setStatus(NOT_STARTED);
             newRound.setLetter(letter);
-            newRound = roundRepository.save(newRound);
+            roundRepository.save(newRound);
             roundCounter++;
         }
         roundRepository.flush();

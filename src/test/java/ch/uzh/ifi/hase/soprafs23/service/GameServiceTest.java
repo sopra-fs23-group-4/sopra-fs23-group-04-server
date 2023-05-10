@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class GameServiceTest {
+class GameServiceTest {
     //@Test
     //void getScoreboard_validGameId_returnsScoreboard() {
     //    // Setup test data

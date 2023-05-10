@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
-public class CategoryRepositoryIntegrationTest {
+class CategoryRepositoryIntegrationTest {
 
     @Autowired
     private TestEntityManager entityManager;
@@ -24,7 +24,7 @@ public class CategoryRepositoryIntegrationTest {
     private CategoryRepository categoryRepository;
 
     @Test
-    public void findByName_success() {
+    void findByName_success() {
         // given
         Category category = new Category();
         category.setName("TestCategory");
@@ -41,7 +41,7 @@ public class CategoryRepositoryIntegrationTest {
     }
 
     @Test
-    public void findByName_failure() {
+    void findByName_failure() {
         // given
         String categoryName = "NonExistentCategory";
 

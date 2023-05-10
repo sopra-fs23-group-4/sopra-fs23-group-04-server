@@ -22,7 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
-public class UserServiceTest {
+class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -53,7 +53,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void createUser_validInputs_success() {
+    void createUser_validInputs_success() {
         // when -> any object is being save in the userRepository -> return the dummy
         // testUser
         User createdUser = userService.createAndReturnUser(testUser);
@@ -69,7 +69,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void createUser_duplicateName_throwsException() {
+    void createUser_duplicateName_throwsException() {
         // given -> a first user has already been created
         userService.createAndReturnUser(testUser);
 
@@ -82,7 +82,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void createUser_duplicateInputs_throwsException() {
+    void createUser_duplicateInputs_throwsException() {
         // given -> a first user has already been created
         userService.createAndReturnUser(testUser);
 
@@ -95,7 +95,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void editUser_validInputs_success() {
+    void editUser_validInputs_success() {
 
         when(userRepository.findById(1)).thenReturn(Optional.of(testUser));
         User editedUser = new User();
@@ -117,7 +117,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void editUser_userNotFound_throwResponseStatusException() {
+    void editUser_userNotFound_throwResponseStatusException() {
         // Given
         when(userRepository.findById(1)).thenReturn(Optional.empty());
         User editedUser = new User();
@@ -131,7 +131,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void editUser_invalidToken_throwResponseStatusException() {
+    void editUser_invalidToken_throwResponseStatusException() {
         // Given
         when(userRepository.findById(1)).thenReturn(Optional.of(testUser));
         User editedUser = new User();
@@ -145,7 +145,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void logIn_validInputs_success() {
+    void logIn_validInputs_success() {
         // Given
         when(userRepository.findByUsername(anyString())).thenReturn(testUser);
 
@@ -160,7 +160,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void logIn_usernameDoesNotExist_throwsException() {
+    void logIn_usernameDoesNotExist_throwsException() {
         // Given
         when(userRepository.findByUsername(anyString())).thenReturn(null);
 
@@ -171,7 +171,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void logIn_incorrectPassword_throwsException() {
+    void logIn_incorrectPassword_throwsException() {
         // Given
         when(userRepository.findByUsername(anyString())).thenReturn(testUser);
 
@@ -186,7 +186,7 @@ public class UserServiceTest {
         assertTrue(exception.getReason().contains("The password you tipped in is incorrect"));
     }
     @Test
-    public void logout_success() {
+    void logout_success() {
         // create User
         User user = new User();
         user.setToken("token");
@@ -202,7 +202,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void logout_failed(){
+    void logout_failed(){
         User user = new User();
         user.setToken("token");
         user.setStatus(UserStatus.ONLINE);
@@ -215,7 +215,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getUsers_usersExistInRepository_success() {
+    void getUsers_usersExistInRepository_success() {
         // Given
         User anotherTestUser = new User();
         anotherTestUser.setId(2);
@@ -233,7 +233,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void checkIfUsernameValid_validUsername_noExceptionThrown() {
+    void checkIfUsernameValid_validUsername_noExceptionThrown() {
         // Given
         User validUser = new User();
         validUser.setUsername("validUsername");
@@ -246,7 +246,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void checkIfUsernameValid_invalidUsername_throwsException() {
+    void checkIfUsernameValid_invalidUsername_throwsException() {
         // Given
         User invalidUser = new User();
         invalidUser.setUsername("invalid username"); // Contains space
@@ -258,7 +258,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getUserById_validId_returnsUser() {
+    void getUserById_validId_returnsUser() {
         // Given
         int userId = 1;
         when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
@@ -273,7 +273,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getUserById_invalidId_throwsResponseStatusException() {
+    void getUserById_invalidId_throwsResponseStatusException() {
         // Given
         int userId = 1;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
@@ -285,7 +285,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getUserByUsername_validUsername_returnsUser() {
+    void getUserByUsername_validUsername_returnsUser() {
         // Given
         String username = "username";
         when(userRepository.findByUsername(username)).thenReturn(testUser);
@@ -300,7 +300,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void getUserByUsername_invalidUsername_throwsResponseStatusException() {
+    void getUserByUsername_invalidUsername_throwsResponseStatusException() {
         // Given
         String username = "nonExistingUsername";
         when(userRepository.findByUsername(username)).thenReturn(null);

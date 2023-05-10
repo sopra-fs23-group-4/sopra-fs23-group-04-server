@@ -1,7 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.entity.game;
 
-import ch.uzh.ifi.hase.soprafs23.repository.CategoryRepository;
-
 import javax.persistence.*;
 import java.io.Serializable;
 
