@@ -6,7 +6,6 @@ public class WinnerGetDTO {
     private int score;
     private String quote;
 
-
     public String getUsername() { return username; }
 
     public void setUsername(String username) { this.username = username; }
