@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ch.uzh.ifi.hase.soprafs23.helper.GameHelper.*;
 import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
@@ -80,7 +81,7 @@ public class GameService {
 
         roundService.createAllRounds(newGame);
 
-        logger.debug("Created following game: {}", newGame);
+        log.debug("Created following game: {}", newGame);
 
         return newGame;
     }
@@ -139,7 +140,7 @@ public class GameService {
             webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, gameUsersDTO);
         }
         catch (ResponseStatusException ignored) {
-            logger.debug("Something went wrong while leaving the game.");
+            log.debug("Something went wrong while leaving the game.");
         }
     }
 
