@@ -36,7 +36,7 @@ public class GameService {
     private final AnswerRepository answerRepository;
     private final VoteRepository voteRepository;
     private final RoundService roundService;
-    private final VoteService voteService;
+    private final ScoreCalculationService scoreCalculationService;
     private final WebSocketService webSocketService;
 
     @Autowired
@@ -45,8 +45,8 @@ public class GameService {
                        @Qualifier("answerRepository") AnswerRepository answerRepository,
                        @Qualifier("userRepository") UserRepository userRepository,
                        @Qualifier("voteRepository")VoteRepository voteRepository,
-                       @Qualifier("roundService") RoundService roundService,
-                       VoteService voteService,
+                       RoundService roundService,
+                       ScoreCalculationService scoreCalculationService,
                        WebSocketService webSocketService) {
         this.gameRepository = gameRepository;
         this.roundRepository = roundRepository;
@@ -55,7 +55,7 @@ public class GameService {
         this.voteRepository = voteRepository;
 
         this.roundService = roundService;
-        this.voteService = voteService;
+        this.scoreCalculationService = scoreCalculationService;
 
         this.webSocketService = webSocketService;
     }
@@ -341,65 +341,65 @@ public class GameService {
         return rand.nextInt(9000) + 1000;
     }
 
-    public Map<User, Integer> calculateUserScores(int gamePin) {
-        Game game = gameRepository.findByGamePin(gamePin);
-        List<Round> rounds = roundRepository.findByGame(game);
-
-        Map<User, Integer> userScores = new HashMap<>();
-
-        for (Round round : rounds) {
-            List<Answer> answers = answerRepository.findByRound(round);
-            for (Answer answer : answers) {
-                List<Vote> votesForAnswer = voteRepository.findByAnswer(answer);
-                int answerScore = calculateScore(votesForAnswer);
-                User user = answer.getUser();
-
-                // If user already has a score, add to it, else put the current answer score
-                userScores.merge(user, answerScore, Integer::sum);
-            }
-        }
-
-        return userScores;
-    }
-
-
-    int calculateScore(List<Vote> votesForAnswer) {
-        int numberOfUnique = 0;
-        int numberOfNotUnique = 0;
-        int numberOfWrong = 0;
-
-
-        for (Vote vote : votesForAnswer) {
-            if (vote.getVotedOption().equals(VoteOption.CORRECT_UNIQUE)) {
-                numberOfUnique++;
-            }
-            else if (vote.getVotedOption().equals(VoteOption.CORRECT_NOT_UNIQUE)) {
-                numberOfNotUnique++;
-            }
-            else if (vote.getVotedOption().equals(VoteOption.WRONG)) {
-                numberOfWrong++;
-            }
-        }
-
-        return calculatePoints(numberOfUnique, numberOfNotUnique, numberOfWrong);
-    }
-
-    private int calculatePoints(int numberOfUnique, int numberOfNotUnique, int numberOfWrong) {
-        int numberOfCorrect = numberOfUnique + numberOfNotUnique;
-
-        if (numberOfCorrect >= numberOfWrong) {
-            if (numberOfUnique >= numberOfNotUnique) {
-                return ScorePoint.CORRECT_UNIQUE.getPoints();
-            } else {
-                return ScorePoint.CORRECT_NOT_UNIQUE.getPoints();
-            }
-        } else {
-            return ScorePoint.INCORRECT.getPoints();
-        }
-    }
+    //public Map<User, Integer> calculateUserScores(int gamePin) {
+    //    Game game = gameRepository.findByGamePin(gamePin);
+    //    List<Round> rounds = roundRepository.findByGame(game);
+//
+    //    Map<User, Integer> userScores = new HashMap<>();
+//
+    //    for (Round round : rounds) {
+    //        List<Answer> answers = answerRepository.findByRound(round);
+    //        for (Answer answer : answers) {
+    //            List<Vote> votesForAnswer = voteRepository.findByAnswer(answer);
+    //            int answerScore = calculateScore(votesForAnswer);
+    //            User user = answer.getUser();
+//
+    //            // If user already has a score, add to it, else put the current answer score
+    //            userScores.merge(user, answerScore, Integer::sum);
+    //        }
+    //    }
+//
+    //    return userScores;
+    //}
+//
+//
+    //int calculateScore(List<Vote> votesForAnswer) {
+    //    int numberOfUnique = 0;
+    //    int numberOfNotUnique = 0;
+    //    int numberOfWrong = 0;
+//
+//
+    //    for (Vote vote : votesForAnswer) {
+    //        if (vote.getVotedOption().equals(VoteOption.CORRECT_UNIQUE)) {
+    //            numberOfUnique++;
+    //        }
+    //        else if (vote.getVotedOption().equals(VoteOption.CORRECT_NOT_UNIQUE)) {
+    //            numberOfNotUnique++;
+    //        }
+    //        else if (vote.getVotedOption().equals(VoteOption.WRONG)) {
+    //            numberOfWrong++;
+    //        }
+    //    }
+//
+    //    return calculatePoints(numberOfUnique, numberOfNotUnique, numberOfWrong);
+    //}
+//
+    //private int calculatePoints(int numberOfUnique, int numberOfNotUnique, int numberOfWrong) {
+    //    int numberOfCorrect = numberOfUnique + numberOfNotUnique;
+//
+    //    if (numberOfCorrect >= numberOfWrong) {
+    //        if (numberOfUnique >= numberOfNotUnique) {
+    //            return ScorePoint.CORRECT_UNIQUE.getPoints();
+    //        } else {
+    //            return ScorePoint.CORRECT_NOT_UNIQUE.getPoints();
+    //        }
+    //    } else {
+    //        return ScorePoint.INCORRECT.getPoints();
+    //    }
+    //}
 
     public List<WinnerGetDTO> getWinner(int gamePin) {
-        Map<User, Integer> userScores = calculateUserScores(gamePin);
+        Map<User, Integer> userScores = scoreCalculationService.calculateUserScores(gamePin);
 
         List<WinnerGetDTO> winners = new ArrayList<>();
         int maxScore = -1;
@@ -424,7 +424,7 @@ public class GameService {
     }
 
     public List<ScoreboardGetDTO> getScoreboard(int gameId) {
-        Map<User, Integer> userScores = calculateUserScores(gameId);
+        Map<User, Integer> userScores = scoreCalculationService.calculateUserScores(gameId);
 
         List<ScoreboardGetDTO> scoreboard = new ArrayList<>();
         for (Map.Entry<User, Integer> entry : userScores.entrySet()) {
@@ -455,7 +455,7 @@ public class GameService {
             // For each answer, get the votes by other users and calculate the score
             for (Answer answer : userAnswers) {
                 List<Vote> votesForAnswer = voteRepository.findAllByAnswer(answer);
-                int answerScore = calculateScore(votesForAnswer);
+                int answerScore = scoreCalculationService.calculateScore(votesForAnswer);
                 totalUserScore += answerScore;
             }
 
