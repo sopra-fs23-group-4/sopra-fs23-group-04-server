@@ -21,7 +21,7 @@ public class QuoteController {
     @GetMapping(value = "/quotes/{category}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public QuoteGetDTO getQuote(@PathVariable("category") String category) throws Exception {
+    public QuoteGetDTO getQuote(@PathVariable("category") String category) {
 
         QuoteHolder quoteHolder = quoteService.generateQuote(category);
 
@@ -37,6 +37,7 @@ public class QuoteController {
 
           return UserDTOMapper.INSTANCE.convertEntityToQuoteCategoriesGetDTO(quoteCategories);
     }
+
     @GetMapping(value = "/facts")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody

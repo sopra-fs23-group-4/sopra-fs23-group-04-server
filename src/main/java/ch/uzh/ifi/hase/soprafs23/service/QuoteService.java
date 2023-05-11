@@ -41,14 +41,20 @@ public class QuoteService {
 
 
         } catch (MalformedURLException e) {
-            logger.info("Error: Invalid URL for quote category: " + quoteCategory.categoryName);
+            String logInfo = String.format("Error: Invalid URL for quote category: %s.", quoteCategory.categoryName);
+            logger.info(logInfo);
             e.printStackTrace();
         } catch (IOException e) {
-            logger.info("Error: Problem connecting to the API for quote category: " + quoteCategory.categoryName+ "possible reasons could be wrong api or no internet access");
+            String logInfo = String.format(
+                    "Error: Invalid URL for quote category: %s.\n" +
+                    "Possible reasons are a wrong api or no internet access.", quoteCategory.categoryName);
+            logger.info(logInfo);
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,"The server has an issue with the api key or not able to connect to api");
         }
-        catch (Error e){
-            logger.info("Something went wrong " + quoteCategory.categoryName);
+        catch (Exception e){
+            String logInfo = String.format(
+                    "Something went wrong while generating the quote for: %s.", quoteCategory.categoryName);
+            logger.info(logInfo);
             e.printStackTrace();
         }
         return null;
@@ -84,8 +90,8 @@ public class QuoteService {
             logger.info("Error: Problem connecting to the API for quote category: fact" + "possible reasons could be wrong api or no internet access");
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,"The server has an issue with the api key or not able to connect to api");
         }
-        catch (Error e){
-            logger.info("Something went wrong fact" );
+        catch (Exception e){
+            logger.info("Something went wrong while generating a fact." );
             e.printStackTrace();
         }
         return null;

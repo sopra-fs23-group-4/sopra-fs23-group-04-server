@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.entity.game;
 
-import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 
 import javax.persistence.*;

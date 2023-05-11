@@ -98,7 +98,7 @@ public class TimeControlService {
         String logInfo = String.format("Voting starting for game: %d.", gamePin);
         logger.info(logInfo);
 
-        Game game = gameRepository.findByGamePin(gamePin);
+        gameRepository.findByGamePin(gamePin);
         int currentVotingRound=1;
         votingTimer(gamePin,currentVotingRound);
 
