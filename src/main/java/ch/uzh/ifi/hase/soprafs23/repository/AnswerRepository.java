@@ -22,5 +22,6 @@ public interface AnswerRepository extends JpaRepository<Answer, Integer> {
     @Query("SELECT a FROM Answer a WHERE a.round.game.gamePin = :gamePin")
     List<Answer> findAllByGamePin(@Param("gamePin") int gamePin);
     List<Answer> findAllByUser(User user);
+    List<Answer> findAllByUser_Id(int userId);
 
 }
