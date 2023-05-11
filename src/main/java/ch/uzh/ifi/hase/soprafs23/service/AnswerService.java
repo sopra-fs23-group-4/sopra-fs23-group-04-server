@@ -3,8 +3,6 @@ package ch.uzh.ifi.hase.soprafs23.service;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.*;
 import ch.uzh.ifi.hase.soprafs23.repository.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -14,7 +12,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
-import static ch.uzh.ifi.hase.soprafs23.constant.ScorePoint.INCORRECT;
 import static ch.uzh.ifi.hase.soprafs23.helper.GameHelper.*;
 import static ch.uzh.ifi.hase.soprafs23.helper.RoundHelper.*;
 import static ch.uzh.ifi.hase.soprafs23.helper.CategoryHelper.*;

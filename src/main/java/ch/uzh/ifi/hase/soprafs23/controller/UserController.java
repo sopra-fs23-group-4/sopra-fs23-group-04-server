@@ -28,7 +28,7 @@ public class UserController {
     UserController(UserService userService) {
       this.userService = userService;
     }
-    Logger log = LoggerFactory.getLogger(UserController.class);
+    Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
@@ -56,7 +56,10 @@ public class UserController {
         User createdUser = userService.createAndReturnUser(userInput);
 
         response.addHeader("Authorization", createdUser.getToken());
-        log.info("The user " + createdUser.getUsername() + " with id " + createdUser.getId() + " has been created.");
+
+        String logInfo = String.format("The user %s with id %d has been created.",
+                createdUser.getUsername(), createdUser.getId());
+        logger.info(logInfo);
         // convert internal representation of user back to API
         return UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(createdUser);
     }

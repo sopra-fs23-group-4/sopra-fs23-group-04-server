@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static ch.uzh.ifi.hase.soprafs23.helper.GameHelper.*;
 import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
@@ -136,7 +135,9 @@ public class GameService {
             checkIfGameExists(getGameByGamePin(gamePin));
             webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, gameUsersDTO);
         }
-        catch (ResponseStatusException ignored) {}
+        catch (ResponseStatusException ignored) {
+            logger.debug("Something went wrong while leaving the game.");
+        }
     }
 
     public void setUpGameForStart(int gamePin){
@@ -271,7 +272,7 @@ public class GameService {
                     leaderboardGetDTO.setAccumulatedScore(entry.getValue());
                     return leaderboardGetDTO;
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /*
