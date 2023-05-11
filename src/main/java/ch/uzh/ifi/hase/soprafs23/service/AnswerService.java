@@ -24,7 +24,6 @@ import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 @Transactional
 public class AnswerService {
 
-    private final Logger log = LoggerFactory.getLogger(UserService.class);
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
     private final RoundRepository roundRepository;

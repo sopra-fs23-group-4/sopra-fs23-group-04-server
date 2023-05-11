@@ -1,10 +1,10 @@
-package ch.uzh.ifi.hase.soprafs23.websocket.DTO;
+package ch.uzh.ifi.hase.soprafs23.websocket.dto;
 
 public class RoundEndDTO {
-    public static final String type="roundEnd";
+    public static final String TYPE = "roundEnd";
     private String rounded;
     public String getType(){
-        return type;
+        return TYPE;
     }
 
     public String getRounded() {

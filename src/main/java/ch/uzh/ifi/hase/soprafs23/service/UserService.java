@@ -28,7 +28,7 @@ import java.util.Objects;
 @Transactional
 public class UserService {
 
-    private final Logger log = LoggerFactory.getLogger(UserService.class);
+    private final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
 
@@ -60,7 +60,7 @@ public class UserService {
         newUser = userRepository.save(newUser);
         userRepository.flush();
 
-        log.debug("Created Information for User: {}", newUser);
+        logger.debug("Created Information for User: {}", newUser);
         return newUser;
 
     }

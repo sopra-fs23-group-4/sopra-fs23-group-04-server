@@ -7,7 +7,6 @@ import ch.uzh.ifi.hase.soprafs23.entity.game.*;
 import ch.uzh.ifi.hase.soprafs23.repository.*;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.VoteGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.VoteOptionsGetDTO;
-import ch.uzh.ifi.hase.soprafs23.websocket.DTO.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,17 +30,15 @@ import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 @Transactional
 public class VoteService {
 
-    private final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final GameRepository gameRepository;
     private final AnswerRepository answerRepository;
     private final VoteRepository voteRepository;
     private final CategoryRepository categoryRepository;
     private final RoundRepository roundRepository;
-    private final WebSocketService webSocketService;
 
 
-    private final String targetDestination="/topic/lobbies/";
+    private final static String targetDestination="/topic/lobbies/";
 
 
     @Autowired
@@ -51,15 +48,13 @@ public class VoteService {
                        @Qualifier("voteRepository") VoteRepository voteRepository,
                        @Qualifier("categoryRepository") CategoryRepository categoryRepository,
                        @Qualifier("roundRepository") RoundRepository roundRepository,
-                       WebSocketService webSocketService,
-                       RoundService roundService) {
+                       WebSocketService webSocketService) {
 
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.answerRepository = answerRepository;
         this.voteRepository = voteRepository;
         this.categoryRepository = categoryRepository;
-        this.webSocketService = webSocketService;
         this.roundRepository=roundRepository;
     }
 
@@ -108,7 +103,7 @@ public class VoteService {
 
         List<User> users = game.getUsers();
 
-        return getVoteGetDTOList(game, round, category, users);
+        return getVoteGetDTOList(round, category, users);
 
     }
 
@@ -126,7 +121,7 @@ public class VoteService {
         return voteOptionsGetDTO;
     }
 
-    private List<VoteGetDTO> getVoteGetDTOList(Game game, Round round, Category category, List<User> users) {
+    private List<VoteGetDTO> getVoteGetDTOList(Round round, Category category, List<User> users) {
 
         List<VoteGetDTO> voteGetDTOList = new ArrayList<>();
 
@@ -225,11 +220,11 @@ public class VoteService {
         Vote newVote = new Vote();
         newVote.setAnswer(answer);
         newVote.setUser(user);
-        newVote = setVoteOption(newVote, votingString);
+        setVoteOption(newVote, votingString);
         voteRepository.saveAndFlush(newVote);
     }
 
-    private Vote setVoteOption(Vote newVote, String vote) {
+    private void setVoteOption(Vote newVote, String vote) {
 
         String errorMessage = "At least one of the votes is invalid!";
 
@@ -243,7 +238,5 @@ public class VoteService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format(errorMessage));
         }
-
-        return newVote;
     }
 }

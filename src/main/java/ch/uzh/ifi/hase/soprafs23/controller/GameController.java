@@ -8,7 +8,7 @@ import ch.uzh.ifi.hase.soprafs23.rest.mapper.GameDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.RoundService;
 import ch.uzh.ifi.hase.soprafs23.service.TimeControlService;
-import ch.uzh.ifi.hase.soprafs23.websocket.DTO.GameUsersDTO;
+import ch.uzh.ifi.hase.soprafs23.websocket.dto.GameUsersDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 

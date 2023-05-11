@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import ch.uzh.ifi.hase.soprafs23.constant.ExtractApiCallData.FactJsonExtractor;
 import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.FactHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteCategoriesHolder;
@@ -15,16 +14,16 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class QuoteServiceTest {
+class QuoteServiceTest {
     private QuoteService quoteService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         quoteService = Mockito.spy(new QuoteService());
     }
 
     @Test
-    public void testGetAllCategories() {
+    void testGetAllCategories() {
         // Call the getCategories method
         QuoteCategoriesHolder quoteCategoriesHolder = quoteService.getCategories();
 
@@ -41,14 +40,14 @@ public class QuoteServiceTest {
     }
 
     @Test
-    public void testInvalidCategory(){
+    void testInvalidCategory(){
         String invalidCategory = "invalidCategory";
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> quoteService.generateQuote(invalidCategory));
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
     }
 
     @Test
-    public void testAllValidCategories(){
+    void testAllValidCategories(){
         for (QuoteCategory quoteCategory: QuoteCategory.values()){
             QuoteHolder quoteHolder= quoteService.generateQuote(quoteCategory.categoryName);
             assertNotNull(quoteHolder);
@@ -57,7 +56,7 @@ public class QuoteServiceTest {
     }
 
     @Test
-    public void testFactApi(){
+    void testFactApi(){
         FactHolder factHolder=quoteService.generateFact();
         System.out.println(factHolder.getFact());
     }

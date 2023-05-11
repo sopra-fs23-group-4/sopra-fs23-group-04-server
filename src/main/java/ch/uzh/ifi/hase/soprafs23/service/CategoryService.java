@@ -13,7 +13,8 @@ public class CategoryService {
     public static CategoryRepository categoryRepository;
 
     @Autowired
-    private CategoryService(@Qualifier("categoryRepository") CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
+    private CategoryService(CategoryRepository categoryRepository) {
+        CategoryService.categoryRepository = categoryRepository;
     }
+
 }
