@@ -224,8 +224,8 @@ public class GameService {
         return winners;
     }
 
-    public List<ScoreboardGetDTO> getScoreboard(int gameId) {
-        Map<User, Integer> userScores = calculateUserScores(gameId);
+    public List<ScoreboardGetDTO> getScoreboard(int gamePin) {
+        Map<User, Integer> userScores = calculateUserScores(gamePin);
 
         List<ScoreboardGetDTO> scoreboard = new ArrayList<>();
         for (Map.Entry<User, Integer> entry : userScores.entrySet()) {
