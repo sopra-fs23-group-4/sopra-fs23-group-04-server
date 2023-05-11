@@ -37,10 +37,6 @@ public class VoteService {
     private final CategoryRepository categoryRepository;
     private final RoundRepository roundRepository;
 
-
-    private final static String targetDestination="/topic/lobbies/";
-
-
     @Autowired
     public VoteService(@Qualifier("userRepository") UserRepository userRepository,
                        @Qualifier("gameRepository") GameRepository gameRepository,

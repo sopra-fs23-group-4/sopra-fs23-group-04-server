@@ -6,6 +6,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 public class UserHelper {
 
+    private UserHelper() {}
+
     public static void checkIfUserExists(User user) {
 
         String errorMessage = "User does not exist. " +
