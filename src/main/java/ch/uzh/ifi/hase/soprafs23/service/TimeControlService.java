@@ -60,7 +60,7 @@ public class TimeControlService {
                     roundTimer.cancel();
 
                 }
-                else if (timeLeft <= 0) {
+                else if (noMoreTimeRemaining(timeLeft)) {
                     //finish round
                     round.setStatus(RoundStatus.FINISHED);
                     roundRepository.save(round);
@@ -96,45 +96,54 @@ public class TimeControlService {
     }
 
 
-    private void scoreBoardTimer(int gamePin, int currentVotingRound) {
+    private void votingScoreOverviewTimer(int gamePin, int currentVotingRound) {
         System.out.println("started");
 
         Timer resultTimer = new Timer();
+
+        AtomicInteger remainingTime = new AtomicInteger(8);
         TimerTask resultTimerTask = new TimerTask() {
 
             @Override
             public void run() {
+                int timeLeft = remainingTime.addAndGet(-1);
+                //todo @Vale one needs add an iff statement that when all players want to continue one does something (oMoreTimeRemaining or all players want to continue)
+                if (noMoreTimeRemaining(timeLeft) ) {
+                    resultTimer.cancel();
+                    if (isLastCategory(gamePin,currentVotingRound)){
 
-                if (isLastCategory(gamePin,currentVotingRound)){
-
-                    if (isFinalRound(gamePin)){
-                        WebSocketDTO webSocketDTO=new WebSocketDTO();
-                        webSocketDTO.setType("resultWinner");
-                        webSocketService.sendMessageToClients(Constant.defaultDestination+gamePin,webSocketDTO);
-                        endGame(gamePin);
+                        if (isFinalRound(gamePin)){
+                            WebSocketDTO webSocketDTO=new WebSocketDTO();
+                            webSocketDTO.setType("resultWinner");
+                            webSocketService.sendMessageToClients(Constant.defaultDestination+gamePin,webSocketDTO);
+                            endGame(gamePin);
+                        }
+                        else{
+                            WebSocketDTO webSocketDTO=new WebSocketDTO();
+                            webSocketDTO.setType("resultScoreboard");
+                            webSocketService.sendMessageToClients(Constant.defaultDestination+ gamePin,webSocketDTO);
+                            scheduleNextRound(gamePin,4000);
+                        }
                     }
-                    else{
+
+                    else {
                         WebSocketDTO webSocketDTO=new WebSocketDTO();
-                        webSocketDTO.setType("resultScoreboard");
+                        webSocketDTO.setType("resultNextVote");
                         webSocketService.sendMessageToClients(Constant.defaultDestination+ gamePin,webSocketDTO);
-                        scheduleNextRound(gamePin,4000);
+                        int currentVotingRoundIncremented = currentVotingRound+1;
+                        votingTimer(gamePin,currentVotingRoundIncremented);
+
                     }
                 }
-
-                else {
-                    WebSocketDTO webSocketDTO=new WebSocketDTO();
-                    webSocketDTO.setType("resultNextVote");
-                    webSocketService.sendMessageToClients(Constant.defaultDestination+ gamePin,webSocketDTO);
-                    int currentVotingRoundIncremented = currentVotingRound+1;
-                    votingTimer(gamePin,currentVotingRoundIncremented);
-
-                }
-
             }
         };
 
         // Schedule votingTimerTask to run every 5 seconds
-        resultTimer.schedule(resultTimerTask, 6000);
+        resultTimer.schedule(resultTimerTask, 1500,1000);
+    }
+
+    private static boolean noMoreTimeRemaining(int timeRemaining){
+        return timeRemaining<=0;
     }
 
     private void votingTimer(int gamePin, int currentVotingRound) {
@@ -145,14 +154,15 @@ public class TimeControlService {
             @Override
             public void run() {
                 timeRemaining -= 1;
-//todo @vale you want to see the scoreboard and or statement which assures that all players want to continue
-                if (timeRemaining <= 0) {
+//todo @vale you want to see the scoreboard and or statement which assures that all players want to continue then do execute the if statement below
+                //something like if (timeRemaing <= 0 || allPlayerswantToContinue=true)
+                if (noMoreTimeRemaining(timeRemaining)) {
+                    votingTimer.cancel();
                     WebSocketDTO webSocketDTO=new WebSocketDTO();
                     webSocketDTO.setType("votingEnd");
                     webSocketService.sendMessageToClients(Constant.defaultDestination+ gamePin,webSocketDTO);
-                    votingTimer.cancel();
                     log.info("voting End now the users see votingresults");
-                    scoreBoardTimer(gamePin,currentVotingRound);
+                    votingScoreOverviewTimer(gamePin,currentVotingRound);
                 }
                 else {
                     VotingTimerDTO votingTimerDTO=new VotingTimerDTO();
