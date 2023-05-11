@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.serviceIntegration;
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundLength;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
+import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Answer;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
@@ -23,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.sql.SQLOutput;
+import java.time.LocalDate;
 import java.util.*;
 
 import static ch.uzh.ifi.hase.soprafs23.helper.AnswerHelper.checkIfAnswerExists;
@@ -54,30 +56,17 @@ class AnswerServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        User userForCreation = new User();
-        userForCreation.setUsername("user1");
-        userForCreation.setPassword("testPassword");
-        user1 = userService.createAndReturnUser(userForCreation);
+        user1 = createUserForTesting();
 
-        User userForCreation2 = new User();
-        userForCreation2.setUsername("user2");
-        userForCreation2.setPassword("testPassword");
-        user2 = userService.createAndReturnUser(userForCreation2);
+        user2 = createUserForTesting();
 
-        User userForCreation3 = new User();
-        userForCreation3.setUsername("user3");
-        userForCreation3.setPassword("testPassword");
-        user3 = userService.createAndReturnUser(userForCreation3);
+        user3 = createUserForTesting();
 
-        Game gameForCreation = new Game();
-        gameForCreation.setRounds(10);
-        gameForCreation.setRoundLength(RoundLength.MEDIUM);
-        gameForCreation.setCategories(getCategories());
-        game = gameService.createAndReturnGame(gameForCreation, user1.getToken());
+        game = createGameForTesting(user1.getToken());
+
         game.addPlayer(user2);
 
         round = roundRepository.findByGameAndRoundNumber(game, 1);
-
     }
 
     @Test
@@ -197,6 +186,29 @@ class AnswerServiceIntegrationTest {
         Map<Integer, String> actualMap = answerListActual.get(0);
 
         assertEquals(expectedMap.values().iterator().next(), actualMap.values().iterator().next());
+    }
+
+    private int userNameSuffix = 1;
+    private User createUserForTesting() {
+        User userForCreation = new User();
+
+        String userName = String.format("user%d", userNameSuffix);
+        userNameSuffix++;
+
+        userForCreation.setUsername(userName);
+        userForCreation.setPassword("testPassword");
+
+        return userService.createAndReturnUser(userForCreation);
+    }
+
+    private Game createGameForTesting(String userToken) {
+
+        Game gameForCreation = new Game();
+        gameForCreation.setRounds(10);
+        gameForCreation.setRoundLength(RoundLength.MEDIUM);
+        gameForCreation.setCategories(getCategories());
+
+        return gameService.createAndReturnGame(gameForCreation, userToken);
     }
 
     private List<Category> getCategories() {

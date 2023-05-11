@@ -73,8 +73,6 @@ public class GameService {
         newGame.setCurrentRound(0);
         newGame.setNumberOfCategories(newGame.getCategories().size());
 
-
-
         newGame = gameRepository.save(newGame);
         gameRepository.flush();
 
@@ -125,12 +123,12 @@ public class GameService {
 
         GameUsersDTO gameUsersDTO = new GameUsersDTO();
 
-        if (userIsHost && gameHasUsers) {
-            setNewHost(game);
-            gameUsersDTO = getHostAndAllUserNamesOfGame(game);
-        } else if (!gameHasUsers) {
+        if (Boolean.FALSE.equals(gameHasUsers)) {
             deleteGameAndRounds(game);
         } else {
+            if (Boolean.TRUE.equals(userIsHost)) {
+                setNewHost(game);
+            }
             gameUsersDTO = getHostAndAllUserNamesOfGame(game);
         }
 
@@ -152,10 +150,6 @@ public class GameService {
         gameRepository.saveAndFlush(game);
 
     }
-
-    /**
-     * Helper methods to aid in the game creation, modification and deletion
-     */
 
     public GameCategoriesDTO getStandardCategories() {
 
@@ -202,197 +196,6 @@ public class GameService {
             gameCategoryNames.add(gameCategory.getName());
         }
         return gameCategoryNames;
-    }
-
-    private List<Game> getOpenGames() {
-        return gameRepository.findByStatus(GameStatus.OPEN);
-    }
-
-    private List<Game> getRunningGames() {
-
-        return gameRepository.findByStatus(GameStatus.RUNNING);
-    }
-
-    private List<Game> getOpenOrRunningGames() {
-
-        List<Game> openOrRunningGames = getOpenGames();
-        openOrRunningGames.addAll(getRunningGames());
-
-        return openOrRunningGames;
-    }
-
-    private List<Integer> getGameUsersId(Game game) {
-        List<Integer> usersId = new ArrayList<>();
-        for (User user : game.getUsers()) {
-            usersId.add(user.getId());
-        }
-        return usersId;
-    }
-
-    private void checkIfHostIsEligible(int hostId) {
-        List<Game> openOrRunningGames = getOpenOrRunningGames();
-
-        String errorMessage = "You are already part of a game." +
-                "You cannot host another game!";
-        for (Game game : openOrRunningGames) {
-            List<Integer> userIds = getGameUsersId(game);
-            if (userIds.contains(hostId)) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT,
-                        String.format(errorMessage));
-            }
-        }
-    }
-
-    public static List<Character> generateRandomLetters(int numberOfRounds){
-        List<Character> letters = new ArrayList<>();
-
-        for (char letter = 'A'; letter <= 'Z'; letter++) {
-            letters.add(letter);
-        }
-
-        Collections.shuffle(letters);
-
-        return letters.subList(0, numberOfRounds);
-    }
-
-    void checkIfUserCanJoin(int userId) {
-
-        List<Game> openOrRunningGames = getOpenOrRunningGames();
-
-        String errorMessage = "You are already part of a game." +
-                "You cannot join another game!";
-
-        for (Game game : openOrRunningGames) {
-            List<Integer> userIds = getGameUsersId(game);
-            if (userIds.contains(userId)) {
-                throw new ResponseStatusException(HttpStatus.CONFLICT,
-                        String.format(errorMessage));
-            }
-        }
-    }
-
-    private Boolean checkIfUserIsHost(User user, Game game) {
-        int hostId = game.getHostId();
-
-        return hostId == user.getId();
-    }
-
-    private Boolean checkIfGameHasUsers(Game game) {
-        List<User> users = game.getUsers();
-        return !users.isEmpty();
-    }
-
-    private void deleteGameAndRounds(Game game) {
-        List<Round> rounds = roundRepository.findByGame(game);
-        for (Round round : rounds) {
-            roundRepository.delete(round);
-        }
-        gameRepository.delete(game);
-    }
-
-    private void setNewHost(Game game) {
-        List<User> users = game.getUsers();
-        User hostCandidate = users.get(rand.nextInt(users.size()));
-        game.setHostId(hostCandidate.getId());
-    }
-
-    public GameUsersDTO getHostAndAllUserNamesOfGame(Game gameToJoin) {
-
-        User host = userRepository.findById(gameToJoin.getHostId()).orElse(null);
-
-        List<User> users = gameToJoin.getUsers();
-        List<String> usernames = new ArrayList<>();
-
-        for (User user : users) {
-            if (!user.equals(host)) {
-                usernames.add(user.getUsername());
-            }
-        }
-        GameUsersDTO gameUsersDTO = new GameUsersDTO();
-
-        checkIfUserExists(host);
-
-        gameUsersDTO.setHostUsername(host.getUsername());
-        gameUsersDTO.setUsernames(usernames);
-
-        return gameUsersDTO;
-    }
-
-    private User getUserByToken(String userToken) {
-        return userRepository.findByToken(userToken);
-    }
-
-
-    private int generateUniqueGamePin() {
-        int newGamePin = generateGamePin();
-        Game game = gameRepository.findByGamePin(newGamePin);
-        while (game != null) {
-            newGamePin = generateGamePin();
-            game = gameRepository.findByGamePin(newGamePin);
-        }
-        return newGamePin;
-    }
-
-    private int generateGamePin() {
-
-        return rand.nextInt(9000) + 1000;
-    }
-
-    public Map<User, Integer> calculateUserScores(int gamePin) {
-        Game game = gameRepository.findByGamePin(gamePin);
-        List<Round> rounds = roundRepository.findByGame(game);
-
-        Map<User, Integer> userScores = new HashMap<>();
-
-        for (Round round : rounds) {
-            List<Answer> answers = answerRepository.findByRound(round);
-            for (Answer answer : answers) {
-                List<Vote> votesForAnswer = voteRepository.findByAnswer(answer);
-                int answerScore = calculateScore(votesForAnswer);
-                User user = answer.getUser();
-
-                // If user already has a score, add to it, else put the current answer score
-                userScores.merge(user, answerScore, Integer::sum);
-            }
-        }
-
-        return userScores;
-    }
-
-
-    int calculateScore(List<Vote> votesForAnswer) {
-        int numberOfUnique = 0;
-        int numberOfNotUnique = 0;
-        int numberOfWrong = 0;
-
-
-        for (Vote vote : votesForAnswer) {
-            if (vote.getVotedOption().equals(VoteOption.CORRECT_UNIQUE)) {
-                numberOfUnique++;
-            }
-            else if (vote.getVotedOption().equals(VoteOption.CORRECT_NOT_UNIQUE)) {
-                numberOfNotUnique++;
-            }
-            else if (vote.getVotedOption().equals(VoteOption.WRONG)) {
-                numberOfWrong++;
-            }
-        }
-
-        return calculatePoints(numberOfUnique, numberOfNotUnique, numberOfWrong);
-    }
-
-    private int calculatePoints(int numberOfUnique, int numberOfNotUnique, int numberOfWrong) {
-        int numberOfCorrect = numberOfUnique + numberOfNotUnique;
-
-        if (numberOfCorrect >= numberOfWrong) {
-            if (numberOfUnique >= numberOfNotUnique) {
-                return ScorePoint.CORRECT_UNIQUE.getPoints();
-            } else {
-                return ScorePoint.CORRECT_NOT_UNIQUE.getPoints();
-            }
-        } else {
-            return ScorePoint.INCORRECT.getPoints();
-        }
     }
 
     public List<WinnerGetDTO> getWinner(int gamePin) {
@@ -469,5 +272,200 @@ public class GameService {
                     return leaderboardGetDTO;
                 })
                 .collect(Collectors.toList());
+    }
+
+    /*
+    * private in-class helper methods
+    */
+
+    private List<Game> getOpenGames() {
+        return gameRepository.findByStatus(GameStatus.OPEN);
+    }
+
+    private List<Game> getRunningGames() {
+
+        return gameRepository.findByStatus(GameStatus.RUNNING);
+    }
+
+    private List<Game> getOpenOrRunningGames() {
+
+        List<Game> openOrRunningGames = getOpenGames();
+        openOrRunningGames.addAll(getRunningGames());
+
+        return openOrRunningGames;
+    }
+
+    private List<Integer> getGameUsersId(Game game) {
+        List<Integer> usersId = new ArrayList<>();
+        for (User user : game.getUsers()) {
+            usersId.add(user.getId());
+        }
+        return usersId;
+    }
+
+    private void checkIfHostIsEligible(int hostId) {
+        List<Game> openOrRunningGames = getOpenOrRunningGames();
+
+        String errorMessage = "You are already part of a game." +
+                "You cannot host another game!";
+        for (Game game : openOrRunningGames) {
+            List<Integer> userIds = getGameUsersId(game);
+            if (userIds.contains(hostId)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        String.format(errorMessage));
+            }
+        }
+    }
+
+    private static List<Character> generateRandomLetters(int numberOfRounds){
+        List<Character> letters = new ArrayList<>();
+
+        for (char letter = 'A'; letter <= 'Z'; letter++) {
+            letters.add(letter);
+        }
+
+        Collections.shuffle(letters);
+
+        return letters.subList(0, numberOfRounds);
+    }
+
+    private void checkIfUserCanJoin(int userId) {
+
+        List<Game> openOrRunningGames = getOpenOrRunningGames();
+
+        String errorMessage = "You are already part of a game." +
+                "You cannot join another game!";
+
+        for (Game game : openOrRunningGames) {
+            List<Integer> userIds = getGameUsersId(game);
+            if (userIds.contains(userId)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        String.format(errorMessage));
+            }
+        }
+    }
+
+    private Boolean checkIfUserIsHost(User user, Game game) {
+        int hostId = game.getHostId();
+
+        return hostId == user.getId();
+    }
+
+    private Boolean checkIfGameHasUsers(Game game) {
+        List<User> users = game.getUsers();
+        return !users.isEmpty();
+    }
+
+    private void deleteGameAndRounds(Game game) {
+        List<Round> rounds = roundRepository.findByGame(game);
+        for (Round round : rounds) {
+            roundRepository.delete(round);
+        }
+        gameRepository.delete(game);
+    }
+
+    private void setNewHost(Game game) {
+        List<User> users = game.getUsers();
+        User hostCandidate = users.get(rand.nextInt(users.size()));
+        game.setHostId(hostCandidate.getId());
+    }
+
+    private GameUsersDTO getHostAndAllUserNamesOfGame(Game gameToJoin) {
+
+        User host = userRepository.findById(gameToJoin.getHostId()).orElse(null);
+
+        List<User> users = gameToJoin.getUsers();
+        List<String> usernames = new ArrayList<>();
+
+        for (User user : users) {
+            if (!user.equals(host)) {
+                usernames.add(user.getUsername());
+            }
+        }
+        GameUsersDTO gameUsersDTO = new GameUsersDTO();
+
+        checkIfUserExists(host);
+
+        gameUsersDTO.setHostUsername(host.getUsername());
+        gameUsersDTO.setUsernames(usernames);
+
+        return gameUsersDTO;
+    }
+
+    private User getUserByToken(String userToken) {
+        return userRepository.findByToken(userToken);
+    }
+
+
+    private int generateUniqueGamePin() {
+        int newGamePin = generateGamePin();
+        Game game = gameRepository.findByGamePin(newGamePin);
+        while (game != null) {
+            newGamePin = generateGamePin();
+            game = gameRepository.findByGamePin(newGamePin);
+        }
+        return newGamePin;
+    }
+
+    private int generateGamePin() {
+
+        return rand.nextInt(9000) + 1000;
+    }
+
+    private Map<User, Integer> calculateUserScores(int gamePin) {
+        Game game = gameRepository.findByGamePin(gamePin);
+        List<Round> rounds = roundRepository.findByGame(game);
+
+        Map<User, Integer> userScores = new HashMap<>();
+
+        for (Round round : rounds) {
+            List<Answer> answers = answerRepository.findByRound(round);
+            for (Answer answer : answers) {
+                List<Vote> votesForAnswer = voteRepository.findByAnswer(answer);
+                int answerScore = calculateScore(votesForAnswer);
+                User user = answer.getUser();
+
+                // If user already has a score, add to it, else put the current answer score
+                userScores.merge(user, answerScore, Integer::sum);
+            }
+        }
+
+        return userScores;
+    }
+
+
+    private int calculateScore(List<Vote> votesForAnswer) {
+        int numberOfUnique = 0;
+        int numberOfNotUnique = 0;
+        int numberOfWrong = 0;
+
+
+        for (Vote vote : votesForAnswer) {
+            if (vote.getVotedOption().equals(VoteOption.CORRECT_UNIQUE)) {
+                numberOfUnique++;
+            }
+            else if (vote.getVotedOption().equals(VoteOption.CORRECT_NOT_UNIQUE)) {
+                numberOfNotUnique++;
+            }
+            else if (vote.getVotedOption().equals(VoteOption.WRONG)) {
+                numberOfWrong++;
+            }
+        }
+
+        return calculatePoints(numberOfUnique, numberOfNotUnique, numberOfWrong);
+    }
+
+    private int calculatePoints(int numberOfUnique, int numberOfNotUnique, int numberOfWrong) {
+        int numberOfCorrect = numberOfUnique + numberOfNotUnique;
+
+        if (numberOfCorrect >= numberOfWrong) {
+            if (numberOfUnique >= numberOfNotUnique) {
+                return ScorePoint.CORRECT_UNIQUE.getPoints();
+            } else {
+                return ScorePoint.CORRECT_NOT_UNIQUE.getPoints();
+            }
+        } else {
+            return ScorePoint.INCORRECT.getPoints();
+        }
     }
 }
