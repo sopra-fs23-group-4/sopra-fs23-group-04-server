@@ -9,10 +9,10 @@ import org.springframework.web.server.ResponseStatusException;
 import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserHelperTest {
+class UserHelperTest {
 
     @Test
-    public void test_checkIfUserExists_userIsNull() {
+    void test_checkIfUserExists_userIsNull() {
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> checkIfUserExists(null));
 
@@ -22,7 +22,7 @@ public class UserHelperTest {
     }
 
     @Test
-    public void test_checkIfUserExists_userExists_noException() {
+    void test_checkIfUserExists_userExists_noException() {
 
         User user = new User();
 

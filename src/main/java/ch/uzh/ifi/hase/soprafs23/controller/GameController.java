@@ -6,6 +6,8 @@ import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.GameDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
+import ch.uzh.ifi.hase.soprafs23.service.RoundService;
+import ch.uzh.ifi.hase.soprafs23.service.TimeControlService;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.GameUsersDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +18,12 @@ import java.util.List;
 public class GameController {
 
     private final GameService gameService;
-
-    GameController(GameService gameService) {
-
+    private final RoundService roundService;
+    private final TimeControlService timeControlService;
+    GameController(GameService gameService, RoundService roundService, TimeControlService timeControlService) {
+        this.roundService = roundService;
         this.gameService = gameService;
+        this.timeControlService=timeControlService;
 
     }
 
@@ -37,7 +41,9 @@ public class GameController {
     @PostMapping("/games/{gamePin}/start")
     public void gameStart(@PathVariable("gamePin") int gamePin) {
 
-        gameService.startGame(gamePin);
+        gameService.setUpGameForStart(gamePin);
+        roundService.nextRound(gamePin);
+        timeControlService.startRoundTime(gamePin);
 
     }
 

@@ -1,22 +1,13 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import ch.uzh.ifi.hase.soprafs23.constant.Constant;
-import ch.uzh.ifi.hase.soprafs23.constant.GameCategory;
-import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
-import ch.uzh.ifi.hase.soprafs23.entity.game.Answer;
-import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
+import ch.uzh.ifi.hase.soprafs23.constant.*;
+import ch.uzh.ifi.hase.soprafs23.entity.game.*;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
-import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
-import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
-import ch.uzh.ifi.hase.soprafs23.repository.AnswerRepository;
-import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
-import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
-import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
+import ch.uzh.ifi.hase.soprafs23.repository.*;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.LeaderboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.WinnerGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
-import ch.uzh.ifi.hase.soprafs23.websocket.DTO.LetterDTO;
 import ch.uzh.ifi.hase.soprafs23.websocket.DTO.GameUsersDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,11 +29,14 @@ import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 public class GameService {
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
+    private Random rand = new Random();
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
     private final RoundRepository roundRepository;
     private final AnswerRepository answerRepository;
+    private final VoteRepository voteRepository;
     private final RoundService roundService;
+    private final VoteService voteService;
     private final WebSocketService webSocketService;
 
     @Autowired
@@ -50,14 +44,18 @@ public class GameService {
                        @Qualifier("roundRepository") RoundRepository roundRepository,
                        @Qualifier("answerRepository") AnswerRepository answerRepository,
                        @Qualifier("userRepository") UserRepository userRepository,
+                       @Qualifier("voteRepository")VoteRepository voteRepository,
                        @Qualifier("roundService") RoundService roundService,
+                       VoteService voteService,
                        WebSocketService webSocketService) {
         this.gameRepository = gameRepository;
         this.roundRepository = roundRepository;
         this.answerRepository = answerRepository;
         this.userRepository = userRepository;
+        this.voteRepository = voteRepository;
 
         this.roundService = roundService;
+        this.voteService = voteService;
 
         this.webSocketService = webSocketService;
     }
@@ -75,7 +73,7 @@ public class GameService {
         newGame.setHostId(user.getId());
         newGame.addPlayer(user);
         newGame.setRoundLetters(generateRandomLetters(newGame.getRounds()));
-        newGame.setCurrentRound(1);
+        newGame.setCurrentRound(0);
         newGame.setNumberOfCategories(newGame.getCategories().size());
 
 
@@ -146,7 +144,7 @@ public class GameService {
         catch (ResponseStatusException ignored) {}
     }
 
-    public void startGame(int gamePin){
+    public void setUpGameForStart(int gamePin){
 
         Game game = gameRepository.findByGamePin(gamePin);
         checkIfGameExists(game);
@@ -154,11 +152,8 @@ public class GameService {
 
         game.setStatus(GameStatus.RUNNING);
 
-        LetterDTO letterDTO = roundService.nextRound(gamePin);
         gameRepository.saveAndFlush(game);
 
-        webSocketService.sendMessageToClients(Constant.defaultDestination +gamePin, letterDTO);
-        roundService.startRoundTime(gamePin);
     }
 
     /**
@@ -287,7 +282,7 @@ public class GameService {
 
     private Boolean checkIfGameHasUsers(Game game) {
         List<User> users = game.getUsers();
-        return users.size() > 0;
+        return !users.isEmpty();
     }
 
     private void deleteGameAndRounds(Game game) {
@@ -300,7 +295,6 @@ public class GameService {
 
     private void setNewHost(Game game) {
         List<User> users = game.getUsers();
-        Random rand = new Random();
         User hostCandidate = users.get(rand.nextInt(users.size()));
         game.setHostId(hostCandidate.getId());
     }
@@ -335,7 +329,6 @@ public class GameService {
     private int generateUniqueGamePin() {
         int newGamePin = generateGamePin();
         Game game = gameRepository.findByGamePin(newGamePin);
-        //todo what about games that have already been played;
         while (game != null) {
             newGamePin = generateGamePin();
             game = gameRepository.findByGamePin(newGamePin);
@@ -345,24 +338,64 @@ public class GameService {
 
     private int generateGamePin() {
 
-        Random rnd = new Random();
-
-        return rnd.nextInt(9000) + 1000;
+        return rand.nextInt(9000) + 1000;
     }
 
-
-    Map<User, Integer> calculateUserScores(int gamePin) {
-        List<Answer> answers = answerRepository.findAllByGamePin(gamePin);
+    public Map<User, Integer> calculateUserScores(int gamePin) {
+        Game game = gameRepository.findByGamePin(gamePin);
+        List<Round> rounds = roundRepository.findByGame(game);
 
         Map<User, Integer> userScores = new HashMap<>();
-        for (Answer answer : answers) {
-            User user = answer.getUser();
-            int currentScore = userScores.getOrDefault(user, 0);
-            currentScore += answer.getScorePoint().getPoints();
-            userScores.put(user, currentScore);
+
+        for (Round round : rounds) {
+            List<Answer> answers = answerRepository.findByRound(round);
+            for (Answer answer : answers) {
+                List<Vote> votesForAnswer = voteRepository.findByAnswer(answer);
+                int answerScore = calculateScore(votesForAnswer);
+                User user = answer.getUser();
+
+                // If user already has a score, add to it, else put the current answer score
+                userScores.merge(user, answerScore, Integer::sum);
+            }
         }
 
         return userScores;
+    }
+
+
+    int calculateScore(List<Vote> votesForAnswer) {
+        int numberOfUnique = 0;
+        int numberOfNotUnique = 0;
+        int numberOfWrong = 0;
+
+
+        for (Vote vote : votesForAnswer) {
+            if (vote.getVotedOption().equals(VoteOption.CORRECT_UNIQUE)) {
+                numberOfUnique++;
+            }
+            else if (vote.getVotedOption().equals(VoteOption.CORRECT_NOT_UNIQUE)) {
+                numberOfNotUnique++;
+            }
+            else if (vote.getVotedOption().equals(VoteOption.WRONG)) {
+                numberOfWrong++;
+            }
+        }
+
+        return calculatePoints(numberOfUnique, numberOfNotUnique, numberOfWrong);
+    }
+
+    private int calculatePoints(int numberOfUnique, int numberOfNotUnique, int numberOfWrong) {
+        int numberOfCorrect = numberOfUnique + numberOfNotUnique;
+
+        if (numberOfCorrect >= numberOfWrong) {
+            if (numberOfUnique >= numberOfNotUnique) {
+                return ScorePoint.CORRECT_UNIQUE.getPoints();
+            } else {
+                return ScorePoint.CORRECT_NOT_UNIQUE.getPoints();
+            }
+        } else {
+            return ScorePoint.INCORRECT.getPoints();
+        }
     }
 
     public List<WinnerGetDTO> getWinner(int gamePin) {
@@ -373,18 +406,18 @@ public class GameService {
         for (Map.Entry<User, Integer> entry : userScores.entrySet()) {
             if (entry.getValue() > maxScore) {
                 winners.clear();
-                WinnerGetDTO winnerDTO = new WinnerGetDTO();
-                winnerDTO.setUsername(entry.getKey().getUsername());
-                winnerDTO.setScore(entry.getValue());
-                winnerDTO.setQuote(entry.getKey().getQuote());
-                winners.add(winnerDTO);
+                WinnerGetDTO winnerGetDTO = new WinnerGetDTO();
+                winnerGetDTO.setUsername(entry.getKey().getUsername());
+                winnerGetDTO.setScore(entry.getValue());
+                winnerGetDTO.setQuote(entry.getKey().getQuote());
+                winners.add(winnerGetDTO);
                 maxScore = entry.getValue();
             } else if (entry.getValue() == maxScore) {
-                WinnerGetDTO winnerDTO = new WinnerGetDTO();
-                winnerDTO.setUsername(entry.getKey().getUsername());
-                winnerDTO.setScore(entry.getValue());
-                winnerDTO.setQuote(entry.getKey().getQuote());
-                winners.add(winnerDTO);
+                WinnerGetDTO winnerGetDTO = new WinnerGetDTO();
+                winnerGetDTO.setUsername(entry.getKey().getUsername());
+                winnerGetDTO.setScore(entry.getValue());
+                winnerGetDTO.setQuote(entry.getKey().getQuote());
+                winners.add(winnerGetDTO);
             }
         }
         return winners;
@@ -395,11 +428,14 @@ public class GameService {
 
         List<ScoreboardGetDTO> scoreboard = new ArrayList<>();
         for (Map.Entry<User, Integer> entry : userScores.entrySet()) {
-            ScoreboardGetDTO scoreboardEntry = new ScoreboardGetDTO();
-            scoreboardEntry.setUsername(entry.getKey().getUsername());
-            scoreboardEntry.setScore(entry.getValue());
-            scoreboard.add(scoreboardEntry);
+            ScoreboardGetDTO scoreboardGetDTO = new ScoreboardGetDTO();
+            scoreboardGetDTO.setUsername(entry.getKey().getUsername());
+            scoreboardGetDTO.setScore(entry.getValue());
+            scoreboard.add(scoreboardGetDTO);
         }
+
+        // Sort the scoreboard in descending order of score
+        scoreboard.sort((dto1, dto2) -> dto2.getScore() - dto1.getScore());
 
         return scoreboard;
     }
@@ -410,22 +446,23 @@ public class GameService {
 
         Map<User, Integer> leaderboard = new HashMap<>();
 
-        // Initialize all users with a score of 0
         for (User user : users) {
-            leaderboard.put(user, 0);
-        }
-
-        for (User user: users){
             int totalUserScore = 0;
-            List<Answer> userAnswer = answerRepository.findAllByUser(user);
-            for (Answer answer: userAnswer){
-                totalUserScore += answer.getScorePoint().getPoints();
+
+            // Get all answers provided by the user
+            List<Answer> userAnswers = answerRepository.findAllByUser(user);
+
+            // For each answer, get the votes by other users and calculate the score
+            for (Answer answer : userAnswers) {
+                List<Vote> votesForAnswer = voteRepository.findAllByAnswer(answer);
+                int answerScore = calculateScore(votesForAnswer);
+                totalUserScore += answerScore;
             }
+
             leaderboard.put(user, totalUserScore);
         }
 
         // Sort the leaderboard map by scores in descending order and create LeaderboardGetDTO objects
-
         return leaderboard.entrySet().stream()
                 .sorted(Map.Entry.<User, Integer>comparingByValue().reversed())
                 .map(entry -> {

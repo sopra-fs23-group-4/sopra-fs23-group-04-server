@@ -2,11 +2,13 @@ package ch.uzh.ifi.hase.soprafs23.rest.mapper;
 
 import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
+import ch.uzh.ifi.hase.soprafs23.entity.quote.FactHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteCategoriesHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.CategoryGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GameSettingGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.quote.FactGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.quote.QuoteCategoriesGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.quote.QuoteGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.user.*;
@@ -57,6 +59,9 @@ public interface UserDTOMapper {
 
     @Mapping(source = "quote", target = "quote")
     QuoteGetDTO convertEntityToQuoteGetDTO(QuoteHolder quoteHolder);
+
+    @Mapping(source ="fact", target = "fact")
+    FactGetDTO convertEntityToFactGetDTO(FactHolder factHolder);
 
     @Mapping(source ="categories", target = "categories")
     QuoteCategoriesGetDTO convertEntityToQuoteCategoriesGetDTO(QuoteCategoriesHolder quoteCategory);

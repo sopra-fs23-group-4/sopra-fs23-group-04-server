@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * This tests if the UserController works.
  */
 @WebMvcTest(UserController.class)
-public class UserControllerTest {
+class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -44,7 +44,7 @@ public class UserControllerTest {
     private UserService userService;
 
   @Test
-  public void givenUsers_whenGetUsers_thenReturnJsonArray() throws Exception {
+  void givenUsers_whenGetUsers_thenReturnJsonArray() throws Exception {
     // given
     User user = new User();
     user.setUsername("firstname@lastname");
@@ -71,7 +71,7 @@ public class UserControllerTest {
     }
 
   @Test
-  public void createUser_validInput_userCreated() throws Exception {
+  void createUser_validInput_userCreated() throws Exception {
     // given
     User user = new User();
     user.setId(1);
@@ -104,7 +104,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void logInUser_validInput_userLoggedIn() throws Exception {
+    void logInUser_validInput_userLoggedIn() throws Exception {
         // given
         User user = new User();
         user.setId(1);
@@ -137,7 +137,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void logInUser_invalidInput_userNotLoggedIn() throws Exception {
+    void logInUser_invalidInput_userNotLoggedIn() throws Exception {
         // given
         UserLoginDTO userLoginDTO = new UserLoginDTO();
         userLoginDTO.setUsername("invalidUsername");
@@ -159,7 +159,7 @@ public class UserControllerTest {
 
 
     @Test
-    public void editUser_validInput_userEdited () throws Exception {
+    void editUser_validInput_userEdited () throws Exception {
         // given
         User user = new User();
         user.setId(1);
@@ -182,7 +182,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void editUser_invalidInput_userEdited () throws Exception {
+    void editUser_invalidInput_userEdited () throws Exception {
         // given
         UserPutDTO userPutDTO = new UserPutDTO();
         userPutDTO.setUsername("username");
@@ -200,7 +200,7 @@ public class UserControllerTest {
                 .andExpect(status().isNotFound());
     }
     @Test
-    public void getUserByID_correctInput_returnUser() throws Exception {
+    void getUserByID_correctInput_returnUser() throws Exception {
         // given
         int userId = 1;
         User user = new User();
@@ -220,7 +220,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.username", is(user.getUsername())));
     }
     @Test
-    public void getUserByUsername_correctInput_returnUser() throws Exception {
+    void getUserByUsername_correctInput_returnUser() throws Exception {
         // given
         String username = "testUsername";
         User user = new User();
@@ -241,7 +241,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void getUserByUsername_incorrectInput_userNotFound() throws Exception {
+    void getUserByUsername_incorrectInput_userNotFound() throws Exception {
         // given
         String username = "nonExistingUsername";
 

@@ -40,13 +40,7 @@ public class Game implements Serializable {
     @Column(nullable = false)
     private int numberOfCategories;
 
-    public int getCurrentRound() {
-        return currentRound;
-    }
 
-    public void setCurrentRound(int currentRound) {
-        this.currentRound = currentRound;
-    }
 
     private int currentRound;
 
@@ -147,6 +141,14 @@ public class Game implements Serializable {
         return users;
     }
 
+    public int getCurrentRound() {
+        return currentRound;
+    }
+
+    public void setCurrentRound(int currentRound) {
+        this.currentRound = currentRound;
+    }
+
     public void addPlayer(User user) {
         this.users.add(user);
     }
@@ -161,6 +163,10 @@ public class Game implements Serializable {
 
     public void removeRound(Round round) {
         rounds.remove(round);
+    }
+    public int incrementRound(){
+        this.currentRound+=1;
+        return currentRound;
     }
 
 

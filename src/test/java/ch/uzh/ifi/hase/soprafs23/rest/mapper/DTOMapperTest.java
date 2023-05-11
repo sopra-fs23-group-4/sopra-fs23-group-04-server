@@ -20,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Tests if the mapping between the internal and the external/API representation
  * works.
  */
-public class DTOMapperTest {
+class DTOMapperTest {
     @Test
-    public void testCreateUser_fromUserPostDTO_toUser_success() {
+    void testCreateUser_fromUserPostDTO_toUser_success() {
     // create UserPostDTO
     UserPostDTO userPostDTO = new UserPostDTO();
     userPostDTO.setPassword("password");
@@ -37,7 +37,7 @@ public class DTOMapperTest {
     }
 
     @Test
-    public void testGetUser_fromUser_toUserGetDTO_success() {
+    void testGetUser_fromUser_toUserGetDTO_success() {
         // create User
         User user = new User();
 
@@ -59,7 +59,7 @@ public class DTOMapperTest {
     }
 
     @Test
-    public void testCreateUser_fromUserPutDTO_toUser_success() {
+    void testCreateUser_fromUserPutDTO_toUser_success() {
         // create UserPostDTO
         UserPutDTO userPutDTO = new UserPutDTO();
         userPutDTO.setUsername("username");
@@ -73,7 +73,7 @@ public class DTOMapperTest {
         assertEquals(userPutDTO.getPassword(), user.getPassword());
     }
     @Test
-    public void testCreateUser_fromUserPutDTOToEntity_success() {
+    void testCreateUser_fromUserPutDTOToEntity_success() {
         // create UserPutDTO
         UserPutDTO userPutDTO = new UserPutDTO();
         userPutDTO.setUsername("username");
@@ -91,7 +91,7 @@ public class DTOMapperTest {
         assertEquals(userPutDTO.getProfilePictureUrl(), user.getProfilePictureUrl());
     }
     @Test
-    public void testCreateUser_fromLoginPostDTO_success() {
+    void testCreateUser_fromLoginPostDTO_success() {
         // create UserLoginDTO
         UserLoginDTO userLoginDTO = new UserLoginDTO();
         userLoginDTO.setUsername("username");
@@ -106,7 +106,7 @@ public class DTOMapperTest {
     }
 
     @Test
-    public void testCreateUser_fromLogoutDTO_success() {
+    void testCreateUser_fromLogoutDTO_success() {
         // create UserLogoutDTO
         UserLogoutDTO userLogoutDTO = new UserLogoutDTO();
         userLogoutDTO.setToken("token");
@@ -119,7 +119,7 @@ public class DTOMapperTest {
     }
 
     @Test
-    public void testCreateGetUserDTO_fromUser_success() {
+    void testCreateGetUserDTO_fromUser_success() {
         // create User
         User user = new User();
         user.setId(1);
@@ -139,7 +139,7 @@ public class DTOMapperTest {
         assertEquals(user.getProfilePictureUrl(), userGetDTO.getProfilePictureUrl());
     }
     @Test
-    public void testCreateQuoteGetDTO_fromQuoteHolder_success() {
+    void testCreateQuoteGetDTO_fromQuoteHolder_success() {
 
         QuoteHolder quoteHolder = new QuoteHolder();
 
@@ -151,7 +151,7 @@ public class DTOMapperTest {
     }
 
     @Test
-    public void testConvertEntityToQuoteCategoriesGetDTO_success() {
+    void testConvertEntityToQuoteCategoriesGetDTO_success() {
 
         QuoteCategoriesHolder quoteCategory = new QuoteCategoriesHolder();
         List<String> categories = new ArrayList<>();

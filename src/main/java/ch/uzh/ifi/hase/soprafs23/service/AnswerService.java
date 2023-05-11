@@ -98,7 +98,7 @@ public class AnswerService {
 
         String errorMessage = "These Answers have already been saved.";
 
-        if (answers.size() > 0) {
+        if (!answers.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format(errorMessage));
         }
@@ -118,7 +118,7 @@ public class AnswerService {
             String answerString = answer.getValue();
 
             if (answerString == null) {
-                answerString = "";
+                answerString = "-";
             }
 
             Answer newAnswer = new Answer();
@@ -127,7 +127,7 @@ public class AnswerService {
             newAnswer.setUser(user);
             newAnswer.setAnswerString(answerString);
             newAnswer.setCategory(category);
-            newAnswer.setScorePoint(INCORRECT);
+
 
             answerRepository.save(newAnswer);
         }
