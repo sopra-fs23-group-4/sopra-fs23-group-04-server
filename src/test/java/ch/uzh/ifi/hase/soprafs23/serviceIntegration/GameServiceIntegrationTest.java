@@ -14,6 +14,7 @@ import ch.uzh.ifi.hase.soprafs23.service.AnswerService;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
 import ch.uzh.ifi.hase.soprafs23.service.WebSocketService;
+import ch.uzh.ifi.hase.soprafs23.websocket.dto.GameUsersDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -55,6 +56,7 @@ class GameServiceIntegrationTest {
     private User user2;
     private User user3;
     private Game game;
+    private final List<String> categoryNames = Arrays.asList("Stadt", "Land", "Auto", "Film Regisseur");
 
     @BeforeEach
     void setUp() {
@@ -202,6 +204,67 @@ class GameServiceIntegrationTest {
 
     }
 
+    @Test
+    void getGameCategoriesByGamePin_validInput() {
+
+        String user1Token = user1.getToken();
+
+        assertDoesNotThrow(() -> gameService.createAndReturnGame(game, user1Token));
+        int gamePin = game.getGamePin();
+
+        AtomicReference<GameCategoriesDTO> gameCategoriesDTOAtomicReference = new AtomicReference<>();
+
+        assertDoesNotThrow(() -> {
+            gameCategoriesDTOAtomicReference.set(gameService.getGameCategoriesByGamePin(gamePin));
+        });
+
+        assertEquals(categoryNames, gameCategoriesDTOAtomicReference.get().getCategories());
+
+    }
+
+    @Test
+    void getGameUsersByGamePin_validInput() {
+
+        String user1Token = user1.getToken();
+        String user2Token = user2.getToken();
+
+        assertDoesNotThrow(() -> gameService.createAndReturnGame(game, user1Token));
+        int gamePin = game.getGamePin();
+
+        assertDoesNotThrow(() -> gameService.joinGame(gamePin, user2Token));
+
+        AtomicReference<GameUsersDTO> gameUsersDTOAtomicReference = new AtomicReference<>();
+
+        assertDoesNotThrow(() -> {
+            gameUsersDTOAtomicReference.set(gameService.getGameUsersByGamePin(gamePin));
+        });
+
+        List<String> gameUsernamesWithoutHost = new ArrayList<>();
+        gameUsernamesWithoutHost.add(user2.getUsername());
+
+        assertEquals(gameUsernamesWithoutHost, gameUsersDTOAtomicReference.get().getUsernames());
+        assertEquals(user1.getUsername(), gameUsersDTOAtomicReference.get().getHostUsername());
+
+    }
+
+    @Test
+    void getGameCategoryNames_validInput() {
+
+        String user1Token = user1.getToken();
+
+        assertDoesNotThrow(() -> game = gameService.createAndReturnGame(game, user1Token));
+        int gamePin = game.getGamePin();
+
+        AtomicReference<List<String>> gameCategoryNames = new AtomicReference<>();
+
+        assertDoesNotThrow(() -> {
+            gameCategoryNames.set(gameService.getCategoryNamesByGame(game));
+        });
+
+        assertEquals(categoryNames, gameCategoryNames.get());
+
+    }
+
     private int userNameSuffix = 1;
     private User createUserForTesting() {
         User userForCreation = new User();
@@ -227,15 +290,14 @@ class GameServiceIntegrationTest {
 
     private List<Category> getCategories() {
 
-        List<String> categoryNames = Arrays.asList("Stadt", "Land", "Auto", "Film Regisseur");
-
         List<Category> mappedCategories = new ArrayList<>();
 
-        for(String categoryName : categoryNames) {
+        for (String categoryName : categoryNames) {
             Category mappedCategory = new Category();
             mappedCategory.setName(categoryName);
             mappedCategories.add(mappedCategory);
         }
         return mappedCategories;
     }
+
 }

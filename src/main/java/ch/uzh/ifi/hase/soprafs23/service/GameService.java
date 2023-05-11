@@ -162,7 +162,7 @@ public class GameService {
     public GameCategoriesDTO getGameCategoriesByGamePin(int gamePin) {
         Game game = getGameByGamePin(gamePin);
 
-        List<String> gameCategoryNames = getGameCategoryNames(game);
+        List<String> gameCategoryNames = getCategoryNamesByGame(game);
 
         GameCategoriesDTO gameCategoriesDTO = new GameCategoriesDTO();
         gameCategoriesDTO.setCategories(gameCategoryNames);
@@ -187,7 +187,7 @@ public class GameService {
         return game;
     }
 
-    public List<String> getGameCategoryNames(Game game) {
+    public List<String> getCategoryNamesByGame(Game game) {
         List<Category> gameCategories = game.getCategories();
 
         List<String> gameCategoryNames = new ArrayList<>();
