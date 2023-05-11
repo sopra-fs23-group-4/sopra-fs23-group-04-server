@@ -106,19 +106,15 @@ public class AnswerService {
 
     }
 
-    void saveAnswersToDatabase(Map<String, String> answers, User user, Round round) {
-        for (Map.Entry<String, String> answer : answers.entrySet()) {
+    void saveAnswersToDatabase(Map<String, String> receivedAnswers, User user, Round round) {
+        for (Map.Entry<String, String> receivedAnswer : receivedAnswers.entrySet()) {
 
-            String categoryName = answer.getKey();
+            String categoryName = receivedAnswer.getKey();
             Category category = getCategory(categoryName);
-            String answerString = answer.getValue();
-
-            if (answerString == null) {
-                answerString = "-";
-            }
-
+            String answerString = receivedAnswer.getValue();
             Answer newAnswer = new Answer();
 
+            newAnswer.setAnswered(answerString != null);
             newAnswer.setRound(round);
             newAnswer.setUser(user);
             newAnswer.setAnswerString(answerString);

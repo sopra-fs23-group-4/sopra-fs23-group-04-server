@@ -340,7 +340,7 @@ public class GameService {
 
 
     public List<WinnerGetDTO> getWinner(int gamePin) {
-        Map<User, Integer> userScores = scoreCalculationService.calculateUserScores(gamePin);
+        Map<User, Integer> userScores = scoreCalculationService.calculateUserTotalScoreInGame(gamePin);
 
         List<WinnerGetDTO> winners = new ArrayList<>();
         int maxScore = -1;
@@ -365,7 +365,7 @@ public class GameService {
     }
 
     public List<ScoreboardGetDTO> getScoreboard(int gameId) {
-        Map<User, Integer> userScores = scoreCalculationService.calculateUserScores(gameId);
+        Map<User, Integer> userScores = scoreCalculationService.calculateUserTotalScoreInGame(gameId);
 
         List<ScoreboardGetDTO> scoreboard = new ArrayList<>();
         for (Map.Entry<User, Integer> entry : userScores.entrySet()) {
@@ -396,7 +396,7 @@ public class GameService {
             // For each answer, get the votes by other users and calculate the score
             for (Answer answer : userAnswers) {
                 List<Vote> votesForAnswer = voteRepository.findAllByAnswer(answer);
-                int answerScore = scoreCalculationService.calculateScore(votesForAnswer);
+                int answerScore = scoreCalculationService.calculateScoreOfAnswer(votesForAnswer);
                 totalUserScore += answerScore;
             }
 

@@ -67,7 +67,7 @@ public class AdvancedStatisticService {
     // checkIfWonOrLoss: Return Winner if won and Looser if loss
     private GameResult checkIfWonOrLoss(Game game, int userId) {
 
-        Map<User, Integer> userScores = scoreCalculationService.calculateUserScores(game.getGamePin());
+        Map<User, Integer> userScores = scoreCalculationService.calculateUserTotalScoreInGame(game.getGamePin());
 
         // Sort the scores from high to low
         List<Map.Entry<User, Integer>> scoreList = new ArrayList<>(userScores.entrySet());
@@ -151,7 +151,7 @@ public class AdvancedStatisticService {
 
         int totalPoints = 0;
         for (Game game : allUserGames) {
-            Map<User, Integer> userScores = scoreCalculationService.calculateUserScores(game.getGamePin());
+            Map<User, Integer> userScores = scoreCalculationService.calculateUserTotalScoreInGame(game.getGamePin());
             Optional<User> user = userRepository.findById(userId); // Assuming you have UserRepository
 
             if(userScores.containsKey(user)) {

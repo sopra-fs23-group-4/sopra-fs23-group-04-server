@@ -35,7 +35,7 @@ public class ScoreCalculationService {
     @Autowired
     private AnswerRepository answerRepository;
 
-    public Map<User, Integer> calculateUserScores(int gamePin) {
+    public Map<User, Integer> calculateUserTotalScoreInGame(int gamePin) {
         Game game = gameRepository.findByGamePin(gamePin);
         List<Round> rounds = roundRepository.findByGame(game);
 
@@ -45,7 +45,7 @@ public class ScoreCalculationService {
             List<Answer> answers = answerRepository.findByRound(round);
             for (Answer answer : answers) {
                 List<Vote> votesForAnswer = voteRepository.findByAnswer(answer);
-                int answerScore = calculateScore(votesForAnswer);
+                int answerScore = calculateScoreOfAnswer(votesForAnswer);
                 User user = answer.getUser();
 
                 // If user already has a score, add to it, else put the current answer score
@@ -56,7 +56,7 @@ public class ScoreCalculationService {
         return userScores;
     }
 
-    public int calculateScore(List<Vote> votesForAnswer) {
+    public int calculateScoreOfAnswer(List<Vote> votesForAnswer) {
         int numberOfUnique = 0;
         int numberOfNotUnique = 0;
         int numberOfWrong = 0;
