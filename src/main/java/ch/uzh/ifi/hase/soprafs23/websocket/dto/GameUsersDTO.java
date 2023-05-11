@@ -1,12 +1,12 @@
-package ch.uzh.ifi.hase.soprafs23.websocket.DTO;
+package ch.uzh.ifi.hase.soprafs23.websocket.dto;
 
 import java.util.List;
 
 public class GameUsersDTO {
-    public final static String type="gameUsers";
+    public static final String TYPE = "gameUsers";
 
     public String getType(){
-        return type;
+        return TYPE;
     }
     private String hostUsername;
     private List<String> usernames;

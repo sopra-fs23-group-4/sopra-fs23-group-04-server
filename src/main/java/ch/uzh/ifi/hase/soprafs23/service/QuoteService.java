@@ -1,6 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import ch.uzh.ifi.hase.soprafs23.constant.ExtractApiCallData.FactJsonExtractor;
+import ch.uzh.ifi.hase.soprafs23.constant.extract_api_call_data.FactJsonExtractor;
 import ch.uzh.ifi.hase.soprafs23.constant.QuoteCategory;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.FactHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteCategoriesHolder;
@@ -21,13 +21,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-import static ch.uzh.ifi.hase.soprafs23.constant.Constant.apiKey;
+import static ch.uzh.ifi.hase.soprafs23.constant.Constant.API_KEY;
 
 @Service
 @Transactional
 public class QuoteService {
 
-    private final Logger log = LoggerFactory.getLogger(QuoteService.class);
+    private final Logger logger = LoggerFactory.getLogger(QuoteService.class);
 
     public QuoteHolder generateQuote(String category)  {
 
@@ -41,14 +41,20 @@ public class QuoteService {
 
 
         } catch (MalformedURLException e) {
-            System.err.println("Error: Invalid URL for quote category: " + quoteCategory.categoryName);
+            String logInfo = String.format("Error: Invalid URL for quote category: %s.", quoteCategory.categoryName);
+            logger.info(logInfo);
             e.printStackTrace();
         } catch (IOException e) {
-            System.err.println("Error: Problem connecting to the API for quote category: " + quoteCategory.categoryName+ "possible reasons could be wrong api or no internet access");
+            String logInfo = String.format(
+                    "Error: Invalid URL for quote category: %s.\n" +
+                    "Possible reasons are a wrong api or no internet access.", quoteCategory.categoryName);
+            logger.info(logInfo);
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,"The server has an issue with the api key or not able to connect to api");
         }
-        catch (Error e){
-            System.err.println("Something went wrong " + quoteCategory.categoryName);
+        catch (Exception e){
+            String logInfo = String.format(
+                    "Something went wrong while generating the quote for: %s.", quoteCategory.categoryName);
+            logger.info(logInfo);
             e.printStackTrace();
         }
         return null;
@@ -78,14 +84,14 @@ public class QuoteService {
 
 
         } catch (MalformedURLException e) {
-            System.err.println("Error: Invalid URL for quote fact");
+            logger.info("Error: Invalid URL for quote fact");
             e.printStackTrace();
         } catch (IOException e) {
-            System.err.println("Error: Problem connecting to the API for quote category: fact" + "possible reasons could be wrong api or no internet access");
+            logger.info("Error: Problem connecting to the API for quote category: fact" + "possible reasons could be wrong api or no internet access");
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,"The server has an issue with the api key or not able to connect to api");
         }
-        catch (Error e){
-            System.err.println("Something went wrong fact" );
+        catch (Exception e){
+            logger.info("Something went wrong while generating a fact." );
             e.printStackTrace();
         }
         return null;
@@ -94,12 +100,12 @@ public class QuoteService {
     private JsonNode callApi(URL url) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestProperty("accept", "application/json");
-        connection.setRequestProperty("X-Api-Key", apiKey);
+        connection.setRequestProperty("X-Api-Key", API_KEY);
 
         InputStream responseStream = connection.getInputStream();
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonResponse = mapper.readTree(responseStream);
-        System.out.println(jsonResponse.toString());
+        logger.info(jsonResponse.toString());
         return jsonResponse;
     }
 

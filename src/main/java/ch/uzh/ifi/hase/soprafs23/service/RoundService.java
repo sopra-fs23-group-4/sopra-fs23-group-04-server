@@ -8,11 +8,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
-import ch.uzh.ifi.hase.soprafs23.websocket.DTO.LetterDTO;
-import ch.uzh.ifi.hase.soprafs23.websocket.DTO.RoundEndDTO;
-import ch.uzh.ifi.hase.soprafs23.websocket.DTO.RoundTimerDTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import ch.uzh.ifi.hase.soprafs23.websocket.dto.LetterDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -21,9 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static ch.uzh.ifi.hase.soprafs23.constant.RoundStatus.NOT_STARTED;
 import static ch.uzh.ifi.hase.soprafs23.helper.GameHelper.*;
@@ -33,7 +26,6 @@ import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 @Transactional
 public class RoundService {
 
-    private final Logger log = LoggerFactory.getLogger(UserService.class);
     private final RoundRepository roundRepository;
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
@@ -102,7 +94,7 @@ public class RoundService {
         LetterDTO letterDTO = new LetterDTO();
         letterDTO.setLetter(round.getLetter());
         letterDTO.setRound(round.getRoundNumber());
-        webSocketService.sendMessageToClients(Constant.defaultDestination+gamePin, letterDTO);
+        webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION +gamePin, letterDTO);
     }
 
 

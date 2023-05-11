@@ -1,11 +1,11 @@
-package ch.uzh.ifi.hase.soprafs23.websocket.DTO;
+package ch.uzh.ifi.hase.soprafs23.websocket.dto;
 
 public class LetterDTO {
 
-    public static final String type="letter";
+    public static final String TYPE = "letter";
 
     public String getType(){
-        return type;
+        return TYPE;
     }
     private int round;
     private Character letter;

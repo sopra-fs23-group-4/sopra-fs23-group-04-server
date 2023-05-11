@@ -1,8 +1,8 @@
 package ch.uzh.ifi.hase.soprafs23.constant;
 
-import ch.uzh.ifi.hase.soprafs23.constant.ExtractApiCallData.ExtractJsonArrayConvertor;
-import ch.uzh.ifi.hase.soprafs23.constant.ExtractApiCallData.ExtractJsonData;
-import ch.uzh.ifi.hase.soprafs23.constant.ExtractApiCallData.ExtractJsonElementConvertor;
+import ch.uzh.ifi.hase.soprafs23.constant.extract_api_call_data.ExtractJsonArrayConvertor;
+import ch.uzh.ifi.hase.soprafs23.constant.extract_api_call_data.ExtractJsonData;
+import ch.uzh.ifi.hase.soprafs23.constant.extract_api_call_data.ExtractJsonElementConvertor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -11,8 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 public enum QuoteCategory {
-
-
+    
     DADJOKE("https://api.api-ninjas.com/v1/dadjokes?limit=1", "dadJoke", "joke"),
     CHUCKNORRIS("https://api.api-ninjas.com/v1/chucknorris?","chucknorris","joke", new ExtractJsonElementConvertor()),
     JOKE("https://api.api-ninjas.com/v1/jokes?limit=1","joke","joke"),
@@ -40,7 +39,6 @@ public enum QuoteCategory {
     MONEY(baseUrlQuote("money"), "money", "quote"),
     MOVIES(baseUrlQuote("movies"), "movies", "quote"),
     SUCCESS(baseUrlQuote("success"), "success", "quote");
-
 
     public final String url;
     public final String categoryName;

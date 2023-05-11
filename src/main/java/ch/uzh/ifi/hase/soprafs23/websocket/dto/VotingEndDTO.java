@@ -1,10 +1,10 @@
-package ch.uzh.ifi.hase.soprafs23.websocket.DTO;
+package ch.uzh.ifi.hase.soprafs23.websocket.dto;
 
 public class VotingEndDTO {
-    private final static String type="votingEnd";
+    private static final String TYPE = "votingEnd";
 
     public static String getType() {
-        return type;
+        return TYPE;
     }
     private String filler;
 

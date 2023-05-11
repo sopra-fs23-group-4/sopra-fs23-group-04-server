@@ -5,7 +5,6 @@ public class LeaderboardGetDTO {
     private String username;
     private int accumulatedScore;
 
-
     public String getUsername() {
         return username;
     }

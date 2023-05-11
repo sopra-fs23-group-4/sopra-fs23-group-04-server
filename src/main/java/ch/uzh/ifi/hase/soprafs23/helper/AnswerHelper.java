@@ -6,6 +6,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 public class AnswerHelper {
 
+    private AnswerHelper() {}
+
     public static void checkIfAnswerExists(Answer answer) {
 
         String errorMessage = "This answer does not exist.";

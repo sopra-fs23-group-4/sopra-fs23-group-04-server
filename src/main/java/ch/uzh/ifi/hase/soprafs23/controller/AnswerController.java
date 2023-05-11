@@ -13,7 +13,7 @@ import java.util.Map;
 public class AnswerController {
 
     private final AnswerService answerService;
-    Logger log = LoggerFactory.getLogger(AnswerController.class);
+    Logger logger = LoggerFactory.getLogger(AnswerController.class);
 
 
     AnswerController(AnswerService answerService) {
@@ -31,6 +31,11 @@ public class AnswerController {
                             @RequestBody Map<String, String> answers) {
 
         answerService.saveAnswers(gamePin, userToken, roundNumber, answers);
+
+        String logInfo = String.format(
+                "Answers saved for gamePin: %d, userToken: %s, roundNumber: %d.",
+                gamePin, userToken, roundNumber);
+        logger.info(logInfo);
     }
 
     @GetMapping("/games/{gamePin}/{roundNumber}/{categoryName}")
@@ -40,9 +45,15 @@ public class AnswerController {
                                               @PathVariable("roundNumber") int roundNumber,
                                               @PathVariable("categoryName") String categoryName,
                                               @RequestHeader("Authorization") String userToken) {
-        log.info("Answer received from game : " + gamePin + " " + roundNumber +categoryName);
 
-        return answerService.getAnswers(gamePin, roundNumber, categoryName, userToken);
+        List<Map<Integer, String>> mapList = answerService.getAnswers(gamePin, roundNumber, categoryName, userToken);
+
+        String logInfo = String.format(
+                "Answer received from game -> gamePin: %d, roundNumber: %d, categoryName: %s.",
+                gamePin, roundNumber, categoryName);
+        logger.info(logInfo);
+
+        return mapList;
     }
 
 }

@@ -12,12 +12,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class WebSocketService {
     @Autowired // Automatic injection of beans
     protected SimpMessagingTemplate simpMessagingTemplate;
-    Logger log = LoggerFactory.getLogger(WebSocketService.class);
+    Logger logger = LoggerFactory.getLogger(WebSocketService.class);
 
     public void sendMessageToClients(String destination, Object dto) {
         this.simpMessagingTemplate.convertAndSend(destination, dto);
-        log.info("Msg sent of to" + destination);
 
+        String logInfo = String.format("Msg sent off to: %s", destination);
+        logger.info(logInfo);
     }
 
 }

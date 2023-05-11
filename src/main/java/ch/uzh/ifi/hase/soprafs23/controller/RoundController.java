@@ -3,8 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.controller;
 import ch.uzh.ifi.hase.soprafs23.constant.Constant;
 import ch.uzh.ifi.hase.soprafs23.service.RoundService;
 import ch.uzh.ifi.hase.soprafs23.service.WebSocketService;
-import ch.uzh.ifi.hase.soprafs23.websocket.DTO.LetterDTO;
-import ch.uzh.ifi.hase.soprafs23.websocket.DTO.RoundEndDTO;
+import ch.uzh.ifi.hase.soprafs23.websocket.dto.RoundEndDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -17,7 +16,7 @@ public class RoundController {
     private final WebSocketService webSocketService;
 
 
-    Logger log = LoggerFactory.getLogger(RoundController.class);
+    Logger logger = LoggerFactory.getLogger(RoundController.class);
 
     RoundController(RoundService roundService,
                     WebSocketService webSocketService) {
@@ -44,14 +43,24 @@ public class RoundController {
     public void endRound(@PathVariable("gamePin") int gamePin,
                          @PathVariable("roundNumber") int roundNumber,
                          @RequestHeader("Authorization") String userToken) {
-        log.info(" "+gamePin + roundNumber+ userToken);
+
 
         roundService.endRound(gamePin, userToken, roundNumber);
+
+        String logInfo1 = String.format(
+                "Round ended -> gamePin: %d, roundNumber: %d.",
+                gamePin, roundNumber);
+        logger.info(logInfo1);
 
         String fill="roundEnd";
         RoundEndDTO roundEndDTO=new RoundEndDTO();
         roundEndDTO.setRounded(fill);
-        webSocketService.sendMessageToClients(Constant.defaultDestination+gamePin, roundEndDTO);
-        log.info("Round " + roundNumber + " ended in lobby " + gamePin);
-}
+        webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, roundEndDTO);
+
+        String logInfo2 = String.format(
+                "Round ended -> gamePin: %d, roundNumber: %d.",
+                gamePin, roundNumber);
+        logger.info(logInfo2);
+
+    }
 }

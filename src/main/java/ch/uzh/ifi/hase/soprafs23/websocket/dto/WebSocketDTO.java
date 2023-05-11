@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs23.websocket.DTO;
+package ch.uzh.ifi.hase.soprafs23.websocket.dto;
 
 public class WebSocketDTO {
     private String type;

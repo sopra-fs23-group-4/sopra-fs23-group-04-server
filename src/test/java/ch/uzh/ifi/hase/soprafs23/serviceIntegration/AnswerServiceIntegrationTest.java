@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.serviceIntegration;
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundLength;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
+import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Answer;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
@@ -23,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.sql.SQLOutput;
+import java.time.LocalDate;
 import java.util.*;
 
 import static ch.uzh.ifi.hase.soprafs23.helper.AnswerHelper.checkIfAnswerExists;
@@ -33,8 +35,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class AnswerServiceIntegrationTest {
 
-    @Autowired
-    private UserRepository userRepository;
     @Autowired
     private GameRepository gameRepository;
     @Autowired
@@ -56,32 +56,17 @@ class AnswerServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Create and save a user
-        User userForCreation = new User();
-        userForCreation.setUsername("user1");
-        userForCreation.setPassword("testPassword");
-        user1 = userService.createAndReturnUser(userForCreation);
+        user1 = createUserForTesting();
 
-        User userForCreation2 = new User();
-        userForCreation2.setUsername("user2");
-        userForCreation2.setPassword("testPassword");
-        user2 = userService.createAndReturnUser(userForCreation2);
+        user2 = createUserForTesting();
 
-        User userForCreation3 = new User();
-        userForCreation3.setUsername("user3");
-        userForCreation3.setPassword("testPassword");
-        user3 = userService.createAndReturnUser(userForCreation3);
+        user3 = createUserForTesting();
 
-        // Create and save a game
-        Game gameForCreation = new Game();
-        gameForCreation.setRounds(10);
-        gameForCreation.setRoundLength(RoundLength.MEDIUM);
-        gameForCreation.setCategories(getCategories());
-        game = gameService.createAndReturnGame(gameForCreation, user1.getToken());
+        game = createGameForTesting(user1.getToken());
+
         game.addPlayer(user2);
 
         round = roundRepository.findByGameAndRoundNumber(game, 1);
-
     }
 
     @Test
@@ -93,30 +78,25 @@ class AnswerServiceIntegrationTest {
         answers.put("Auto", "Audi");
         answers.put("Film Regisseur", null);
 
-        // change status of game to RUNNING
         game.setStatus(GameStatus.RUNNING);
         gameRepository.saveAndFlush(game);
 
-        // change status of round to FINISHED
         round.setStatus(RoundStatus.FINISHED);
         roundRepository.saveAndFlush(round);
 
-        // No exception should be thrown in this case
-        assertDoesNotThrow(() -> answerService.saveAnswers(game.getGamePin(), user1.getToken(), 1, answers));
+        int gamePin = game.getGamePin();
+        String user1Token = user1.getToken();
+
+        assertDoesNotThrow(() -> answerService.saveAnswers(gamePin, user1Token, 1, answers));
 
         List<Answer> savedAnswers = answerRepository.findByRoundAndUser(round, user1);
 
-        // Verify that the saved answers match the provided answers
         assertEquals(answers.size(), savedAnswers.size());
 
         for (Answer savedAnswer : savedAnswers) {
             String categoryName = savedAnswer.getCategory().getName();
             String submittedAnswer = answers.get(categoryName);
-            if (submittedAnswer == null) {
-                assertEquals("-", savedAnswer.getAnswerString());
-            } else {
-                assertEquals(submittedAnswer, savedAnswer.getAnswerString());
-            }
+            assertEquals(Objects.requireNonNullElse(submittedAnswer, "-"), savedAnswer.getAnswerString());
         }
     }
 
@@ -129,21 +109,18 @@ class AnswerServiceIntegrationTest {
                 "Auto", "Audi",
                 "Film Regisseur", "Woody Allen");
 
-        // change status of game to RUNNING
         game.setStatus(GameStatus.RUNNING);
         gameRepository.saveAndFlush(game);
 
-        // change status of round to FINISHED
         round.setStatus(RoundStatus.FINISHED);
         roundRepository.saveAndFlush(round);
 
-        int gamePing = game.getGamePin();
+        int gamePin = game.getGamePin();
         String user1Token = user1.getToken();
 
-        // No exception should be thrown in this case
-        assertDoesNotThrow(() -> answerService.saveAnswers(gamePing, user1Token, 1, answers));
+        assertDoesNotThrow(() -> answerService.saveAnswers(gamePin, user1Token, 1, answers));
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> answerService.saveAnswers(gamePing, user1Token, 1, answers));
+                () -> answerService.saveAnswers(gamePin, user1Token, 1, answers));
 
 
         assertEquals(HttpStatus.CONFLICT, exception.getStatus());
@@ -159,19 +136,17 @@ class AnswerServiceIntegrationTest {
                 "Auto", "Audi",
                 "Film Regisseur", "Woody Allen");
 
-        // change status of game to RUNNING
         game.setStatus(GameStatus.RUNNING);
         gameRepository.saveAndFlush(game);
 
-        // change status of round to FINISHED
         round.setStatus(RoundStatus.FINISHED);
         roundRepository.saveAndFlush(round);
 
-        int gamePing = game.getGamePin();
+        int gamePin = game.getGamePin();
         String user3Token = user3.getToken();
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> answerService.saveAnswers(gamePing, user3Token, 1, answers));
+                () -> answerService.saveAnswers(gamePin, user3Token, 1, answers));
 
         assertEquals(HttpStatus.FORBIDDEN, exception.getStatus());
         assertEquals("User is not part of this game.", exception.getReason());
@@ -187,15 +162,12 @@ class AnswerServiceIntegrationTest {
                 "Auto", "Audi",
                 "Film Regisseur", "Woody Allen");
 
-        // change status of game to RUNNING
         game.setStatus(GameStatus.RUNNING);
         gameRepository.saveAndFlush(game);
 
-        // change status of round to FINISHED
         round.setStatus(RoundStatus.FINISHED);
         roundRepository.saveAndFlush(round);
 
-        // No exception should be thrown in this case
         assertDoesNotThrow(() -> answerService.saveAnswers(game.getGamePin(), user1.getToken(), 1, answersUser1And2));
         assertDoesNotThrow(() -> answerService.saveAnswers(game.getGamePin(), user2.getToken(), 1, answersUser1And2));
 
@@ -208,14 +180,35 @@ class AnswerServiceIntegrationTest {
         List<Map<Integer, String>> answerListActual =
                 answerService.getAnswers(game.getGamePin(), 1, "Stadt", user2.getToken());
 
-        // Check that the number of answers is the same
         assertEquals(answerListExpected.size(), answerListActual.size());
 
-        // Check that the answers are the same
         Map<Integer, String> expectedMap = answerListExpected.get(0);
         Map<Integer, String> actualMap = answerListActual.get(0);
 
         assertEquals(expectedMap.values().iterator().next(), actualMap.values().iterator().next());
+    }
+
+    private int userNameSuffix = 1;
+    private User createUserForTesting() {
+        User userForCreation = new User();
+
+        String userName = String.format("user%d", userNameSuffix);
+        userNameSuffix++;
+
+        userForCreation.setUsername(userName);
+        userForCreation.setPassword("testPassword");
+
+        return userService.createAndReturnUser(userForCreation);
+    }
+
+    private Game createGameForTesting(String userToken) {
+
+        Game gameForCreation = new Game();
+        gameForCreation.setRounds(10);
+        gameForCreation.setRoundLength(RoundLength.MEDIUM);
+        gameForCreation.setCategories(getCategories());
+
+        return gameService.createAndReturnGame(gameForCreation, userToken);
     }
 
     private List<Category> getCategories() {
