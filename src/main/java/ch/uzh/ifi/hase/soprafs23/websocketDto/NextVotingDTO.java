@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs23.websocket.dto;
+package ch.uzh.ifi.hase.soprafs23.websocketDto;
 
 public class NextVotingDTO {
     public static final String TYPE = "nextVoting";

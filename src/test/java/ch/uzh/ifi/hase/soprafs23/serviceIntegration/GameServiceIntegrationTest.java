@@ -16,7 +16,7 @@ import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.WinnerGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
 import ch.uzh.ifi.hase.soprafs23.service.*;
-import ch.uzh.ifi.hase.soprafs23.websocket.dto.GameUsersDTO;
+import ch.uzh.ifi.hase.soprafs23.websocketDto.GameUsersDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

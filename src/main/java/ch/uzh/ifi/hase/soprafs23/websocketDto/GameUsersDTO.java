@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs23.websocket.dto;
+package ch.uzh.ifi.hase.soprafs23.websocketDto;
 
 import java.util.List;
 

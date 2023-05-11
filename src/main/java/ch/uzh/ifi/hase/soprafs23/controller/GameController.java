@@ -7,8 +7,7 @@ import ch.uzh.ifi.hase.soprafs23.rest.mapper.UserDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.GameDTOMapper;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.RoundService;
-import ch.uzh.ifi.hase.soprafs23.service.TimeControlService;
-import ch.uzh.ifi.hase.soprafs23.websocket.dto.GameUsersDTO;
+import ch.uzh.ifi.hase.soprafs23.websocketDto.GameUsersDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,11 +18,9 @@ public class GameController {
 
     private final GameService gameService;
     private final RoundService roundService;
-    private final TimeControlService timeControlService;
-    GameController(GameService gameService, RoundService roundService, TimeControlService timeControlService) {
+    GameController(GameService gameService, RoundService roundService) {
         this.roundService = roundService;
         this.gameService = gameService;
-        this.timeControlService=timeControlService;
 
     }
 
@@ -43,7 +40,7 @@ public class GameController {
 
         gameService.setUpGameForStart(gamePin);
         roundService.nextRound(gamePin);
-        timeControlService.startRoundTime(gamePin);
+        roundService.startRoundTime(gamePin);
 
     }
 
