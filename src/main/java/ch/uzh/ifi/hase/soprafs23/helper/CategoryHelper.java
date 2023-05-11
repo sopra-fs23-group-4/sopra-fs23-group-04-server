@@ -6,6 +6,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 public class CategoryHelper {
 
+    private CategoryHelper() {}
+
     public static void checkIfCategoryExists(Category category) {
 
         String errorMessage = "This category does not exist.";

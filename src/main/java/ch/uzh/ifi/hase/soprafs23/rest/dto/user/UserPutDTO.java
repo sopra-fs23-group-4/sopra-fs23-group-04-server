@@ -9,10 +9,6 @@ public class UserPutDTO {
     private String quote;
     private String profilePictureUrl;
 
-
-    public UserPutDTO() {
-    }
-
     public int getUserId() { return userId; }
 
     public void setUserId(int userId) { this.userId = userId; }
