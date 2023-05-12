@@ -22,7 +22,7 @@ public class Game implements Serializable {
     @Column(name = "game_id")
     private int gameId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private int hostId;
 
     @Column(nullable = false, unique = true)

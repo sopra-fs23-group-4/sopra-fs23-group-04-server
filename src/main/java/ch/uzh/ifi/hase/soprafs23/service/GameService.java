@@ -8,7 +8,7 @@ import ch.uzh.ifi.hase.soprafs23.rest.dto.game.LeaderboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.WinnerGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
-import ch.uzh.ifi.hase.soprafs23.websocket.dto.GameUsersDTO;
+import ch.uzh.ifi.hase.soprafs23.websocketDto.GameUsersDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +28,8 @@ import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 @Transactional
 public class GameService {
 
-    private final Logger log = LoggerFactory.getLogger(UserService.class);
-    private Random rand = new Random();
+    private final Logger logger = LoggerFactory.getLogger(GameService.class);
+    private final Random rand = new Random();
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
     private final RoundRepository roundRepository;
@@ -81,7 +81,7 @@ public class GameService {
 
         roundService.createAllRounds(newGame);
 
-        log.debug("Created following game: {}", newGame);
+        logger.debug("Created following game: {}", newGame);
 
         return newGame;
     }
@@ -140,7 +140,7 @@ public class GameService {
             webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, gameUsersDTO);
         }
         catch (ResponseStatusException ignored) {
-            log.debug("Something went wrong while leaving the game.");
+            logger.debug("Something went wrong while leaving the game.");
         }
     }
 

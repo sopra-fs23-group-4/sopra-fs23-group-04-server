@@ -3,7 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.controller;
 import ch.uzh.ifi.hase.soprafs23.constant.Constant;
 import ch.uzh.ifi.hase.soprafs23.service.RoundService;
 import ch.uzh.ifi.hase.soprafs23.service.WebSocketService;
-import ch.uzh.ifi.hase.soprafs23.websocket.dto.RoundEndDTO;
+import ch.uzh.ifi.hase.soprafs23.websocketDto.RoundEndDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -45,7 +45,7 @@ public class RoundController {
                          @RequestHeader("Authorization") String userToken) {
 
 
-        roundService.endRound(gamePin, userToken, roundNumber);
+        roundService.stopRound(gamePin, userToken, roundNumber);
 
         String logInfo1 = String.format(
                 "Round ended -> gamePin: %d, roundNumber: %d.",
