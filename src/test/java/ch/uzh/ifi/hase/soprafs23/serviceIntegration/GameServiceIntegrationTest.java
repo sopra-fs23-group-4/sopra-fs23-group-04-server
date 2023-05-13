@@ -83,9 +83,7 @@ class GameServiceIntegrationTest {
 
         AtomicReference<Game> createdGame = new AtomicReference<>();
 
-        assertDoesNotThrow(() -> {
-            createdGame.set(gameService.createAndReturnGame(game, user1Token));
-        });
+        assertDoesNotThrow(() -> createdGame.set(gameService.createAndReturnGame(game, user1Token)));
 
         assertNotNull(createdGame.get());
 
@@ -162,7 +160,7 @@ class GameServiceIntegrationTest {
     }
 
     @Test
-    void leaveGame_validInput_lastUser_gameDeleted() {
+    void leaveGame_validInput_lastUser_gameClosed() {
 
         String user1Token = user1.getToken();
 
@@ -171,8 +169,9 @@ class GameServiceIntegrationTest {
 
         assertDoesNotThrow(() -> gameService.leaveGame(gamePin, user1Token));
 
-        assertNull(gameRepository.findByGamePin(gamePin));
-
+        Game closedGame = gameRepository.findByGamePin(gamePin);
+        assertNotNull(closedGame); // The game should still exist
+        assertEquals(GameStatus.CLOSED, closedGame.getStatus()); // The game should now be CLOSED
     }
 
     @Test
@@ -218,9 +217,7 @@ class GameServiceIntegrationTest {
 
         AtomicReference<GameCategoriesDTO> gameCategoriesDTO = new AtomicReference<>();
 
-        assertDoesNotThrow(() -> {
-            gameCategoriesDTO.set(gameService.getStandardCategories());
-        });
+        assertDoesNotThrow(() -> gameCategoriesDTO.set(gameService.getStandardCategories()));
 
         assertEquals(GameCategory.getCategories(), gameCategoriesDTO.get().getCategories());
 
@@ -236,9 +233,7 @@ class GameServiceIntegrationTest {
 
         AtomicReference<GameCategoriesDTO> gameCategoriesDTOAtomicReference = new AtomicReference<>();
 
-        assertDoesNotThrow(() -> {
-            gameCategoriesDTOAtomicReference.set(gameService.getGameCategoriesByGamePin(gamePin));
-        });
+        assertDoesNotThrow(() -> gameCategoriesDTOAtomicReference.set(gameService.getGameCategoriesByGamePin(gamePin)));
 
         assertEquals(categoryNames, gameCategoriesDTOAtomicReference.get().getCategories());
 
@@ -257,9 +252,7 @@ class GameServiceIntegrationTest {
 
         AtomicReference<GameUsersDTO> gameUsersDTOAtomicReference = new AtomicReference<>();
 
-        assertDoesNotThrow(() -> {
-            gameUsersDTOAtomicReference.set(gameService.getGameUsersByGamePin(gamePin));
-        });
+        assertDoesNotThrow(() -> gameUsersDTOAtomicReference.set(gameService.getGameUsersByGamePin(gamePin)));
 
         List<String> gameUsernamesWithoutHost = new ArrayList<>();
         gameUsernamesWithoutHost.add(user2.getUsername());
@@ -279,9 +272,7 @@ class GameServiceIntegrationTest {
 
         AtomicReference<List<String>> gameCategoryNames = new AtomicReference<>();
 
-        assertDoesNotThrow(() -> {
-            gameCategoryNames.set(gameService.getCategoryNamesByGame(game));
-        });
+        assertDoesNotThrow(() -> gameCategoryNames.set(gameService.getCategoryNamesByGame(game)));
 
         assertEquals(categoryNames, gameCategoryNames.get());
 
@@ -329,9 +320,7 @@ class GameServiceIntegrationTest {
 
         AtomicReference<List<WinnerGetDTO>> winnerGetDTOList = new AtomicReference<>();
 
-        assertDoesNotThrow(() -> {
-            winnerGetDTOList.set(gameService.getWinner(gamePin));
-        });
+        assertDoesNotThrow(() -> winnerGetDTOList.set(gameService.getWinner(gamePin)));
 
         List<String> actualWinnerUsernames = new ArrayList<>();
         for (int i = 0; i < winnerGetDTOList.get().size(); i++) {
@@ -379,9 +368,7 @@ class GameServiceIntegrationTest {
 
         AtomicReference<List<ScoreboardGetDTO>> scoreboardGetDTOList = new AtomicReference<>();
 
-        assertDoesNotThrow(() -> {
-            scoreboardGetDTOList.set(gameService.getScoreboard(gamePin));
-        });
+        assertDoesNotThrow(() -> scoreboardGetDTOList.set(gameService.getScoreboard(gamePin)));
 
         List<String> actualScoreboard = new ArrayList<>();
         for (int i = 0; i < scoreboardGetDTOList.get().size(); i++) {
@@ -429,9 +416,7 @@ class GameServiceIntegrationTest {
 
         AtomicReference<List<LeaderboardGetDTO>> leaderboardGetDTOList = new AtomicReference<>();
 
-        assertDoesNotThrow(() -> {
-            leaderboardGetDTOList.set(gameService.getLeaderboard());
-        });
+        assertDoesNotThrow(() -> leaderboardGetDTOList.set(gameService.getLeaderboard()));
 
         List<String> actualLeaderboard = new ArrayList<>();
         for (int i = 0; i < leaderboardGetDTOList.get().size(); i++) {
