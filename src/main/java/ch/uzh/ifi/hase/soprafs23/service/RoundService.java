@@ -7,6 +7,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
 import ch.uzh.ifi.hase.soprafs23.entity.game.SkipManager;
+import ch.uzh.ifi.hase.soprafs23.helper.WebSocketDTOCreator;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.SkipRepository;
@@ -219,27 +220,29 @@ public class RoundService {
                     if (isLastCategory(gamePin,currentVotingRound)){
 
                         if (isFinalRound(gamePin)){
-                            WebSocketDTO webSocketDTO=new WebSocketDTO();
-                            webSocketDTO.setType("resultWinner");
+                            WebSocketDTO webSocketDTO = WebSocketDTOCreator.resultWinner();
                             webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION +gamePin,webSocketDTO);
                             endGame(gamePin);
                         }
                         else{
-                            WebSocketDTO webSocketDTO=new WebSocketDTO();
-                            webSocketDTO.setType("resultScoreboard");
+                            WebSocketDTO webSocketDTO = WebSocketDTOCreator.resultScoreBoard();
                             webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,webSocketDTO);
                             scheduleNextRound(gamePin,4000);
                         }
                     }
 
                     else {
-                        WebSocketDTO webSocketDTO=new WebSocketDTO();
-                        webSocketDTO.setType("resultNextVote");
+                        WebSocketDTO webSocketDTO = WebSocketDTOCreator.resultNextVote();
                         webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,webSocketDTO);
                         int currentVotingRoundIncremented = currentVotingRound+1;
                         votingTimer(gamePin,currentVotingRoundIncremented);
 
                     }
+                }
+                else {
+                    ResultTimerDTO resultTimerDTO= new ResultTimerDTO();
+                    resultTimerDTO.setTimeRemaining(timeLeft);
+                    webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,resultTimerDTO);
                 }
             }
         };
@@ -265,8 +268,7 @@ public class RoundService {
                 if (noMoreTimeRemaining(timeRemaining) || skipManager.allPlayersWantToContinue()) {
                     votingTimer.cancel();
                     cleanUpSkipForNextRound(gamePin);
-                    WebSocketDTO webSocketDTO=new WebSocketDTO();
-                    webSocketDTO.setType("votingEnd");
+                    WebSocketDTO webSocketDTO = WebSocketDTOCreator.votingEnd();
                     webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,webSocketDTO);
                     logger.info("Voting ended, the users see voting results now.");
                     votingScoreOverviewTimer(gamePin,currentVotingRound);

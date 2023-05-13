@@ -2,10 +2,10 @@ package ch.uzh.ifi.hase.soprafs23.websocketDto;
 
 public class LetterDTO {
 
-    public static final String TYPE = "letter";
+    public static final String type = "roundStart";
 
     public String getType(){
-        return TYPE;
+        return type;
     }
     private int round;
     private Character letter;
