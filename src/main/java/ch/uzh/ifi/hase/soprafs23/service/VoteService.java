@@ -87,13 +87,13 @@ public class VoteService {
         Game game = gameRepository.findByGamePin(gamePin);
         Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
         Category category = categoryRepository.findByName(categoryName);
-        User user = userRepository.findByToken(userToken);
+        User requestUser = userRepository.findByToken(userToken);
 
         checkIfGameExists(game);
         checkIfRoundExists(round);
         checkIfCategoryExists(category);
-        checkIfUserExists(user);
-        checkIfUserIsInGame(game, user);
+        checkIfUserExists(requestUser);
+        checkIfUserIsInGame(game, requestUser);
 
         List<User> users = game.getUsers();
 
@@ -145,24 +145,22 @@ public class VoteService {
         voteGetDTO.setUsername(username);
         voteGetDTO.setAnswerString(answer.getAnswerString());
 
-        if (!answer.getAnswerString().equals("-")) {
-            for (User user : allUsersFiltered) {
+        for (User user : allUsersFiltered) {
 
-                Vote vote = voteRepository.findByUserAndAnswer(user, answer);
+            Vote vote = voteRepository.findByUserAndAnswer(user, answer);
 
-                if (vote != null) {
-                    if (vote.getVotedOption().equals(VoteOption.CORRECT_UNIQUE)) {
-                        numberOfUnique++;
-                    }
-                    else if (vote.getVotedOption().equals(VoteOption.CORRECT_NOT_UNIQUE)) {
-                        numberOfNotUnique++;
-                    }
-                    else if (vote.getVotedOption().equals(VoteOption.WRONG)) {
-                        numberOfWrong++;
-                    }
-                    else {
-                        numberOfNoVote++;
-                    }
+            if (vote != null) {
+                if (vote.getVotedOption().equals(VoteOption.CORRECT_UNIQUE)) {
+                    numberOfUnique++;
+                }
+                else if (vote.getVotedOption().equals(VoteOption.CORRECT_NOT_UNIQUE)) {
+                    numberOfNotUnique++;
+                }
+                else if (vote.getVotedOption().equals(VoteOption.WRONG)) {
+                    numberOfWrong++;
+                }
+                else {
+                    numberOfNoVote++;
                 }
             }
         }
@@ -216,7 +214,11 @@ public class VoteService {
         Vote newVote = new Vote();
         newVote.setAnswer(answer);
         newVote.setUser(user);
-        setVoteOption(newVote, votingString);
+        if (answer.getAnswerString().equals("-")) {
+            setVoteOption(newVote, "WRONG");
+        } else {
+            setVoteOption(newVote, votingString);
+        }
         voteRepository.saveAndFlush(newVote);
     }
 

@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 
 /**
@@ -41,16 +42,11 @@ public class UserService {
         return this.userRepository.findAll();
     }
 
-    int token = 1;
-
     public synchronized User createAndReturnUser(User newUser) {
-        // TODO change setToken back to random
-        //newUser.setToken(UUID.randomUUID().toString());
         if (newUser.getUsername().length()>10) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"You're username exceeds 10 character");
         }
-        newUser.setToken(Integer.toString(token));
-        token++;
+        newUser.setToken(UUID.randomUUID().toString());
         newUser.setStatus(UserStatus.ONLINE);
         checkIfUsernameAlreadyExists(newUser);
         checkIfUsernameValid(newUser);

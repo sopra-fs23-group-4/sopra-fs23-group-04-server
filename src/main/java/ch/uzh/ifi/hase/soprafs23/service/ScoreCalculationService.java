@@ -61,6 +61,7 @@ public class ScoreCalculationService {
         int numberOfNotUnique = 0;
         int numberOfWrong = 0;
 
+
         for (Vote vote : votesForAnswer) {
             if (vote.getVotedOption().equals(VoteOption.CORRECT_UNIQUE)) {
                 numberOfUnique++;

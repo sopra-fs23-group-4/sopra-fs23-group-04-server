@@ -100,7 +100,7 @@ class GameServiceIntegrationTest {
                 () -> gameService.createAndReturnGame(game, user1Token));
 
         assertEquals(HttpStatus.CONFLICT, exception.getStatus());
-        assertEquals("You are already part of a game." +
+        assertEquals("You are already part of a game. " +
                 "You cannot host another game!", exception.getReason());
 
     }
@@ -136,7 +136,7 @@ class GameServiceIntegrationTest {
                 () -> gameService.joinGame(gamePin, user1Token));
 
         assertEquals(HttpStatus.CONFLICT, exception.getStatus());
-        assertEquals("You are already part of a game." +
+        assertEquals("You are already part of a game. " +
                 "You cannot join another game!", exception.getReason());
 
     }
