@@ -139,7 +139,6 @@ public class RoundService {
         logger.info("starting");
         Game game = gameRepository.findByGamePin(gamePin);
         Round round = roundRepository.findByGameAndRoundNumber(game, game.getCurrentRound());
-        assert round.getStatus()==RoundStatus.RUNNING;
         int roundLength = game.getRoundLength().getDuration();
 
         String logInfo = String.format("roundLength: %d.", roundLength);
@@ -206,7 +205,7 @@ public class RoundService {
 
         Timer resultTimer = new Timer();
 
-        AtomicInteger remainingTime = new AtomicInteger(8);
+        AtomicInteger remainingTime = new AtomicInteger(15);
         TimerTask resultTimerTask = new TimerTask() {
 
             @Override
@@ -258,7 +257,7 @@ public class RoundService {
     private void votingTimer(int gamePin, int currentVotingRound) {
         Timer votingTimer = new Timer();
         TimerTask votingTimerTask = new TimerTask() {
-            int timeRemaining = 20; // Time remaining in seconds
+            int timeRemaining = 30; // Time remaining in seconds
 
             @Override
             public void run() {
@@ -289,7 +288,7 @@ public class RoundService {
         Timer timer = new Timer();
 
         TimerTask task = new TimerTask() {
-            int timeRemaining = 9;
+            int timeRemaining = 11;
             @Override
             public void run() {
                 timeRemaining-=1;
