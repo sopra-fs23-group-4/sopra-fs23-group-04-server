@@ -63,4 +63,14 @@ public class RoundController {
         logger.info(logInfo2);
 
     }
+
+    @PutMapping("/games/{gamePin}/skip")
+    @ResponseStatus(HttpStatus.OK)
+    public void userSkipRequest(@RequestHeader("Authorization") String userToken,
+                                @PathVariable("gamePin") int gamePin) {
+
+        roundService.skipRequest(gamePin,userToken);
+        logger.info("Skip Request from " + userToken);
+
+    }
 }

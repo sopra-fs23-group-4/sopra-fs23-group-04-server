@@ -6,8 +6,10 @@ import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
+import ch.uzh.ifi.hase.soprafs23.entity.game.SkipManager;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
+import ch.uzh.ifi.hase.soprafs23.repository.SkipRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs23.websocketDto.*;
 import org.slf4j.Logger;
@@ -36,6 +38,7 @@ public class RoundService {
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
     private final WebSocketService webSocketService;
+
     private final Logger logger = LoggerFactory.getLogger(RoundService.class);
 
 
@@ -103,6 +106,14 @@ public class RoundService {
         letterDTO.setLetter(round.getLetter());
         letterDTO.setRound(round.getRoundNumber());
         webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION +gamePin, letterDTO);
+    }
+
+    public void setUpSkipManager(int gamePin) {
+        SkipRepository.addGame(gamePin);
+        SkipManager skipManager=SkipRepository.findByGameId(gamePin);
+        Game game= gameRepository.findByGamePin(gamePin);
+        List<User> users=game.getUsers();
+        skipManager.addPlayersForFirstRound(users);
     }
 
 
@@ -200,9 +211,11 @@ public class RoundService {
             @Override
             public void run() {
                 int timeLeft = remainingTime.addAndGet(-1);
-                //todo @Vale one needs add an iff statement that when all players want to continue one does something (oMoreTimeRemaining or all players want to continue)
-                if (noMoreTimeRemaining(timeLeft) ) {
+                SkipManager skipManager=SkipRepository.findByGameId(gamePin);
+                if (noMoreTimeRemaining(timeLeft)  ||skipManager.allPlayersWantToContinue()) {
                     resultTimer.cancel();
+                    cleanUpSkipForNextRound(gamePin);
+
                     if (isLastCategory(gamePin,currentVotingRound)){
 
                         if (isFinalRound(gamePin)){
@@ -247,10 +260,11 @@ public class RoundService {
             @Override
             public void run() {
                 timeRemaining -= 1;
-//todo @vale you want to see the scoreboard and or statement which assures that all players want to continue then do execute the if statement below
-                //something like if (timeRemaing <= 0 || allPlayerswantToContinue=true)
-                if (noMoreTimeRemaining(timeRemaining)) {
+                SkipManager skipManager=SkipRepository.findByGameId(gamePin);
+
+                if (noMoreTimeRemaining(timeRemaining) || skipManager.allPlayersWantToContinue()) {
                     votingTimer.cancel();
+                    cleanUpSkipForNextRound(gamePin);
                     WebSocketDTO webSocketDTO=new WebSocketDTO();
                     webSocketDTO.setType("votingEnd");
                     webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,webSocketDTO);
@@ -301,6 +315,24 @@ public class RoundService {
         Game game=gameRepository.findByGamePin(gamePin);
         game.setStatus(GameStatus.CLOSED);
         gameRepository.saveAndFlush(game);
+    }
+
+    public void skipRequest(int gamePin, String userToken){
+
+        User user = userRepository.findByToken(userToken);
+        Game game= gameRepository.findByGamePin(gamePin);
+
+        checkIfUserExists(user);
+        checkIfUserIsInGame(game, user);
+
+        SkipManager skipManager=SkipRepository.findByGameId(gamePin);
+        skipManager.userWantsToSkip(user);
+    }
+
+    private void cleanUpSkipForNextRound(int gamePin) {
+        List<User> players = gameRepository.findByGamePin(gamePin).getUsers();
+        SkipManager skipManager = SkipRepository.findByGameId(gamePin);
+        skipManager.cleanUp(players);
     }
 
 }
