@@ -239,6 +239,11 @@ public class RoundService {
 
                     }
                 }
+                else {
+                    ResultTimerDTO resultTimerDTO= new ResultTimerDTO();
+                    resultTimerDTO.setTimeRemaining(timeLeft);
+                    webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,resultTimerDTO);
+                }
             }
         };
 
