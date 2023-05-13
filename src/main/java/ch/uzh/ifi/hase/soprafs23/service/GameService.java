@@ -106,6 +106,7 @@ public class GameService {
         webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, gameUsersDTO);
     }
 
+
     public void leaveGame(int gamePin, String userToken) {
 
         User user = getUserByToken(userToken);
@@ -127,7 +128,8 @@ public class GameService {
         GameUsersDTO gameUsersDTO = new GameUsersDTO();
 
         if (Boolean.FALSE.equals(gameHasUsers)) {
-            deleteGameAndRounds(game);
+            game.setStatus(GameStatus.CLOSED);
+            gameRepository.save(game); // update the game status to CLOSED
         } else {
             if (Boolean.TRUE.equals(userIsHost)) {
                 setNewHost(game);
@@ -281,19 +283,16 @@ public class GameService {
         return !users.isEmpty();
     }
 
-    private void deleteGameAndRounds(Game game) {
-        List<Round> rounds = roundRepository.findByGame(game);
-        for (Round round : rounds) {
-            roundRepository.delete(round);
-        }
-        gameRepository.delete(game);
-    }
 
     private void setNewHost(Game game) {
         List<User> users = game.getUsers();
-        User hostCandidate = users.get(rand.nextInt(users.size()));
-        game.setHostId(hostCandidate.getId());
+        // Check if there are users left in the game.
+        if (!users.isEmpty()) {
+            User hostCandidate = users.get(rand.nextInt(users.size()));
+            game.setHostId(hostCandidate.getId());
+        }
     }
+
 
     private GameUsersDTO getHostAndAllUserNamesOfGame(Game gameToJoin) {
 
