@@ -145,22 +145,24 @@ public class VoteService {
         voteGetDTO.setUsername(username);
         voteGetDTO.setAnswerString(answer.getAnswerString());
 
-        for (User user : allUsersFiltered) {
+        if (!answer.getAnswerString().equals("-")) {
+            for (User user : allUsersFiltered) {
 
-            Vote vote = voteRepository.findByUserAndAnswer(user, answer);
+                Vote vote = voteRepository.findByUserAndAnswer(user, answer);
 
-            if (vote != null) {
-                if (vote.getVotedOption().equals(VoteOption.CORRECT_UNIQUE)) {
-                    numberOfUnique++;
-                }
-                else if (vote.getVotedOption().equals(VoteOption.CORRECT_NOT_UNIQUE)) {
-                    numberOfNotUnique++;
-                }
-                else if (vote.getVotedOption().equals(VoteOption.WRONG)) {
-                    numberOfWrong++;
-                }
-                else {
-                    numberOfNoVote++;
+                if (vote != null) {
+                    if (vote.getVotedOption().equals(VoteOption.CORRECT_UNIQUE)) {
+                        numberOfUnique++;
+                    }
+                    else if (vote.getVotedOption().equals(VoteOption.CORRECT_NOT_UNIQUE)) {
+                        numberOfNotUnique++;
+                    }
+                    else if (vote.getVotedOption().equals(VoteOption.WRONG)) {
+                        numberOfWrong++;
+                    }
+                    else {
+                        numberOfNoVote++;
+                    }
                 }
             }
         }
