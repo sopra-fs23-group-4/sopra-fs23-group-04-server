@@ -40,6 +40,7 @@ public class GameController {
 
         gameService.setUpGameForStart(gamePin);
         roundService.nextRound(gamePin);
+        roundService.setUpSkipManager(gamePin);
         roundService.startRoundTime(gamePin);
 
     }
