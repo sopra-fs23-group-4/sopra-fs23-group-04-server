@@ -227,7 +227,7 @@ public class RoundService {
                         else{
                             WebSocketDTO webSocketDTO = WebSocketDTOCreator.resultScoreBoard();
                             webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,webSocketDTO);
-                            scheduleNextRound(gamePin);
+                            scheduleNextRound(gamePin,4000);
                         }
                     }
 
@@ -285,30 +285,18 @@ public class RoundService {
         };
         votingTimer.schedule(votingTimerTask, 2000, 1000);
     }
-    private void scheduleNextRound(int gamePin) {
+    private void scheduleNextRound(int gamePin, int delay) {
         Timer timer = new Timer();
-
-
         TimerTask task = new TimerTask() {
-            int timeRemaining = 9;
             @Override
             public void run() {
-                timeRemaining-=1;
-                if (noMoreTimeRemaining(timeRemaining)){
-                    nextRound(gamePin);
-                    startRoundTime(gamePin);
-                }
-                else {
-                    ScoreboardTimerDTO scoreboardTimerDTO= new ScoreboardTimerDTO();
-                    scoreboardTimerDTO.setTimeRemaining(timeRemaining);
-                    webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION+gamePin,scoreboardTimerDTO);
-                }
-
+                nextRound(gamePin);
+                startRoundTime(gamePin);
             }
         };
 
         // Schedule the task to run after the specified delay
-        timer.schedule(task, 2000,1000);
+        timer.schedule(task, delay);
     }
 
     private boolean isFinalRound(int gamePin) {

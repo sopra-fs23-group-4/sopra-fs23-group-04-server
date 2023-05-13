@@ -12,7 +12,7 @@ public class WebSocketDTOCreator {
 
     public static WebSocketDTO resultScoreBoard(){
         WebSocketDTO webSocketDTO=new WebSocketDTO();
-        webSocketDTO.setType("resultWinner");
+        webSocketDTO.setType("resultScoreboard");
         return webSocketDTO;
     }
     public static WebSocketDTO resultNextVote(){
