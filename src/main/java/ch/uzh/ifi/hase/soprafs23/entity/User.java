@@ -46,8 +46,7 @@ public class User implements Serializable {
     @Column
     private String quote;
 
-    @Column
-    private String profilePictureUrl;
+
 
     @Override
     public boolean equals(Object obj) {
@@ -114,9 +113,7 @@ public class User implements Serializable {
 
     public void setQuote(String quote) { this.quote = quote; }
 
-    public String getProfilePictureUrl() { return profilePictureUrl; }
 
-    public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
 
 
   }

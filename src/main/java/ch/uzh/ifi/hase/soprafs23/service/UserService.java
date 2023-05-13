@@ -46,13 +46,15 @@ public class UserService {
     public synchronized User createAndReturnUser(User newUser) {
         // TODO change setToken back to random
         //newUser.setToken(UUID.randomUUID().toString());
+        if (newUser.getUsername().length()>10) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"You're username exceeds 10 character");
+        }
         newUser.setToken(Integer.toString(token));
         token++;
         newUser.setStatus(UserStatus.ONLINE);
         checkIfUsernameAlreadyExists(newUser);
         checkIfUsernameValid(newUser);
         newUser.setCreationDate((LocalDate.now()));
-        newUser.setProfilePictureUrl("https://storage.googleapis.com/sorpa-fs23-gr-leetfive-server.appspot.com/DefaultProfilePicture100x100.jpg");
         newUser.setQuote("No Quote");
 
         // saves the given entity but data is only persisted in the database once
@@ -153,6 +155,7 @@ public class UserService {
             userDB.setUsername(newUsername);
         }
         if (!Objects.equals(newQuote, null)) {
+            checkIfQuoteValid(newQuote);
             userDB.setQuote(newQuote);
         }
         if (!Objects.equals(newPassword, null)) {
@@ -167,6 +170,12 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         foundUser.setStatus(UserStatus.OFFLINE);
+    }
+
+    private void checkIfQuoteValid(String quote){
+        if (quote.length()>255){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The quote you are trying to add is to long");
+        }
     }
 
 }

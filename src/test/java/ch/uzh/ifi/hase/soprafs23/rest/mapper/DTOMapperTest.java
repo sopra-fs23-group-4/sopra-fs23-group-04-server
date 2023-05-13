@@ -44,7 +44,7 @@ class DTOMapperTest {
         user.setUsername("firstname@lastname");
         user.setStatus(UserStatus.OFFLINE);
         user.setToken("1");
-        user.setProfilePictureUrl("https://example.com/test-profile-picture.jpg");
+
         user.setQuote("My penis was in the Guinness book of records!" +
                     "\n" +
                     "Until the librarian told me to take it out.");
@@ -79,7 +79,7 @@ class DTOMapperTest {
         userPutDTO.setUsername("username");
         userPutDTO.setPassword("password");
         userPutDTO.setQuote("quote");
-        userPutDTO.setProfilePictureUrl("profilePictureUrl");
+
 
         // MAP -> Convert to user
         User user = UserDTOMapper.INSTANCE.convertUserPutDTOToEntity(userPutDTO);
@@ -88,7 +88,7 @@ class DTOMapperTest {
         assertEquals(userPutDTO.getUsername(), user.getUsername());
         assertEquals(userPutDTO.getPassword(), user.getPassword());
         assertEquals(userPutDTO.getQuote(), user.getQuote());
-        assertEquals(userPutDTO.getProfilePictureUrl(), user.getProfilePictureUrl());
+
     }
     @Test
     void testCreateUser_fromLoginPostDTO_success() {
@@ -126,7 +126,7 @@ class DTOMapperTest {
         user.setUsername("username");
         user.setStatus(UserStatus.ONLINE);
         user.setCreationDate(LocalDate.EPOCH);
-        user.setProfilePictureUrl("profilePictureUrl");
+
 
         // MAP -> Convert to UserGetDTO
         UserGetDTO userGetDTO = UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
@@ -136,7 +136,7 @@ class DTOMapperTest {
         assertEquals(user.getUsername(), userGetDTO.getUsername());
         assertEquals(user.getStatus(), userGetDTO.getStatus());
         assertEquals(user.getCreationDate(), userGetDTO.getCreationDate());
-        assertEquals(user.getProfilePictureUrl(), userGetDTO.getProfilePictureUrl());
+
     }
     @Test
     void testCreateQuoteGetDTO_fromQuoteHolder_success() {

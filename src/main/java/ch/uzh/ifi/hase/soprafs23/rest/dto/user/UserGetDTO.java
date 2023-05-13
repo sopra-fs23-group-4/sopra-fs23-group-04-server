@@ -11,7 +11,7 @@ public class UserGetDTO {
     private UserStatus status;
     private LocalDate creationDate;
     private String quote;
-    private String profilePictureUrl;
+
 
     public String getQuote() {
         return quote;
@@ -36,9 +36,5 @@ public class UserGetDTO {
     public LocalDate getCreationDate() { return creationDate; }
 
     public void setCreationDate(LocalDate creationDate) { this.creationDate = creationDate; }
-
-    public String getProfilePictureUrl() { return profilePictureUrl; }
-
-    public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
 
 }

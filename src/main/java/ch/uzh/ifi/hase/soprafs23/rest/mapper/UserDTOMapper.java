@@ -47,14 +47,12 @@ public interface UserDTOMapper {
     @Mapping(source = "status", target = "status")
     @Mapping(source = "creationDate",target = "creationDate")
     @Mapping(source = "quote", target="quote")
-    @Mapping(source = "profilePictureUrl", target = "profilePictureUrl")
     UserGetDTO convertEntityToUserGetDTO(User user);
 
     @Mapping(source = "username", target = "username")
     @Mapping(source = "password", target = "password")
     @Mapping(source = "quote", target = "quote")
     @Mapping(source = "token", target = "token")
-    @Mapping(source = "profilePictureUrl",target = "profilePictureUrl")
     User convertUserPutDTOToEntity(UserPutDTO userPutDTO);
 
     @Mapping(source = "quote", target = "quote")
