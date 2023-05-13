@@ -49,7 +49,6 @@ public class GameService {
                        ScoreCalculationService scoreCalculationService,
                        WebSocketService webSocketService) {
         this.gameRepository = gameRepository;
-        this.roundRepository = roundRepository;
         this.answerRepository = answerRepository;
         this.userRepository = userRepository;
         this.voteRepository = voteRepository;
