@@ -33,7 +33,6 @@ public class GameService {
     private final Random rand = new Random();
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
-    private final RoundRepository roundRepository;
     private final AnswerRepository answerRepository;
     private final VoteRepository voteRepository;
     private final RoundService roundService;
@@ -236,7 +235,7 @@ public class GameService {
     private void checkIfHostIsEligible(int hostId) {
         List<Game> openOrRunningGames = getOpenOrRunningGames();
 
-        String errorMessage = "You are already part of a game." +
+        String errorMessage = "You are already part of a game. " +
                 "You cannot host another game!";
         for (Game game : openOrRunningGames) {
             List<Integer> userIds = getGameUsersId(game);
@@ -263,7 +262,7 @@ public class GameService {
 
         List<Game> openOrRunningGames = getOpenOrRunningGames();
 
-        String errorMessage = "You are already part of a game." +
+        String errorMessage = "You are already part of a game. " +
                 "You cannot join another game!";
 
         for (Game game : openOrRunningGames) {
