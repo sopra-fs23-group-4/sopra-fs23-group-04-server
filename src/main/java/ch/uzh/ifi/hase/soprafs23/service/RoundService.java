@@ -330,7 +330,8 @@ public class RoundService {
     }
 
     private void cleanUpSkipForNextRound(int gamePin) {
-        List<User> players = gameRepository.findByGamePin(gamePin).getUsers();
+        Game game= gameRepository.findByGamePin(gamePin);
+        List<User> players = game.getUsers();
         SkipManager skipManager = SkipRepository.findByGameId(gamePin);
         skipManager.cleanUp(players);
     }
