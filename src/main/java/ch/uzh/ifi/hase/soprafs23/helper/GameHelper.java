@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.helper;
 
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
+import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -53,6 +54,14 @@ public class GameHelper {
 
         if(!users.contains(user)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, errorMessage);
+        }
+    }
+
+    public static void checkIfNotToManyCategories(Game game){
+        List<Category> gameCategories = game.getCategories();
+        if (gameCategories.size()>10) {
+            String errorMessage ="You're game cannot have more than ten categories";
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,errorMessage);
         }
     }
 }

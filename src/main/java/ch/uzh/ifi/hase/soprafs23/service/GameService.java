@@ -3,6 +3,7 @@ package ch.uzh.ifi.hase.soprafs23.service;
 import ch.uzh.ifi.hase.soprafs23.constant.*;
 import ch.uzh.ifi.hase.soprafs23.entity.game.*;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
+import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.*;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.LeaderboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardGetDTO;
@@ -67,6 +68,8 @@ public class GameService {
         checkIfUserExists(user);
 
         checkIfHostIsEligible(user.getId());
+
+        GameHelper.checkIfNotToManyCategories(newGame);
 
         newGame.setGamePin(generateUniqueGamePin());
         newGame.setStatus(GameStatus.OPEN);
@@ -158,7 +161,7 @@ public class GameService {
 
     }
 
-    public GameCategoriesDTO getStandardCategories() {
+    public static GameCategoriesDTO getStandardCategories() {
 
         GameCategoriesDTO gameCategoriesDTO = new GameCategoriesDTO();
         gameCategoriesDTO.setCategories(GameCategory.getCategories());
@@ -194,7 +197,7 @@ public class GameService {
         return game;
     }
 
-    public List<String> getCategoryNamesByGame(Game game) {
+    public static List<String> getCategoryNamesByGame(Game game) {
         List<Category> gameCategories = game.getCategories();
 
         List<String> gameCategoryNames = new ArrayList<>();
@@ -222,7 +225,7 @@ public class GameService {
         return openOrRunningGames;
     }
 
-    private List<Integer> getGameUsersId(Game game) {
+    private static List<Integer> getGameUsersId(Game game) {
         List<Integer> usersId = new ArrayList<>();
         for (User user : game.getUsers()) {
             usersId.add(user.getId());

@@ -49,7 +49,6 @@ class UserControllerTest {
     User user = new User();
     user.setUsername("firstname@lastname");
     user.setStatus(UserStatus.OFFLINE);
-    user.setProfilePictureUrl("https://example.com/test-profile-picture.jpg");
     user.setQuote("My penis was in the Guinness book of records!" +
               "\n" +
               "Until the librarian told me to take it out.");
@@ -78,7 +77,6 @@ class UserControllerTest {
     user.setUsername("testUsername");
     user.setToken("1");
     user.setStatus(UserStatus.ONLINE);
-    user.setProfilePictureUrl("https://example.com/test-profile-picture.jpg");
     user.setQuote("My penis was in the Guinness book of records!" +
               "\n" +
               "Until the librarian told me to take it out.");
@@ -111,7 +109,6 @@ class UserControllerTest {
         user.setUsername("testUsername");
         user.setToken("1");
         user.setStatus(UserStatus.ONLINE);
-        user.setProfilePictureUrl("https://example.com/test-profile-picture.jpg");
         user.setQuote("My penis was in the Guinness book of records!" +
                 "\n" +
                 "Until the librarian told me to take it out.");
