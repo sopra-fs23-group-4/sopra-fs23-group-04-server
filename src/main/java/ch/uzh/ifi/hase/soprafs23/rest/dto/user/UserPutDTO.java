@@ -7,7 +7,6 @@ public class UserPutDTO {
     private String username;
     private String password;
     private String quote;
-    private String profilePictureUrl;
 
     public int getUserId() { return userId; }
 
@@ -44,9 +43,4 @@ public class UserPutDTO {
         this.quote = quote;
     }
 
-    public String getProfilePictureUrl() {
-        return profilePictureUrl;
-    }
-
-    public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
 }
