@@ -58,7 +58,7 @@ public class Game implements Serializable {
     )
     private List<Category> categories;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
             name = "GAME_USER",
             joinColumns = @JoinColumn(name = "game_id"),

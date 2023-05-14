@@ -257,14 +257,15 @@ public class RoundService {
     private void votingTimer(int gamePin, int currentVotingRound) {
         Timer votingTimer = new Timer();
         TimerTask votingTimerTask = new TimerTask() {
-            int timeRemaining = 30; // Time remaining in seconds
+            int timeRemaining = 30;
+            // Time remaining in seconds
 
             @Override
             public void run() {
                 timeRemaining -= 1;
                 SkipManager skipManager=SkipRepository.findByGameId(gamePin);
 
-                if (noMoreTimeRemaining(timeRemaining) || skipManager.allPlayersWantToContinue()) {
+                if (noMoreTimeRemaining(timeRemaining) || skipManager.allPlayersWantToContinue() ) {
                     votingTimer.cancel();
                     cleanUpSkipForNextRound(gamePin);
                     WebSocketDTO webSocketDTO = WebSocketDTOCreator.votingEnd();
@@ -341,8 +342,7 @@ public class RoundService {
     }
 
     private void cleanUpSkipForNextRound(int gamePin) {
-        Game game= gameRepository.findByGamePin(gamePin);
-        List<User> players = game.getUsers();
+        List<User> players = gameRepository.findAllUsersByGamePin(gamePin);
         SkipManager skipManager = SkipRepository.findByGameId(gamePin);
         skipManager.cleanUp(players);
     }
