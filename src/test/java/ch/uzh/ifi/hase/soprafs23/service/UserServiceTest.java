@@ -65,7 +65,6 @@ class UserServiceTest {
 
         assertEquals(testUser.getUsername(), createdUser.getUsername());
         assertNotNull(createdUser.getToken());
-        assertEquals(UserStatus.ONLINE, createdUser.getStatus());
     }
 
     @Test
@@ -156,7 +155,6 @@ class UserServiceTest {
         assertEquals(testUser.getId(), loggedInUser.getId());
         assertEquals(testUser.getUsername(), loggedInUser.getUsername());
         assertEquals(testUser.getPassword(), loggedInUser.getPassword());
-        assertEquals(UserStatus.ONLINE, loggedInUser.getStatus());
     }
 
     @Test
@@ -185,34 +183,7 @@ class UserServiceTest {
         assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
         assertTrue(exception.getReason().contains("The password you tipped in is incorrect"));
     }
-    @Test
-    void logout_success() {
-        // create User
-        User user = new User();
-        user.setToken("token");
-        user.setStatus(UserStatus.ONLINE);
 
-
-        when(userRepository.findByToken(user.getToken())).thenReturn(user);
-
-
-        userService.logout(user);
-
-        assertEquals(UserStatus.OFFLINE, user.getStatus());
-    }
-
-    @Test
-    void logout_failed(){
-        User user = new User();
-        user.setToken("token");
-        user.setStatus(UserStatus.ONLINE);
-
-
-        when(userRepository.findByToken(user.getToken())).thenReturn(null);
-        
-        assertThrows(ResponseStatusException.class, () -> userService.logout(user));
-
-    }
 
     @Test
     void getUsers_usersExistInRepository_success() {

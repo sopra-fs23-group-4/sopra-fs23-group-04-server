@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.helper;
 
+import ch.uzh.ifi.hase.soprafs23.constant.Constant;
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
@@ -62,6 +63,16 @@ public class GameHelper {
         if (gameCategories.size()>10) {
             String errorMessage ="You're game cannot have more than ten categories";
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,errorMessage);
+        }
+    }
+
+    public static void checkCategoryNames(Game game){
+        List<Category> gameCategories = game.getCategories();
+        for (Category category: gameCategories) {
+            if (category.getName().length()> Constant.MAX_STRING_LENGTH_OF_CATEGORY) {
+                String errorMessage ="One of the categories you selected is too loonnnggg";
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,errorMessage);
+            }
         }
     }
 }

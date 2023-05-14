@@ -194,7 +194,7 @@ public class RoundService {
         logger.info(logInfo);
 
         gameRepository.findByGamePin(gamePin);
-        int currentVotingRound=1;
+        int currentVotingRound = 1;
         votingTimer(gamePin,currentVotingRound);
 
     }
@@ -331,12 +331,12 @@ public class RoundService {
     public void skipRequest(int gamePin, String userToken){
 
         User user = userRepository.findByToken(userToken);
-        Game game= gameRepository.findByGamePin(gamePin);
+        Game game = gameRepository.findByGamePin(gamePin);
 
         checkIfUserExists(user);
         checkIfUserIsInGame(game, user);
 
-        SkipManager skipManager=SkipRepository.findByGameId(gamePin);
+        SkipManager skipManager = SkipRepository.findByGameId(gamePin);
         skipManager.userWantsToSkip(user);
     }
 

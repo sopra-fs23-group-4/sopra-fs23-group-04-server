@@ -6,4 +6,9 @@ public class Constant {
 
     public static final String DEFAULT_DESTINATION = "/topic/lobbies/";
     public static final String API_KEY = "Jcn3zBSrMNcsCeGm5rSm5zUabLibdT4xZiliT2rX";
+
+    public static final int MAX_NUMBER_OF_CATEGORIES=10;
+
+    public static final int MAX_STRING_LENGTH_OF_CATEGORY=18;
+
 }
