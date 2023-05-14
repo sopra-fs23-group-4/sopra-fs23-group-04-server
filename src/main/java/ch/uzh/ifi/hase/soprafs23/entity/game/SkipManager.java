@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class SkipManager {
-    private static HashMap<User, Skip> userContinueMap = new HashMap<>();
+    private static final HashMap<User, Skip> userContinueMap = new HashMap<>();
 
     public void cleanUp(List<User> players){
         userContinueMap.clear();

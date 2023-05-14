@@ -23,27 +23,25 @@ class UserRepositoryIntegrationTest {
 
   @Test
   void findByUsername_success() {
-    // given
-    User user = new User();
+      // given
+      User user = new User();
 
-    user.setUsername("firstname@lastname");
-    user.setStatus(UserStatus.OFFLINE);
-    user.setCreationDate(LocalDate.now());
-    user.setPassword("abc");
-    user.setToken("1");
-
-
-    entityManager.persist(user);
-    entityManager.flush();
-    User found = userRepository.findByUsername(user.getUsername());
-    // when
+      user.setUsername("firstname@lastname");
+      user.setCreationDate(LocalDate.now());
+      user.setPassword("abc");
+      user.setToken("1");
 
 
-    // then
+      entityManager.persist(user);
+      entityManager.flush();
+      User found = userRepository.findByUsername(user.getUsername());
+      // when
 
-    assertEquals(found.getUsername(), user.getUsername());
-    assertEquals(found.getToken(), user.getToken());
-    assertEquals(found.getStatus(), user.getStatus());
+
+      // then
+
+      assertEquals(found.getUsername(), user.getUsername());
+      assertEquals(found.getToken(), user.getToken());
   }
 
 }

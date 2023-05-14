@@ -112,13 +112,7 @@ public class UserController {
         return UserDTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
     }
 
-    @PutMapping("/logout")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void logout(@RequestBody UserLogoutDTO userLogoutDTO){
 
-        User userToBeLoggedOut = UserDTOMapper.INSTANCE.convertUserLogoutDTOtoEntity(userLogoutDTO);
-        userService.logout(userToBeLoggedOut);
-    }
 
 
 }

@@ -68,6 +68,7 @@ public class GameService {
         checkIfHostIsEligible(user.getId());
 
         GameHelper.checkIfNotToManyCategories(newGame);
+        GameHelper.checkCategoryNames(newGame);
 
         newGame.setGamePin(generateUniqueGamePin());
         newGame.setStatus(GameStatus.OPEN);

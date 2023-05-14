@@ -48,7 +48,7 @@ class UserControllerTest {
     // given
     User user = new User();
     user.setUsername("firstname@lastname");
-    user.setStatus(UserStatus.OFFLINE);
+
     user.setQuote("My penis was in the Guinness book of records!" +
               "\n" +
               "Until the librarian told me to take it out.");
@@ -65,8 +65,7 @@ class UserControllerTest {
         // then
         mockMvc.perform(getRequest).andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(1)))
-            .andExpect(jsonPath("$[0].username", is(user.getUsername())))
-            .andExpect(jsonPath("$[0].status", is(user.getStatus().toString())));
+            .andExpect(jsonPath("$[0].username", is(user.getUsername())));
     }
 
   @Test
@@ -76,7 +75,6 @@ class UserControllerTest {
     user.setId(1);
     user.setUsername("testUsername");
     user.setToken("1");
-    user.setStatus(UserStatus.ONLINE);
     user.setQuote("My penis was in the Guinness book of records!" +
               "\n" +
               "Until the librarian told me to take it out.");
@@ -97,8 +95,7 @@ class UserControllerTest {
         mockMvc.perform(postRequest)
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.id", is(user.getId())))
-            .andExpect(jsonPath("$.username", is(user.getUsername())))
-            .andExpect(jsonPath("$.status", is(user.getStatus().toString())));
+            .andExpect(jsonPath("$.username", is(user.getUsername())));
     }
 
     @Test
@@ -108,7 +105,6 @@ class UserControllerTest {
         user.setId(1);
         user.setUsername("testUsername");
         user.setToken("1");
-        user.setStatus(UserStatus.ONLINE);
         user.setQuote("My penis was in the Guinness book of records!" +
                 "\n" +
                 "Until the librarian told me to take it out.");
@@ -129,7 +125,6 @@ class UserControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", is(user.getId())))
                 .andExpect(jsonPath("$.username", is(user.getUsername())))
-                .andExpect(jsonPath("$.status", is(user.getStatus().toString())))
                 .andExpect(header().string("Authorization", user.getToken()));
     }
 
@@ -161,7 +156,6 @@ class UserControllerTest {
         User user = new User();
         user.setId(1);
         user.setUsername("testUsername");
-        user.setStatus(UserStatus.ONLINE);
 
         UserPutDTO userPutDTO = new UserPutDTO();
         userPutDTO.setUsername("username");
