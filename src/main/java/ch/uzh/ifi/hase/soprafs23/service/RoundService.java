@@ -112,8 +112,7 @@ public class RoundService {
     public void setUpSkipManager(int gamePin) {
         SkipRepository.addGame(gamePin);
         SkipManager skipManager=SkipRepository.findByGameId(gamePin);
-        Game game= gameRepository.findByGamePin(gamePin);
-        List<User> users=game.getUsers();
+        List<User> users = gameRepository.findAllUsersByGamePin(gamePin);
         skipManager.addPlayersForFirstRound(users);
     }
 
