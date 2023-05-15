@@ -18,4 +18,9 @@ public class UserHelper {
                     String.format(errorMessage));
         }
     }
+    public static void checkIfQuoteValid(String quote){
+        if (quote.length()>255){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The quote you are trying to add is to long");
+        }
+    }
 }

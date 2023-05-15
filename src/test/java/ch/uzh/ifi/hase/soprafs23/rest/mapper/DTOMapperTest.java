@@ -42,7 +42,6 @@ class DTOMapperTest {
         User user = new User();
 
         user.setUsername("firstname@lastname");
-        user.setStatus(UserStatus.OFFLINE);
         user.setToken("1");
 
         user.setQuote("My penis was in the Guinness book of records!" +
@@ -55,7 +54,6 @@ class DTOMapperTest {
         assertEquals(user.getId(), userGetDTO.getId());
 
         assertEquals(user.getUsername(), userGetDTO.getUsername());
-        assertEquals(user.getStatus(), userGetDTO.getStatus());
     }
 
     @Test
@@ -124,7 +122,6 @@ class DTOMapperTest {
         User user = new User();
         user.setId(1);
         user.setUsername("username");
-        user.setStatus(UserStatus.ONLINE);
         user.setCreationDate(LocalDate.EPOCH);
 
 
@@ -134,7 +131,6 @@ class DTOMapperTest {
         // check content
         assertEquals(user.getId(), userGetDTO.getId());
         assertEquals(user.getUsername(), userGetDTO.getUsername());
-        assertEquals(user.getStatus(), userGetDTO.getStatus());
         assertEquals(user.getCreationDate(), userGetDTO.getCreationDate());
 
     }

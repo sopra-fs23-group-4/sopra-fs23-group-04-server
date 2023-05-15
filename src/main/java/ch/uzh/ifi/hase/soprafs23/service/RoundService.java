@@ -112,8 +112,7 @@ public class RoundService {
     public void setUpSkipManager(int gamePin) {
         SkipRepository.addGame(gamePin);
         SkipManager skipManager=SkipRepository.findByGameId(gamePin);
-        Game game= gameRepository.findByGamePin(gamePin);
-        List<User> users=game.getUsers();
+        List<User> users = gameRepository.findAllUsersByGamePin(gamePin);
         skipManager.addPlayersForFirstRound(users);
     }
 
@@ -194,7 +193,7 @@ public class RoundService {
         logger.info(logInfo);
 
         gameRepository.findByGamePin(gamePin);
-        int currentVotingRound=1;
+        int currentVotingRound = 1;
         votingTimer(gamePin,currentVotingRound);
 
     }
@@ -257,14 +256,15 @@ public class RoundService {
     private void votingTimer(int gamePin, int currentVotingRound) {
         Timer votingTimer = new Timer();
         TimerTask votingTimerTask = new TimerTask() {
-            int timeRemaining = 30; // Time remaining in seconds
+            int timeRemaining = 30;
+            // Time remaining in seconds
 
             @Override
             public void run() {
                 timeRemaining -= 1;
                 SkipManager skipManager=SkipRepository.findByGameId(gamePin);
 
-                if (noMoreTimeRemaining(timeRemaining) || skipManager.allPlayersWantToContinue()) {
+                if (noMoreTimeRemaining(timeRemaining) || skipManager.allPlayersWantToContinue() ) {
                     votingTimer.cancel();
                     cleanUpSkipForNextRound(gamePin);
                     WebSocketDTO webSocketDTO = WebSocketDTOCreator.votingEnd();
@@ -331,18 +331,17 @@ public class RoundService {
     public void skipRequest(int gamePin, String userToken){
 
         User user = userRepository.findByToken(userToken);
-        Game game= gameRepository.findByGamePin(gamePin);
+        Game game = gameRepository.findByGamePin(gamePin);
 
         checkIfUserExists(user);
         checkIfUserIsInGame(game, user);
 
-        SkipManager skipManager=SkipRepository.findByGameId(gamePin);
+        SkipManager skipManager = SkipRepository.findByGameId(gamePin);
         skipManager.userWantsToSkip(user);
     }
 
     private void cleanUpSkipForNextRound(int gamePin) {
-        Game game= gameRepository.findByGamePin(gamePin);
-        List<User> players = game.getUsers();
+        List<User> players = gameRepository.findAllUsersByGamePin(gamePin);
         SkipManager skipManager = SkipRepository.findByGameId(gamePin);
         skipManager.cleanUp(players);
     }

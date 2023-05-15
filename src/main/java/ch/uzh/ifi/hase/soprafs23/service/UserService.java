@@ -1,7 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
-import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
+import ch.uzh.ifi.hase.soprafs23.helper.UserHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,6 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"You're username exceeds 10 character");
         }
         newUser.setToken(UUID.randomUUID().toString());
-        newUser.setStatus(UserStatus.ONLINE);
         checkIfUsernameAlreadyExists(newUser);
         checkIfUsernameValid(newUser);
         newUser.setCreationDate((LocalDate.now()));
@@ -75,7 +74,6 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,wrongPassword);
         }
 
-        userByUsername.setStatus(UserStatus.ONLINE);
         return userByUsername;
 
     }
@@ -151,7 +149,7 @@ public class UserService {
             userDB.setUsername(newUsername);
         }
         if (!Objects.equals(newQuote, null)) {
-            checkIfQuoteValid(newQuote);
+            UserHelper.checkIfQuoteValid(newQuote);
             userDB.setQuote(newQuote);
         }
         if (!Objects.equals(newPassword, null)) {
@@ -159,19 +157,4 @@ public class UserService {
         }
         userRepository.save(userDB);
     }
-
-    public void logout(User user){
-        User foundUser = userRepository.findByToken(user.getToken());
-        if (foundUser == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        foundUser.setStatus(UserStatus.OFFLINE);
-    }
-
-    private void checkIfQuoteValid(String quote){
-        if (quote.length()>255){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The quote you are trying to add is to long");
-        }
-    }
-
 }
