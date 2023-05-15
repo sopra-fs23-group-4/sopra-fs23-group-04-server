@@ -46,7 +46,7 @@
 | Valentin Meyer        | #158, #159          | #160, #163                 | create utility classes and handled exceptional calls, plus other trouble shooting |
 | Christopher Narayanan | #123  #201          |  #208, #197, #223          | implementing fact api, websocket working locally, timer implementedn              |
 | Lennart Töllke        | #27, #28            | #15, #16                   | Score page, Winner page, improved lobby and settings page                         |
-| Remo Wiget            | #26, #5             |                            | VotingResults page, add custom Category, redesign Dashboard, ws, fix bug Answer   |
+| Remo Wiget            | #26, #5             | #198, #50                  | VotingResults page, add custom Category, redesign Dashboard, ws, fix bug Answer   |
 
 16.05.2023
 
@@ -56,4 +56,4 @@
 | Valentin Meyer        | #160, #163          | #212, #217                 | added integration tests for GameService and AnswerService                         |
 | Christopher Narayanan | #208, #197, #223    |                            |                                                                                   |
 | Lennart Töllke        | #15, #16            |                            |                                                                                   |
-| Remo Wiget            |                     |                            |                                                                                   |
+| Remo Wiget            | #198, #50, #51 ,#65 | #19, #219, #234            | VotingResult optimized for mobile, Voting loader, timers, manual continue, beautify error msg, ui |
