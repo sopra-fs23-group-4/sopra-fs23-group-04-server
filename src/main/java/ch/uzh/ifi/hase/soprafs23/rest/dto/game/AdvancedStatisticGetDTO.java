@@ -4,22 +4,26 @@ import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 
 public class AdvancedStatisticGetDTO {
 
+    int rank;
     int totalWins;
-    int totalLoss;
-    double percentageOfWins;
-    double percentageOfLoss;
+    //int totalLoss;
+    //double percentageOfWins;
+    //double percentageOfLoss;
     int totalPlayedGames;
-    int totalPlayedRounds;
+    //int totalPlayedRounds;
     int totalAnswersAnswered;
     int totalPointsOverall;
-    double avgPlayedRoundsPerGames;
+    //double avgPlayedRoundsPerGames;
     int totalCorrectAndUniqueAnswers;
-    int totalCorrectAndNotUniqueAnswers;
-    int totalWrongAnswers;
-    double percentOfCorrectAnswersPerGame;
-    Category mostPlayedCategory;
+    //int totalCorrectAndNotUniqueAnswers;
+    //int totalWrongAnswers;
+    //double percentOfCorrectAnswersPerGame;
+    String mostPlayedCategory;
 
 
+    public int getRank() { return rank; }
+
+    public void setRank(int rank) { this.rank = rank; }
 
     public int getTotalWins() {
         return totalWins;
@@ -29,31 +33,31 @@ public class AdvancedStatisticGetDTO {
         this.totalWins = totalWins;
     }
 
-    public int getTotalLoss() {
-        return totalLoss;
-    }
-
-    public void setTotalLoss(int totalLoss) {
-        this.totalLoss = totalLoss;
-    }
-
-    public double getPercentOfWins() {
-        return percentageOfWins;
-    }
-
-    public void setPercentOfWins(double percentOfWins) {
-        this.percentageOfWins = percentOfWins;
-    }
-
-    public double getPercentOfLoss() {
-        return percentageOfLoss;
-    }
-
-    public void setPercentOfLoss(double percentOfLoss) {
-        this.percentageOfLoss = percentOfLoss;
-    }
-
-
+    //public int getTotalLoss() {
+    //    return totalLoss;
+    //}
+//
+    //public void setTotalLoss(int totalLoss) {
+    //    this.totalLoss = totalLoss;
+    //}
+//
+    //public double getPercentOfWins() {
+    //    return percentageOfWins;
+    //}
+//
+    //public void setPercentOfWins(double percentOfWins) {
+    //    this.percentageOfWins = percentOfWins;
+    //}
+//
+    //public double getPercentOfLoss() {
+    //    return percentageOfLoss;
+    //}
+//
+    //public void setPercentOfLoss(double percentOfLoss) {
+    //    this.percentageOfLoss = percentOfLoss;
+    //}
+//
+//
     public int getTotalPlayedGames() {
         return totalPlayedGames;
     }
@@ -62,14 +66,14 @@ public class AdvancedStatisticGetDTO {
         this.totalPlayedGames = totalPlayedGames;
     }
 
-    public int getTotalPlayedRounds() {
-        return totalPlayedRounds;
-    }
-
-    public void setTotalPlayedRounds(int totalPlayedRounds) {
-        this.totalPlayedRounds = totalPlayedRounds;
-    }
-
+    //public int getTotalPlayedRounds() {
+    //    return totalPlayedRounds;
+    //}
+//
+    //public void setTotalPlayedRounds(int totalPlayedRounds) {
+    //    this.totalPlayedRounds = totalPlayedRounds;
+    //}
+//
     public int getTotalAnswersAnswered() {
         return totalAnswersAnswered;
     }
@@ -78,14 +82,14 @@ public class AdvancedStatisticGetDTO {
         this.totalAnswersAnswered = totalAnswersAnswered;
     }
 
-    public double getAvgPlayedRoundsPerGames() {
-        return avgPlayedRoundsPerGames;
-    }
-
-    public void setAvgPlayedRoundsPerGames(double avgPlayedRoundsPerGames) {
-        this.avgPlayedRoundsPerGames = avgPlayedRoundsPerGames;
-    }
-
+    //public double getAvgPlayedRoundsPerGames() {
+    //    return avgPlayedRoundsPerGames;
+    //}
+//
+    //public void setAvgPlayedRoundsPerGames(double avgPlayedRoundsPerGames) {
+    //    this.avgPlayedRoundsPerGames = avgPlayedRoundsPerGames;
+    //}
+//
     public int getTotalPointsOverall() {
         return totalPointsOverall;
     }
@@ -94,15 +98,15 @@ public class AdvancedStatisticGetDTO {
         this.totalPointsOverall = totalPointsOverall;
     }
 
-    public double getPercentOfCorrectPerGame() {
-        return percentOfCorrectAnswersPerGame;
-    }
-
-    public void setPercentOfCorrectPerGame(double percentOfCorrectPerGame) {
-        this.percentOfCorrectAnswersPerGame = percentOfCorrectPerGame;
-    }
-
-
+    //public double getPercentOfCorrectPerGame() {
+    //    return percentOfCorrectAnswersPerGame;
+    //}
+//
+    //public void setPercentOfCorrectPerGame(double percentOfCorrectPerGame) {
+    //    this.percentOfCorrectAnswersPerGame = percentOfCorrectPerGame;
+    //}
+//
+//
     public int getTotalCorrectAndUniqueAnswers() {
         return totalCorrectAndUniqueAnswers;
     }
@@ -111,28 +115,27 @@ public class AdvancedStatisticGetDTO {
         this.totalCorrectAndUniqueAnswers = totalCorrectAndUniqueAnswers;
     }
 
-    public int getTotalCorrectAndNotUniqueAnswers() {
-        return totalCorrectAndNotUniqueAnswers;
-    }
-
-    public void setTotalCorrectAndNotUniqueAnswers(int totalCorrectAndNotUniqueAnswers) {
-        this.totalCorrectAndNotUniqueAnswers = totalCorrectAndNotUniqueAnswers;
-    }
-
-    public int getTotalWrongAnswers() {
-        return totalWrongAnswers;
-    }
-
-    public void setTotalWrongAnswers(int totalWrongAnswers) {
-        this.totalWrongAnswers = totalWrongAnswers;
-    }
-
-
-    public Category getMostPlayedCategory() {
+    //public int getTotalCorrectAndNotUniqueAnswers() {
+    //    return totalCorrectAndNotUniqueAnswers;
+    //}
+//
+    //public void setTotalCorrectAndNotUniqueAnswers(int totalCorrectAndNotUniqueAnswers) {
+    //    this.totalCorrectAndNotUniqueAnswers = totalCorrectAndNotUniqueAnswers;
+    //}
+//
+    //public int getTotalWrongAnswers() {
+    //    return totalWrongAnswers;
+    //}
+//
+    //public void setTotalWrongAnswers(int totalWrongAnswers) {
+    //    this.totalWrongAnswers = totalWrongAnswers;
+    //}
+//
+//
+    public String getMostPlayedCategory() {
         return mostPlayedCategory;
     }
-
-    public void setMostPlayedCategory(Category mostPlayedCategory) {
+    public void setMostPlayedCategory(String mostPlayedCategory) {
         this.mostPlayedCategory = mostPlayedCategory;
     }
 

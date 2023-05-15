@@ -9,10 +9,17 @@ import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Vote;
 import ch.uzh.ifi.hase.soprafs23.repository.*;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.AdvancedStatisticGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.game.LeaderboardGetDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
+@Service
+@Transactional
 public class AdvancedStatisticService {
 
     private final GameRepository gameRepository;
@@ -22,14 +29,17 @@ public class AdvancedStatisticService {
     private final VoteRepository voteRepository;
     private final UserRepository userRepository;
     private final ScoreCalculationService scoreCalculationService;
+    private final GameService gameService;
 
+    @Autowired
     public AdvancedStatisticService(@Qualifier("gameRepository")GameRepository gameRepository,
                                     @Qualifier("categoryRepository")CategoryRepository categoryRepository,
                                     @Qualifier("answerRepository")AnswerRepository answerRepository,
                                     @Qualifier("roundRepository")RoundRepository roundRepository,
                                     @Qualifier("voteRepository")VoteRepository voteRepository,
                                     @Qualifier("userRepository")UserRepository userRepository,
-                                    ScoreCalculationService scoreCalculationService) {
+                                    ScoreCalculationService scoreCalculationService,
+                                    GameService gameService) {
         this.gameRepository = gameRepository;
         this.categoryRepository = categoryRepository;
         this.answerRepository = answerRepository;
@@ -37,6 +47,33 @@ public class AdvancedStatisticService {
         this.voteRepository = voteRepository;
         this.userRepository = userRepository;
         this.scoreCalculationService = scoreCalculationService;
+        this.gameService = gameService;
+    }
+
+    /*
+    Statistics: Rank of a player
+     */
+    public int getRank(int userId) {
+        // Get the user
+        User user = userRepository.findById(userId).orElse(null);
+
+        // If user is not found, return -1
+        if (user == null) {
+            return -1;
+        }
+
+        // Get the leaderboard
+        List<LeaderboardGetDTO> leaderboard = gameService.getLeaderboard();
+
+        // Find the rank of the specified user
+        for (int i = 0; i < leaderboard.size(); i++) {
+            if (leaderboard.get(i).getUsername().equals(user.getUsername())) {
+                return i + 1; // Rank is index + 1 because index starts at 0
+            }
+        }
+
+        // If the user is not found in the leaderboard, return -1
+        return -1;
     }
 
 
@@ -66,29 +103,33 @@ public class AdvancedStatisticService {
 
     // checkIfWonOrLoss: Return Winner if won and Looser if loss
     private GameResult checkIfWonOrLoss(Game game, int userId) {
-
         Map<User, Integer> userScores = scoreCalculationService.calculateUserScores(game.getGamePin());
 
-        // Sort the scores from high to low
-        List<Map.Entry<User, Integer>> scoreList = new ArrayList<>(userScores.entrySet());
-        scoreList.sort(Map.Entry.<User, Integer>comparingByValue().reversed());
+        int maxScore = Integer.MIN_VALUE;
+        int minScore = Integer.MAX_VALUE;
+        int userScore = -1;
 
-        // Find the user and check if they are the first or last in the list
-        for (int i = 0; i < scoreList.size(); i++) {
-            if (scoreList.get(i).getKey().getId() == userId) {
-                if (i == 0) {
-                    return GameResult.WINNER;
-                } else if (i == scoreList.size() - 1) {
-                    return GameResult.LOSER;
-                } else {
-                    return GameResult.NEUTRAL;
-                }
+        for (Map.Entry<User, Integer> entry : userScores.entrySet()) {
+            int score = entry.getValue();
+            if (entry.getKey().getId() == userId) {
+                userScore = score;
             }
+            maxScore = Math.max(maxScore, score);
+            minScore = Math.min(minScore, score);
+        }
+
+        if (userScore == maxScore) {
+            return GameResult.WINNER;
+        } else if (userScore == minScore) {
+            return GameResult.LOSER;
+        } else if (userScore != -1) {
+            return GameResult.NEUTRAL;
         }
 
         // If the user is not found, return null
         return null;
     }
+
 
     /*
     Statistics: Percentage of Wins or Losses
@@ -152,7 +193,7 @@ public class AdvancedStatisticService {
         int totalPoints = 0;
         for (Game game : allUserGames) {
             Map<User, Integer> userScores = scoreCalculationService.calculateUserScores(game.getGamePin());
-            Optional<User> user = userRepository.findById(userId); // Assuming you have UserRepository
+            User user = userRepository.findById(userId).orElse(null); // Assuming you have UserRepository
 
             if(userScores.containsKey(user)) {
                 totalPoints += userScores.get(user);
@@ -236,19 +277,35 @@ public class AdvancedStatisticService {
     /*
     Statistics: Most played and best played categories
      */
-    private Category getMostPlayedCategory(int userId) {
+    private String getMostPlayedCategory(int userId) {
         List<Game> allUserGames = gameRepository.findAllGamesByUserId(userId);
 
-        Map<Category, Integer> categoryCount = new HashMap<>();
+        Map<String, Integer> categoryCount = new HashMap<>();
 
         for (Game game : allUserGames) {
             for (Category category : game.getCategories()) {
-                categoryCount.put(category, categoryCount.getOrDefault(category, 0) + 1);
+                String categoryName = category.getName();
+                categoryCount.put(categoryName, categoryCount.getOrDefault(categoryName, 0) + 1);
             }
         }
 
-        // Find the category with the maximum value
-        return Collections.max(categoryCount.entrySet(), Map.Entry.comparingByValue()).getKey();
+        if (!categoryCount.isEmpty()) {
+            // Get the max count
+            int maxCount = Collections.max(categoryCount.values());
+
+            // Collect all categories with the max count
+            List<String> maxCategories = categoryCount.entrySet().stream()
+                    .filter(entry -> entry.getValue() == maxCount)
+                    .map(Map.Entry::getKey)
+                    .toList();
+
+            // Randomly select one of the categories with the max count
+            Random rand = new Random();
+            return maxCategories.get(rand.nextInt(maxCategories.size()));
+        } else {
+            // If categoryCount is empty, return null or handle it in the way that is most suitable for your application.
+            return null;
+        }
     }
 
         public AdvancedStatisticGetDTO getAdvancedUserStatistic(int userId) {
@@ -256,19 +313,20 @@ public class AdvancedStatisticService {
 
         AdvancedStatisticGetDTO advancedStatisticsGetDTO = new AdvancedStatisticGetDTO();
 
+        advancedStatisticsGetDTO.setRank(getRank(userId));
         advancedStatisticsGetDTO.setTotalWins(getTotalWins(userId));
-        advancedStatisticsGetDTO.setTotalLoss(getTotalLoss(userId));
-        advancedStatisticsGetDTO.setPercentOfWins(getPercentageOfWin(userId));
-        advancedStatisticsGetDTO.setPercentOfLoss(getPercentageOfLoss(userId));
+        //advancedStatisticsGetDTO.setTotalLoss(getTotalLoss(userId));
+        //advancedStatisticsGetDTO.setPercentOfWins(getPercentageOfWin(userId));
+        //advancedStatisticsGetDTO.setPercentOfLoss(getPercentageOfLoss(userId));
         advancedStatisticsGetDTO.setTotalPlayedGames(getTotalPlayedGames(userId));
-        advancedStatisticsGetDTO.setTotalPlayedRounds(getTotalPlayedRounds(userId));
+        //advancedStatisticsGetDTO.setTotalPlayedRounds(getTotalPlayedRounds(userId));
         advancedStatisticsGetDTO.setTotalAnswersAnswered(getTotalAnswerAnswered(userId));
         advancedStatisticsGetDTO.setTotalPointsOverall(getTotalPointsOverall(userId));
-        advancedStatisticsGetDTO.setAvgPlayedRoundsPerGames(getAvgPlayedRoundsPerGame(userId));
+        //advancedStatisticsGetDTO.setAvgPlayedRoundsPerGames(getAvgPlayedRoundsPerGame(userId));
         advancedStatisticsGetDTO.setTotalCorrectAndUniqueAnswers(getTotalCorrectAndUniqueAnswers(userId));
-        advancedStatisticsGetDTO.setTotalCorrectAndNotUniqueAnswers(getTotalCorrectAndNotUniqueAnswers(userId));
-        advancedStatisticsGetDTO.setTotalWrongAnswers(getTotalWrongAnswers(userId));
-        advancedStatisticsGetDTO.setPercentOfCorrectPerGame(getPercentOfCorrectPerGame(userId));
+        //advancedStatisticsGetDTO.setTotalCorrectAndNotUniqueAnswers(getTotalCorrectAndNotUniqueAnswers(userId));
+        //advancedStatisticsGetDTO.setTotalWrongAnswers(getTotalWrongAnswers(userId));
+        //advancedStatisticsGetDTO.setPercentOfCorrectPerGame(getPercentOfCorrectPerGame(userId));
         advancedStatisticsGetDTO.setMostPlayedCategory(getMostPlayedCategory(userId));
 
 

@@ -40,10 +40,7 @@ public class Game implements Serializable {
     @Column(nullable = false)
     private int numberOfCategories;
 
-
-
     private int currentRound;
-
 
     @ElementCollection
     @OrderColumn
@@ -89,9 +86,7 @@ public class Game implements Serializable {
         this.hostId = hostId;
     }
 
-    public int getGamePin() {
-        return gamePin;
-    }
+    public int getGamePin() { return gamePin; }
 
     public void setGamePin(int gamePin) {
         this.gamePin = gamePin;
