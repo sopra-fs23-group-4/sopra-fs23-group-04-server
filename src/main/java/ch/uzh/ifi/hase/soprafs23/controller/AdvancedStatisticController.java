@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+@RestController
 public class AdvancedStatisticController {
 
     private final AdvancedStatisticService advancedStatisticService;
@@ -21,7 +22,7 @@ public class AdvancedStatisticController {
     @GetMapping("users/{userId}/advancedStatistics")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    private AdvancedStatisticGetDTO getAdvancedUserStatistic (@PathVariable ("userId") int userId){
+    public AdvancedStatisticGetDTO getAdvancedUserStatistic (@PathVariable ("userId") int userId){
 
         return advancedStatisticService.getAdvancedUserStatistic(userId);
     }
