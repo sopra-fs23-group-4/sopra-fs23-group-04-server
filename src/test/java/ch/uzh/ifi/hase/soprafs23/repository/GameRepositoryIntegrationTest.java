@@ -1,5 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.repository;
 
+import ch.uzh.ifi.hase.soprafs23.entity.User;
+import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundLength;
@@ -9,8 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
@@ -140,4 +145,34 @@ class GameRepositoryIntegrationTest {
         // then
         assertNull(found);
     }
+
+    @Test
+    public void findAllUsersByGamePin_ShouldReturnUsers() {
+        User user = new User();
+        user.setUsername("TestUser");
+        user.setPassword("TestPassword");
+        user.setToken("r");
+        user.setQuote("f");
+        user.setCreationDate(LocalDate.EPOCH);
+
+        Game testGame;
+        testGame = new Game();
+        testGame.setGamePin(1234);
+        testGame.addPlayer(user);
+        testGame.setCurrentRound(1);
+        testGame.setNumberOfCategories(3);
+        testGame.setHostId(3);
+        testGame.setStatus(GameStatus.RUNNING);
+        testGame.setRoundLength(RoundLength.LONG);
+
+        entityManager.persist(user);
+        entityManager.persist(testGame);
+        entityManager.flush();
+        // Execute the method being tested
+        List<User> users = gameRepository.findAllUsersByGamePin(testGame.getGamePin());
+
+        // Validate the resul
+        assertThat(users.get(0).getUsername()).isEqualTo("TestUser");
+    }
+
 }
