@@ -40,10 +40,20 @@
 
 09.05.2023
 
-| Person                | Last Week           | Next Week  | Description                                                                       |
-|-----------------------|---------------------|------------|-----------------------------------------------------------------------------------|
-| Alexandre Bacmann     | #33,#37,#38,#39,#40 |#46,#46          | Rules page, Backend leaderboard, testing                                          |
-| Valentin Meyer        | #158, #159          | #160, #163 | create utility classes and handled exceptional calls, plus other trouble shooting |
-| Christopher Narayanan |     #123  #201              |  #208, #197, #223          | implementing fact api, websocket working locally, timer implementedn                                                                                  |
-| Lennart Töllke        | #27, #28            | #15, #16   | Score page, Winner page, improved lobby and settings page                         |
-| Remo Wiget            | #26, #5             |            | VotingResults page, add custom Category, redesign Dashboard, ws, fix bug Answer   |
+| Person                | Last Week           | Next Week                  | Description                                                                       |
+|-----------------------|---------------------|----------------------------|-----------------------------------------------------------------------------------|
+| Alexandre Bacmann     | #33,#37,#38,#39,#40 |#46,#46                     | Rules page, Backend leaderboard, testing                                          |
+| Valentin Meyer        | #158, #159          | #160, #163                 | create utility classes and handled exceptional calls, plus other trouble shooting |
+| Christopher Narayanan | #123  #201          |  #208, #197, #223          | implementing fact api, websocket working locally, timer implementedn              |
+| Lennart Töllke        | #27, #28            | #15, #16                   | Score page, Winner page, improved lobby and settings page                         |
+| Remo Wiget            | #26, #5             |                            | VotingResults page, add custom Category, redesign Dashboard, ws, fix bug Answer   |
+
+16.05.2023
+
+| Person                | Last Week           | Next Week                  | Description                                                                       |
+|-----------------------|---------------------|----------------------------|-----------------------------------------------------------------------------------|
+| Alexandre Bacmann     | #46,#46             |                            |                                                                                   |
+| Valentin Meyer        | #160, #163          | #212, #217                 | added integration tests for GameService and AnswerService                         |
+| Christopher Narayanan | #208, #197, #223    |                            |                                                                                   |
+| Lennart Töllke        | #15, #16            |                            |                                                                                   |
+| Remo Wiget            |                     |                            |                                                                                   |
