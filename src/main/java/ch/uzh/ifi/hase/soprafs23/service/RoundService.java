@@ -7,6 +7,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
 import ch.uzh.ifi.hase.soprafs23.entity.game.SkipManager;
+import ch.uzh.ifi.hase.soprafs23.entity.quote.FactHolder;
 import ch.uzh.ifi.hase.soprafs23.helper.WebSocketDTOCreator;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
@@ -39,6 +40,7 @@ public class RoundService {
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
     private final WebSocketService webSocketService;
+    private final QuoteService quoteService;
 
     private final Logger logger = LoggerFactory.getLogger(RoundService.class);
 
@@ -48,11 +50,13 @@ public class RoundService {
     public RoundService(@Qualifier("roundRepository") RoundRepository roundRepository,
                         @Qualifier("gameRepository")GameRepository gameRepository,
                         @Qualifier("userRepository") UserRepository userRepository,
-                        WebSocketService webSocketService) {
+                        WebSocketService webSocketService,
+                        QuoteService quoteService) {
         this.roundRepository = roundRepository;
         this.gameRepository = gameRepository;
         this.userRepository = userRepository;
         this.webSocketService=webSocketService;
+        this.quoteService=quoteService;
     }
 
     public void createAllRounds(Game game) {
@@ -265,8 +269,9 @@ public class RoundService {
                 SkipManager skipManager=SkipRepository.findByGameId(gamePin);
 
                 if (noMoreTimeRemaining(timeRemaining) || skipManager.allPlayersWantToContinue() ) {
-                    votingTimer.cancel();
                     cleanUpSkipForNextRound(gamePin);
+                    votingTimer.cancel();
+
                     WebSocketDTO webSocketDTO = WebSocketDTOCreator.votingEnd();
                     webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,webSocketDTO);
                     logger.info("Voting ended, the users see voting results now.");
@@ -289,14 +294,25 @@ public class RoundService {
 
         TimerTask task = new TimerTask() {
             int timeRemaining = 11;
+            boolean quoteSent = false;
             @Override
             public void run() {
                 timeRemaining-=1;
+
+                if (!quoteSent) {
+                    FactHolder factHolder = quoteService.generateFact();
+                    FactDTO factDTO = new FactDTO();
+                    factDTO.setFact(factHolder.getFact());
+                    webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,factDTO);
+                    quoteSent = true;
+                }
+
                 if (noMoreTimeRemaining(timeRemaining)){
                     timer.cancel();
                     nextRound(gamePin);
                     startRoundTime(gamePin);}
                 else {
+
                     ScoreboardTimerDTO scoreboardTimerDTO = new ScoreboardTimerDTO();
                     scoreboardTimerDTO.setTimeRemaining(timeRemaining);
                     webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION+gamePin,scoreboardTimerDTO);
