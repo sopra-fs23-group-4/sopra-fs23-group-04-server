@@ -32,7 +32,7 @@
 
 | Person                | Last Week     | Next Week           | Description                                            |
 |-----------------------|---------------|---------------------|--------------------------------------------------------|
-| Alexandre Bacmann     |#179,#180,#181 | #33,#37,#38,#39,#40 | Frontend Leaderboard, testing                          |
+| Alexandre Bacmann     |#179,#180,#181 | #33,#37,#38,#39,#40 | backend Leaderboard, testing                          |
 | Valentin Meyer        | #161, #162    | #158, #159          | improved voting and enabled starting and ending rounds |
 | Christopher Narayanan |# 120              | #123, #201                 |websocket working on page                                              |
 | Lennart Töllke        | #17, #18      | #27, #28            | lobby page, settings page, game creation               |
@@ -42,7 +42,7 @@
 
 | Person                | Last Week           | Next Week                  | Description                                                                       |
 |-----------------------|---------------------|----------------------------|-----------------------------------------------------------------------------------|
-| Alexandre Bacmann     | #33,#37,#38,#39,#40,#174 |#46,#48,#179,#180,#181                     | Rules page, Backend leaderboard, testing                                          |
+| Alexandre Bacmann     | #33,#37,#38,#39,#40,#174|#46,#48,#200,#242,#243 | Rules page, Front leaderboard, testing                                          |
 | Valentin Meyer        | #158, #159          | #160, #163                 | create utility classes and handled exceptional calls, plus other trouble shooting |
 | Christopher Narayanan | #123  #201          |  #208, #197, #223          | implementing fact api, websocket working locally, timer implementedn              |
 | Lennart Töllke        | #27, #28            | #16, #56, #199             | Score page, Winner page, improved lobby and settings page                         |
@@ -52,7 +52,7 @@
 
 | Person                | Last Week           | Next Week                  | Description                                                                       |
 |-----------------------|---------------------|----------------------------|-----------------------------------------------------------------------------------|
-| Alexandre Bacmann     | #46,#48,#179,#180,#181|#183,#184,#185,#186,#199  | testing, Advanced statistics (service, controller and DTO class)                                                                                  
+| Alexandre Bacmann     | #46,#48,#200,#242,#243|#183,#184,#185,#186,#199  | testing, Advanced statistics (service, controller and DTO class)                                                                                  
 | Valentin Meyer        | #160, #163          | #212, #217                 | added integration tests for GameService and AnswerService                         |
 | Christopher Narayanan | #208, #197, #223    | #236, #211, #245           | adding functionality that if users want they can skip round, changing how quotes are sent,      |
 | Lennart Töllke        | #16, #56, #43, #199 | #68, #63, #59, #57, #57    | added User page with advanced stats, managed uncontrolled leaving behaviour and single player  |
