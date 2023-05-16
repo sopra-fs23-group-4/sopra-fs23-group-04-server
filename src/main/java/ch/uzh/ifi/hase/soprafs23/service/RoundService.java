@@ -230,7 +230,7 @@ public class RoundService {
         resultTimer.schedule(resultTimerTask, 1500,1000);
     }
 
-    private static boolean noMoreTimeRemaining(int timeRemaining){
+    static boolean noMoreTimeRemaining(int timeRemaining){
         return timeRemaining<=0;
     }
 

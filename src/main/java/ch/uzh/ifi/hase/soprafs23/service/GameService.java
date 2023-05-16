@@ -24,7 +24,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static ch.uzh.ifi.hase.soprafs23.helper.GameHelper.*;
-import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 
 @Service
 @Transactional
@@ -170,13 +169,6 @@ public class GameService {
 
     }
 
-    public static GameCategoriesDTO getStandardCategories() {
-
-        GameCategoriesDTO gameCategoriesDTO = new GameCategoriesDTO();
-        gameCategoriesDTO.setCategories(GameCategory.getCategories());
-
-        return gameCategoriesDTO;
-    }
 
     public GameCategoriesDTO getGameCategoriesByGamePin(int gamePin) {
         Game game = getGameByGamePin(gamePin);
@@ -224,13 +216,6 @@ public class GameService {
         return openOrRunningGames;
     }
 
-    private static List<Integer> getGameUsersId(Game game) {
-        List<Integer> usersId = new ArrayList<>();
-        for (User user : game.getUsers()) {
-            usersId.add(user.getId());
-        }
-        return usersId;
-    }
 
     private void checkIfHostIsEligible(int hostId) {
         List<Game> openOrRunningGames = getOpenOrRunningGames();

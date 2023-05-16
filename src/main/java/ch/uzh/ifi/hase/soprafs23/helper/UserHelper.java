@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.helper;
 
+import ch.uzh.ifi.hase.soprafs23.constant.Constant;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,7 +20,7 @@ public class UserHelper {
         }
     }
     public static void checkIfQuoteValid(String quote){
-        if (quote.length()>255){
+        if (quote.length()> Constant.QUOTE_MAX_LENGTH){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The quote you are trying to add is to long");
         }
     }
