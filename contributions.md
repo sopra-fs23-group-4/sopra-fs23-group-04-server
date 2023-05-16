@@ -54,6 +54,6 @@
 |-----------------------|---------------------|----------------------------|-----------------------------------------------------------------------------------|
 | Alexandre Bacmann     | #46,#46             |                            |                                                                                   |
 | Valentin Meyer        | #160, #163          | #212, #217                 | added integration tests for GameService and AnswerService                         |
-| Christopher Narayanan | #208, #197, #223    |                            |                                                                                   |
+| Christopher Narayanan | #208, #197, #223    | #236, #211, #245                           | adding functionality that if users want they can skip round, changing how quotes are sent,                                                                                |
 | Lennart Töllke        | #15, #16            |                            |                                                                                   |
 | Remo Wiget            | #198, #50, #51 ,#65 | #19, #219, #234            | VotingResult optimized for mobile, Voting loader, timers, manual continue, beautify error msg, ui |
