@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
+import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.*;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GameCategoriesDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.mapper.UserDTOMapper;
@@ -50,7 +51,7 @@ public class GameController {
     @ResponseBody
     public GameCategoriesDTO getStandardCategories() {
 
-        return gameService.getStandardCategories();
+        return GameHelper.getStandardCategories();
     }
 
     @GetMapping("/games/randomCategories")

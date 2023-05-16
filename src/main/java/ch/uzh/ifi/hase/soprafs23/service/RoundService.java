@@ -8,6 +8,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
 import ch.uzh.ifi.hase.soprafs23.entity.game.SkipManager;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.FactHolder;
+import ch.uzh.ifi.hase.soprafs23.helper.RoundHelper;
 import ch.uzh.ifi.hase.soprafs23.helper.WebSocketDTOCreator;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
@@ -88,8 +89,8 @@ public class RoundService {
 
 
         Round round = roundRepository.findByGameAndRoundNumber(game, roundNumber);
-        checkIfRoundExists(round);
-        checkIfRoundIsRunning(round);
+        RoundHelper.checkIfRoundExists(round);
+        RoundHelper.checkIfRoundIsRunning(round);
         round.setStatus(RoundStatus.FINISHED);
 
         roundRepository.saveAndFlush(round);
@@ -111,23 +112,6 @@ public class RoundService {
         letterDTO.setLetter(round.getLetter());
         letterDTO.setRound(round.getRoundNumber());
         webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION +gamePin, letterDTO);
-    }
-
-
-    private void checkIfRoundExists(Round round) {
-        String errorMessage = "Round does not exist.";
-
-        if (round == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, errorMessage);
-        }
-    }
-
-    private void checkIfRoundIsRunning(Round round) {
-        String errorMessage = "Round is not running anymore. Not possible to save your answers!";
-
-        if (!round.getStatus().equals(RoundStatus.RUNNING)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
-        }
     }
 
 
@@ -349,7 +333,7 @@ public class RoundService {
         skipManager.userWantsToSkip(user);
     }
 
-    private void cleanUpSkipForNextRound(int gamePin) {
+    private static void cleanUpSkipForNextRound(int gamePin) {
         SkipManager skipManager = SkipRepository.findByGameId(gamePin);
         skipManager.cleanUp();
     }

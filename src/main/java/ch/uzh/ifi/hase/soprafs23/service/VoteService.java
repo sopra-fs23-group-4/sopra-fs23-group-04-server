@@ -101,20 +101,6 @@ public class VoteService {
 
     }
 
-    public VoteOptionsGetDTO getVoteOptions() {
-
-        VoteOptionsGetDTO voteOptionsGetDTO = new VoteOptionsGetDTO();
-        List<String> voteOptions = new ArrayList<>();
-
-        for (VoteOption voteOption : VoteOption.values()) {
-            voteOptions.add(voteOption.name());
-        }
-
-        voteOptionsGetDTO.setVoteOptions(voteOptions);
-
-        return voteOptionsGetDTO;
-    }
-
     private List<VoteGetDTO> getVoteGetDTOList(Round round, Category category, List<User> users) {
 
         List<VoteGetDTO> voteGetDTOList = new ArrayList<>();
@@ -222,7 +208,7 @@ public class VoteService {
         voteRepository.saveAndFlush(newVote);
     }
 
-    private void setVoteOption(Vote newVote, String vote) {
+    private static void setVoteOption(Vote newVote, String vote) {
 
         String errorMessage = "At least one of the votes is invalid!";
 

@@ -4,6 +4,7 @@ import ch.uzh.ifi.hase.soprafs23.constant.*;
 import ch.uzh.ifi.hase.soprafs23.entity.game.*;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
+import ch.uzh.ifi.hase.soprafs23.helper.UserHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.*;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.*;
 import ch.uzh.ifi.hase.soprafs23.websocketDto.GameUsersDTO;
@@ -60,7 +61,7 @@ public class GameService {
 
         User user = getUserByToken(userToken);
 
-        checkIfUserExists(user);
+        UserHelper.checkIfUserExists(user);
 
         checkIfHostIsEligible(user.getId());
 
@@ -71,7 +72,7 @@ public class GameService {
         newGame.setStatus(GameStatus.OPEN);
         newGame.setHostId(user.getId());
         newGame.addPlayer(user);
-        newGame.setRoundLetters(generateRandomLetters(newGame.getRounds()));
+        newGame.setRoundLetters(GameHelper.generateRandomLetters(newGame.getRounds()));
         newGame.setCurrentRound(0);
         newGame.setNumberOfCategories(newGame.getCategories().size());
 
@@ -92,14 +93,14 @@ public class GameService {
 
         User user = getUserByToken(userToken);
 
-        checkIfUserExists(user);
+        UserHelper.checkIfUserExists(user);
 
         checkIfUserCanJoin(user.getId());
 
         Game gameToJoin = gameRepository.findByGamePin(gamePin);
 
-        checkIfGameExists(gameToJoin);
-        checkIfGameIsOpen(gameToJoin);
+        GameHelper.checkIfGameExists(gameToJoin);
+        GameHelper.checkIfGameIsOpen(gameToJoin);
 
         gameToJoin.addPlayer(user);
 
@@ -115,19 +116,19 @@ public class GameService {
 
         User user = getUserByToken(userToken);
 
-        checkIfUserExists(user);
+        UserHelper.checkIfUserExists(user);
 
         Game game = gameRepository.findByGamePin(gamePin);
 
-        checkIfGameExists(game);
+        GameHelper.checkIfGameExists(game);
 
-        checkIfUserIsInGame(game, user);
+        GameHelper.checkIfUserIsInGame(game, user);
 
-        Boolean userIsHost = checkIfUserIsHost(user, game);
+        Boolean userIsHost = GameHelper.checkIfUserIsHost(user, game);
 
         game.removePlayer(user);
 
-        Boolean gameHasUsers = checkIfGameHasUsers(game);
+        Boolean gameHasUsers = GameHelper.checkIfGameHasUsers(game);
 
         GameUsersDTO gameUsersDTO = new GameUsersDTO();
 
@@ -156,8 +157,9 @@ public class GameService {
     public void setUpGameForStart(int gamePin){
 
         Game game = gameRepository.findByGamePin(gamePin);
-        checkIfGameExists(game);
-        checkIfGameIsOpen(game);
+
+        GameHelper.checkIfGameExists(game);
+        GameHelper.checkIfGameIsOpen(game);
 
         game.setStatus(GameStatus.RUNNING);
 
@@ -184,7 +186,7 @@ public class GameService {
     public GameCategoriesDTO getGameCategoriesByGamePin(int gamePin) {
         Game game = getGameByGamePin(gamePin);
 
-        List<String> gameCategoryNames = getCategoryNamesByGame(game);
+        List<String> gameCategoryNames = GameHelper.getCategoryNamesByGame(game);
 
         GameCategoriesDTO gameCategoriesDTO = new GameCategoriesDTO();
         gameCategoriesDTO.setCategories(gameCategoryNames);
@@ -204,21 +206,11 @@ public class GameService {
 
         Game game = gameRepository.findByGamePin(gamePin);
 
-        checkIfGameExists(game);
+        GameHelper.checkIfGameExists(game);
 
         return game;
     }
 
-    public static List<String> getCategoryNamesByGame(Game game) {
-        List<Category> gameCategories = game.getCategories();
-
-        List<String> gameCategoryNames = new ArrayList<>();
-
-        for (Category gameCategory : gameCategories) {
-            gameCategoryNames.add(gameCategory.getName());
-        }
-        return gameCategoryNames;
-    }
 
     private List<Game> getOpenGames() {
         return gameRepository.findByStatus(GameStatus.OPEN);
@@ -251,24 +243,12 @@ public class GameService {
         String errorMessage = "You are already part of a game. " +
                 "You cannot host another game!";
         for (Game game : openOrRunningGames) {
-            List<Integer> userIds = getGameUsersId(game);
+            List<Integer> userIds = GameHelper.getGameUsersId(game);
             if (userIds.contains(hostId)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         String.format(errorMessage));
             }
         }
-    }
-
-    private static List<Character> generateRandomLetters(int numberOfRounds){
-        List<Character> letters = new ArrayList<>();
-
-        for (char letter = 'A'; letter <= 'Z'; letter++) {
-            letters.add(letter);
-        }
-
-        Collections.shuffle(letters);
-
-        return letters.subList(0, numberOfRounds);
     }
 
     private void checkIfUserCanJoin(int userId) {
@@ -279,25 +259,13 @@ public class GameService {
                 "You cannot join another game!";
 
         for (Game game : openOrRunningGames) {
-            List<Integer> userIds = getGameUsersId(game);
+            List<Integer> userIds = GameHelper.getGameUsersId(game);
             if (userIds.contains(userId)) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT,
                         String.format(errorMessage));
             }
         }
     }
-
-    private static Boolean checkIfUserIsHost(User user, Game game) {
-        int hostId = game.getHostId();
-
-        return hostId == user.getId();
-    }
-
-    private static Boolean checkIfGameHasUsers(Game game) {
-        List<User> users = game.getUsers();
-        return !users.isEmpty();
-    }
-
 
     private void setNewHost(Game game) {
         List<User> users = game.getUsers();
@@ -323,7 +291,7 @@ public class GameService {
         }
         GameUsersDTO gameUsersDTO = new GameUsersDTO();
 
-        checkIfUserExists(host);
+        UserHelper.checkIfUserExists(host);
 
         gameUsersDTO.setHostUsername(host.getUsername());
         gameUsersDTO.setUsernames(usernames);
