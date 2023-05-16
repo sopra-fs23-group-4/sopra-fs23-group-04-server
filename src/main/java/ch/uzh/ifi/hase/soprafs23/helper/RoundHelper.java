@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.helper;
 
+import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,6 +25,13 @@ public class RoundHelper {
         String errorMessage = "Round is not finished yet.";
 
         if (!round.getStatus().equals(FINISHED)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
+        }
+    }
+    public static void checkIfRoundIsRunning(Round round) {
+        String errorMessage = "Round is not running anymore. Not possible to save your answers!";
+
+        if (!round.getStatus().equals(RoundStatus.RUNNING)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
         }
     }

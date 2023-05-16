@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.*;
+import ch.uzh.ifi.hase.soprafs23.helper.AnswerHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -81,7 +82,7 @@ public class AnswerService {
 
         List<Answer> answers = answerRepository.findByRoundAndCategory(round, category);
 
-        return filterAnswersByDeletingUser(answers, user);
+        return AnswerHelper.filterAnswersByDeletingUser(answers, user);
     }
 
     /**
@@ -128,19 +129,5 @@ public class AnswerService {
             answerRepository.save(newAnswer);
         }
         answerRepository.flush();
-    }
-
-    private static List<Map<Integer, String>> filterAnswersByDeletingUser(List<Answer> answers, User user) {
-
-        List<Map<Integer, String>> filteredAnswers = new ArrayList<>();
-
-        for (Answer answer : answers) {
-            if (!answer.getUser().equals(user)) {
-                Map<Integer, String> answerTuple = new HashMap<>();
-                answerTuple.put(answer.getAnswerId(), answer.getAnswerString());
-                filteredAnswers.add(answerTuple);
-            }
-        }
-        return filteredAnswers;
     }
 }
