@@ -6,10 +6,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
 import ch.uzh.ifi.hase.soprafs23.helper.UserHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.*;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.game.LeaderboardGetDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardGetDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.game.WinnerGetDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.game.*;
 import ch.uzh.ifi.hase.soprafs23.websocketDto.GameUsersDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,12 +167,20 @@ public class GameService {
 
     }
 
-    public static GameCategoriesDTO getStandardCategories() {
+    public GameCategoriesDTO getStandardCategories() {
 
         GameCategoriesDTO gameCategoriesDTO = new GameCategoriesDTO();
         gameCategoriesDTO.setCategories(GameCategory.getCategories());
 
         return gameCategoriesDTO;
+    }
+
+    public CategoryGetDTO getRandomCategory() {
+
+        CategoryGetDTO categoryGetDTO = new CategoryGetDTO();
+        categoryGetDTO.setCategoryName(AdditionalCategory.getRandomCategoryName());
+
+        return categoryGetDTO;
     }
 
     public GameCategoriesDTO getGameCategoriesByGamePin(int gamePin) {

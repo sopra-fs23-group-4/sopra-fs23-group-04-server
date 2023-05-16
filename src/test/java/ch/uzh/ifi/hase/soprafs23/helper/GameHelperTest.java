@@ -150,5 +150,4 @@ class GameHelperTest {
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
     }
 
-
 }
