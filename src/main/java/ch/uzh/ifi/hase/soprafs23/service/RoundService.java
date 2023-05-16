@@ -234,7 +234,7 @@ public class RoundService {
         return timeRemaining<=0;
     }
 
-    private void votingTimer(int gamePin, int currentVotingRound) {
+    void votingTimer(int gamePin, int currentVotingRound) {
         Timer votingTimer = new Timer();
         TimerTask votingTimerTask = new TimerTask() {
             int timeRemaining = 30;
