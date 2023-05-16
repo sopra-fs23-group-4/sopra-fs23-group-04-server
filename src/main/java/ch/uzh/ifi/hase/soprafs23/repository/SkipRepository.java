@@ -9,8 +9,9 @@ import java.util.HashMap;
 public class SkipRepository {
     private static final HashMap<Integer, SkipManager> skipRepo = new HashMap<>();
 
-    public static void addGame(int gamePin){
+    public static SkipManager addGame(int gamePin){
         skipRepo.put(gamePin, new SkipManager());
+        return findByGameId(gamePin);
     }
     public static SkipManager findByGameId(int gamePin) {
         SkipManager skipManager =skipRepo.get(gamePin);
@@ -18,6 +19,10 @@ public class SkipRepository {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This lobby does not exist!");
         }
         return skipManager;
+    }
+
+    public static void removeSkipManager(int gamePin) {
+        skipRepo.remove(gamePin);
     }
 
 }

@@ -9,20 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class SkipManager {
-    private static final HashMap<User, Skip> userContinueMap = new HashMap<>();
+    private final HashMap<User, Skip> userContinueMap = new HashMap<>();
 
-    public void cleanUp(List<User> players){
-        userContinueMap.clear();
-        for (User player: players){
-            userContinueMap.put(player,Skip.DoesNotWantToSkip);
-        }
+    public void cleanUp(){
+        userContinueMap.replaceAll((u, v) -> Skip.DoesNotWantToSkip);
     }
 
-    public void addPlayersForFirstRound(List<User> players) {
-        for (User player: players){
-            userContinueMap.put(player,Skip.DoesNotWantToSkip);
-        }
-    }
     public  boolean allPlayersWantToContinue(){
         for (Skip skip : userContinueMap.values()) {
             if (skip == Skip.DoesNotWantToSkip) {
@@ -38,6 +30,15 @@ public class SkipManager {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"You already want to skip");
         }
         userContinueMap.put(user,Skip.WantsToSkip);
+    }
+
+    public void addUser(User user) {
+        userContinueMap.put(user, Skip.DoesNotWantToSkip);
+    }
+    public void removeUser(User user) {
+        if (userContinueMap.get(user)!=null) {
+            userContinueMap.remove(user);
+        }
     }
 
 }

@@ -113,13 +113,6 @@ public class RoundService {
         webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION +gamePin, letterDTO);
     }
 
-    public void setUpSkipManager(int gamePin) {
-        SkipRepository.addGame(gamePin);
-        SkipManager skipManager=SkipRepository.findByGameId(gamePin);
-        List<User> users = gameRepository.findAllUsersByGamePin(gamePin);
-        skipManager.addPlayersForFirstRound(users);
-    }
-
 
     private void checkIfRoundExists(Round round) {
         String errorMessage = "Round does not exist.";
@@ -357,9 +350,8 @@ public class RoundService {
     }
 
     private void cleanUpSkipForNextRound(int gamePin) {
-        List<User> players = gameRepository.findAllUsersByGamePin(gamePin);
         SkipManager skipManager = SkipRepository.findByGameId(gamePin);
-        skipManager.cleanUp(players);
+        skipManager.cleanUp();
     }
 
 }

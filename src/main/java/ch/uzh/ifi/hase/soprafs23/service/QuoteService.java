@@ -97,7 +97,7 @@ public class QuoteService {
         return null;
     }
 
-    private JsonNode callApi(URL url) throws IOException {
+    private  JsonNode callApi(URL url) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestProperty("accept", "application/json");
         connection.setRequestProperty("X-Api-Key", API_KEY);

@@ -81,6 +81,9 @@ public class GameService {
         newGame = gameRepository.save(newGame);
         gameRepository.flush();
 
+        SkipManager skipManager = SkipRepository.addGame(newGame.getGamePin());
+        skipManager.addUser(user);
+
         roundService.createAllRounds(newGame);
 
         logger.debug("Created following game: {}", newGame);
@@ -104,6 +107,8 @@ public class GameService {
         gameToJoin.addPlayer(user);
 
         GameUsersDTO gameUsersDTO = getHostAndAllUserNamesOfGame(gameToJoin);
+        SkipManager skipManager = SkipRepository.findByGameId(gamePin);
+        skipManager.addUser(user);
 
         webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, gameUsersDTO);
     }
@@ -142,10 +147,13 @@ public class GameService {
         try {
             checkIfGameExists(getGameByGamePin(gamePin));
             webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, gameUsersDTO);
+            logger.info("Player " + userToken + " left the lobby " + gamePin);
         }
         catch (ResponseStatusException ignored) {
             logger.debug("Something went wrong while leaving the game.");
         }
+        SkipManager skipManager = SkipRepository.findByGameId(gamePin);
+        skipManager.removeUser(user);
     }
 
     public void setUpGameForStart(int gamePin){
@@ -274,13 +282,13 @@ public class GameService {
         }
     }
 
-    private Boolean checkIfUserIsHost(User user, Game game) {
+    private static Boolean checkIfUserIsHost(User user, Game game) {
         int hostId = game.getHostId();
 
         return hostId == user.getId();
     }
 
-    private Boolean checkIfGameHasUsers(Game game) {
+    private static Boolean checkIfGameHasUsers(Game game) {
         List<User> users = game.getUsers();
         return !users.isEmpty();
     }
