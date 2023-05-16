@@ -21,7 +21,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static ch.uzh.ifi.hase.soprafs23.helper.GameHelper.*;
-import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 
 @Service
 @Transactional
@@ -231,7 +230,7 @@ public class GameService {
 
     private static List<Integer> getGameUsersId(Game game) {
         List<Integer> usersId = new ArrayList<>();
-        for (User user : game.getUsers()) {
+        for (User user : game.getActiveUsers()) {
             usersId.add(user.getId());
         }
         return usersId;
@@ -268,7 +267,7 @@ public class GameService {
     }
 
     private void setNewHost(Game game) {
-        List<User> users = game.getUsers();
+        List<User> users = game.getActiveUsers();
         // Check if there are users left in the game.
         if (!users.isEmpty()) {
             User hostCandidate = users.get(rand.nextInt(users.size()));
@@ -281,7 +280,7 @@ public class GameService {
 
         User host = userRepository.findById(gameToJoin.getHostId()).orElse(null);
 
-        List<User> users = gameToJoin.getUsers();
+        List<User> users = gameToJoin.getActiveUsers();
         List<String> usernames = new ArrayList<>();
 
         for (User user : users) {

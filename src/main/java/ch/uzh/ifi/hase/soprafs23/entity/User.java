@@ -1,10 +1,13 @@
 package ch.uzh.ifi.hase.soprafs23.entity;
 
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
+import ch.uzh.ifi.hase.soprafs23.entity.game.GameParticipant;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -43,6 +46,11 @@ public class User implements Serializable {
 
     @Column(nullable = false)
     private String quote;
+
+
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GameParticipant> gameParticipants = new ArrayList<>();
 
 
 
@@ -106,7 +114,9 @@ public class User implements Serializable {
 
     public void setQuote(String quote) { this.quote = quote; }
 
+    public List<GameParticipant> getGameParticipants() { return gameParticipants; }
 
+    public void setGameParticipants(List<GameParticipant> gameParticipants) { this.gameParticipants = gameParticipants; }
 
 
   }
