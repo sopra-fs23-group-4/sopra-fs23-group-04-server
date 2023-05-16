@@ -22,7 +22,7 @@
 
 | Person                | Last Week       | Next Week   | Description                                                                  |
 |-----------------------|-----------------|-------------|------------------------------------------------------------------------------|
-| Alexandre Bacmann     | #123, #124      |             | websocket scorebaord, last round, quote for winner                           |
+| Alexandre Bacmann     | #123, #124      |#179,#180,#181| websocket scorebaord, last round, quote for winner                           |
 | Valentin Meyer        | #114, #118      | #161, #162  | added the answer and voting functionality                                    |
 | Christopher Narayanan | #119, #120      |  #120           | websocket                                                                    |
 | Lennart Töllke        | #42, (#17, #18) | #17, #18    | struggle with websockets/sse for lobby, started with Settings and Lobby page |
