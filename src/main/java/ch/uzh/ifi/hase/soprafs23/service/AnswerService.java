@@ -130,7 +130,7 @@ public class AnswerService {
         answerRepository.flush();
     }
 
-    private List<Map<Integer, String>> filterAnswersByDeletingUser(List<Answer> answers, User user) {
+    private static List<Map<Integer, String>> filterAnswersByDeletingUser(List<Answer> answers, User user) {
 
         List<Map<Integer, String>> filteredAnswers = new ArrayList<>();
 

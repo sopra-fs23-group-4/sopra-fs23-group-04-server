@@ -56,7 +56,7 @@ public class ScoreCalculationService {
         return userScores;
     }
 
-    public int calculateScore(List<Vote> votesForAnswer) {
+    public static int calculateScore(List<Vote> votesForAnswer) {
         int numberOfUnique = 0;
         int numberOfNotUnique = 0;
         int numberOfWrong = 0;
@@ -75,7 +75,7 @@ public class ScoreCalculationService {
         return calculatePoints(numberOfUnique, numberOfNotUnique, numberOfWrong);
     }
 
-    private int calculatePoints(int numberOfUnique, int numberOfNotUnique, int numberOfWrong) {
+    private static int calculatePoints(int numberOfUnique, int numberOfNotUnique, int numberOfWrong) {
         int numberOfCorrect = numberOfUnique + numberOfNotUnique;
 
         if (numberOfCorrect >= numberOfWrong) {

@@ -349,7 +349,7 @@ public class RoundService {
         skipManager.userWantsToSkip(user);
     }
 
-    private void cleanUpSkipForNextRound(int gamePin) {
+    private static void cleanUpSkipForNextRound(int gamePin) {
         SkipManager skipManager = SkipRepository.findByGameId(gamePin);
         skipManager.cleanUp();
     }

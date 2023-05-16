@@ -101,7 +101,7 @@ public class VoteService {
 
     }
 
-    public VoteOptionsGetDTO getVoteOptions() {
+    public static VoteOptionsGetDTO getVoteOptions() {
 
         VoteOptionsGetDTO voteOptionsGetDTO = new VoteOptionsGetDTO();
         List<String> voteOptions = new ArrayList<>();
