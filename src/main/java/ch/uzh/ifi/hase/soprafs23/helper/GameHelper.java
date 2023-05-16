@@ -6,7 +6,7 @@ import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GameCategoriesDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 

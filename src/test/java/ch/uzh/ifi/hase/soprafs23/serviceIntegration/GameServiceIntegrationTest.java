@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.serviceIntegration;
 
-import ch.uzh.ifi.hase.soprafs23.constant.GameCategory;
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundLength;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
@@ -8,6 +7,7 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
+import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.AnswerRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
@@ -261,7 +261,7 @@ class GameServiceIntegrationTest {
 
         AtomicReference<List<String>> gameCategoryNames = new AtomicReference<>();
 
-        assertDoesNotThrow(() -> gameCategoryNames.set(gameService.getCategoryNamesByGame(game)));
+        assertDoesNotThrow(() -> gameCategoryNames.set(GameHelper.getCategoryNamesByGame(game)));
 
         assertEquals(categoryNames, gameCategoryNames.get());
 
