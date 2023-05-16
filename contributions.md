@@ -63,7 +63,7 @@
 | Person                | Last Week                  | Description                                                                       |
 |-----------------------|----------------------------|-----------------------------------------------------------------------------------|
 | Alexandre Bacmann     | #183,#184,#185,#186,#199   |                                                                                   |
-| Valentin Meyer        | #212, #217                 | added random categories in backend                                                |
+| Valentin Meyer        | #212, #217, #252           | added random categories in backend, fixed sonarcloud issues                       |
 | Christopher Narayanan | #236, #211, #245           |                                                                                   |
 | Lennart Töllke        | #68, #63, #59, #57, #57    |                                                                                   |
 | Remo Wiget            | #19, #217, #219, #234      | added random categories in frontend                                               |
