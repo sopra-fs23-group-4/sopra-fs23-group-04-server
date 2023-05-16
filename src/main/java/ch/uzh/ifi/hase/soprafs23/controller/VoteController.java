@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
+import ch.uzh.ifi.hase.soprafs23.helper.VoteHelper;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.VoteOptionsGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.VoteGetDTO;
 import ch.uzh.ifi.hase.soprafs23.service.VoteService;
@@ -46,7 +47,7 @@ public class VoteController {
     @ResponseBody
     public VoteOptionsGetDTO getVoteOptions(){
 
-        return voteService.getVoteOptions();
+        return VoteHelper.getVoteOptions();
 
     }
 

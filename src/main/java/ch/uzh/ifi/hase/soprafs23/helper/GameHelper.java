@@ -1,13 +1,17 @@
 package ch.uzh.ifi.hase.soprafs23.helper;
 
 import ch.uzh.ifi.hase.soprafs23.constant.Constant;
+import ch.uzh.ifi.hase.soprafs23.constant.GameCategory;
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static ch.uzh.ifi.hase.soprafs23.constant.GameStatus.RUNNING;
@@ -74,5 +78,54 @@ public class GameHelper {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,errorMessage);
             }
         }
+    }
+    public static Boolean checkIfUserIsHost(User user, Game game) {
+        int hostId = game.getHostId();
+
+        return hostId == user.getId();
+    }
+
+    public static Boolean checkIfGameHasUsers(Game game) {
+        List<User> users = game.getUsers();
+        return !users.isEmpty();
+    }
+
+    public static List<Character> generateRandomLetters(int numberOfRounds){
+        List<Character> letters = new ArrayList<>();
+
+        for (char letter = 'A'; letter <= 'Z'; letter++) {
+            letters.add(letter);
+        }
+
+        Collections.shuffle(letters);
+
+        return letters.subList(0, numberOfRounds);
+    }
+
+    public static GameCategoriesDTO getStandardCategories() {
+
+        GameCategoriesDTO gameCategoriesDTO = new GameCategoriesDTO();
+        gameCategoriesDTO.setCategories(GameCategory.getCategories());
+
+        return gameCategoriesDTO;
+    }
+
+    public static List<String> getCategoryNamesByGame(Game game) {
+        List<Category> gameCategories = game.getCategories();
+
+        List<String> gameCategoryNames = new ArrayList<>();
+
+        for (Category gameCategory : gameCategories) {
+            gameCategoryNames.add(gameCategory.getName());
+        }
+        return gameCategoryNames;
+    }
+
+     public static List<Integer> getGameUsersId(Game game) {
+        List<Integer> usersId = new ArrayList<>();
+        for (User user : game.getUsers()) {
+            usersId.add(user.getId());
+        }
+        return usersId;
     }
 }
