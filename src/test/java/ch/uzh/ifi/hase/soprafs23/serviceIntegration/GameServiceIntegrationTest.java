@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.serviceIntegration;
 
-import ch.uzh.ifi.hase.soprafs23.constant.GameCategory;
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundLength;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
@@ -15,7 +14,7 @@ import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.LeaderboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.WinnerGetDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.user.GameCategoriesDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GameCategoriesDTO;
 import ch.uzh.ifi.hase.soprafs23.service.*;
 import ch.uzh.ifi.hase.soprafs23.websocketDto.GameUsersDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -210,17 +209,6 @@ class GameServiceIntegrationTest {
         Game testGame = gameRepository.findByGamePin(gamePin);
 
         assertEquals(GameStatus.RUNNING, game.getStatus());
-
-    }
-
-    @Test
-    void getStandardCategories_validInput() {
-
-        AtomicReference<GameCategoriesDTO> gameCategoriesDTO = new AtomicReference<>();
-
-        assertDoesNotThrow(() -> gameCategoriesDTO.set(GameHelper.getStandardCategories()));
-
-        assertEquals(GameCategory.getCategories(), gameCategoriesDTO.get().getCategories());
 
     }
 

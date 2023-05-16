@@ -169,6 +169,21 @@ public class GameService {
 
     }
 
+    public GameCategoriesDTO getStandardCategories() {
+
+        GameCategoriesDTO gameCategoriesDTO = new GameCategoriesDTO();
+        gameCategoriesDTO.setCategories(GameCategory.getCategories());
+
+        return gameCategoriesDTO;
+    }
+
+    public CategoryGetDTO getRandomCategory() {
+
+        CategoryGetDTO categoryGetDTO = new CategoryGetDTO();
+        categoryGetDTO.setCategoryName(AdditionalCategory.getRandomCategoryName());
+
+        return categoryGetDTO;
+    }
 
     public GameCategoriesDTO getGameCategoriesByGamePin(int gamePin) {
         Game game = getGameByGamePin(gamePin);
@@ -216,6 +231,13 @@ public class GameService {
         return openOrRunningGames;
     }
 
+    private static List<Integer> getGameUsersId(Game game) {
+        List<Integer> usersId = new ArrayList<>();
+        for (User user : game.getUsers()) {
+            usersId.add(user.getId());
+        }
+        return usersId;
+    }
 
     private void checkIfHostIsEligible(int hostId) {
         List<Game> openOrRunningGames = getOpenOrRunningGames();

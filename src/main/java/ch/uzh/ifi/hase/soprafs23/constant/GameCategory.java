@@ -5,14 +5,7 @@ import java.util.List;
 
 public enum GameCategory {
     CITY("City"),
-    COUNTRY("Country"),
-    //FRUIT("Fruit"),
-    //ANIMAL("Animal"),
-    //COLOR("Color"),
-    //VEGETABLE("Vegetable"),
-    MOVIE("Movie"),
-    SPORT("Sport");
-    //MUSICAL_INSTRUMENTS("Musical Instruments");
+    COUNTRY("Country");
     private final String name;
 
     GameCategory(String name) {
