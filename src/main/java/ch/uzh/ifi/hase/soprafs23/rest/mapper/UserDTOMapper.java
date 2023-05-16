@@ -63,7 +63,7 @@ public interface UserDTOMapper {
     @Mapping(source ="categories", target = "categories")
     QuoteCategoriesGetDTO convertEntityToQuoteCategoriesGetDTO(QuoteCategoriesHolder quoteCategory);
 
-    @Mapping(source = "name", target = "category")
+    @Mapping(source = "name", target = "categoryName")
     CategoryGetDTO convertEntityToCategoryGetDTO(Category category);
 
     @Mapping(source = "rounds", target = "rounds")

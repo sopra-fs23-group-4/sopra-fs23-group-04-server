@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs23.rest.dto.user;
+package ch.uzh.ifi.hase.soprafs23.rest.dto.game;
 
 import java.util.List;
 

@@ -2,10 +2,9 @@ package ch.uzh.ifi.hase.soprafs23.rest.dto.game;
 
 public class CategoryGetDTO {
 
+    private String categoryName;
 
-    private String category;
+    public String getCategoryName() { return categoryName; }
 
-    public String getCategory() { return category; }
-
-    public void setCategory(String category) { this.category = category; }
+    public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
 }
