@@ -30,6 +30,7 @@ class UserRepositoryIntegrationTest {
       user.setCreationDate(LocalDate.now());
       user.setPassword("abc");
       user.setToken("1");
+      user.setQuote("j");
 
 
       entityManager.persist(user);
