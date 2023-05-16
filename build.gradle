@@ -57,6 +57,7 @@ bootJar {
 
 sonarqube {
     properties {
+        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
         property "sonar.projectKey", "sopra-fs23-group-4_sopra-fs23-group-04-server"
         property "sonar.organization", "sopra-fs23-group-4"
         property "sonar.projectName", "sopra-fs23-group-04-server"
