@@ -52,7 +52,7 @@
 
 | Person                | Last Week           | Next Week                  | Description                                                                       |
 |-----------------------|---------------------|----------------------------|-----------------------------------------------------------------------------------|
-| Alexandre Bacmann     | #46,#46             |                            |                                                                                   |
+| Alexandre Bacmann     | #46,#46             |#183,#184,#185,#186,#199    |Testing, Process to leave the game                                                                                   |
 | Valentin Meyer        | #160, #163          | #212, #217                 | added integration tests for GameService and AnswerService                         |
 | Christopher Narayanan | #208, #197, #223    | #236, #211, #245           | adding functionality that if users want they can skip round, changing how quotes are sent,      |
 | Lennart Töllke        | #16, #56, #43, #199 | #68, #63, #59, #57, #57    | added User page with advanced stats, managed uncontrolled leaving behaviour and single player  |
