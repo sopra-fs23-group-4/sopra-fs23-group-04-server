@@ -1,6 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.GameResult;
+import ch.uzh.ifi.hase.soprafs23.constant.ScorePoint;
 import ch.uzh.ifi.hase.soprafs23.constant.VoteOption;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Answer;
@@ -237,35 +238,49 @@ public class AdvancedStatisticService {
     Statistics: Total CorrectAndUnique, CorrectAndNotUnique, Wrong answers
      */
     private int getTotalCorrectAndUniqueAnswers(int userId) {
-        return getTotalCountsOfVoteOptions(userId).get(VoteOption.CORRECT_UNIQUE);
+        return getTotalCountsOfAnswerTypes(userId).get(ScorePoint.CORRECT_UNIQUE);
     }
 
     private int getTotalCorrectAndNotUniqueAnswers(int userId) {
-        return getTotalCountsOfVoteOptions(userId).get(VoteOption.CORRECT_NOT_UNIQUE);
+        return getTotalCountsOfAnswerTypes(userId).get(ScorePoint.CORRECT_NOT_UNIQUE);
     }
 
     private int getTotalWrongAnswers(int userId) {
-        return getTotalCountsOfVoteOptions(userId).get(VoteOption.WRONG);
+        return getTotalCountsOfAnswerTypes(userId).get(ScorePoint.INCORRECT);
     }
 
-    private Map<VoteOption, Integer> getTotalCountsOfVoteOptions(int userId) {
+    private Map<ScorePoint, Integer> getTotalCountsOfAnswerTypes(int userId) {
         List<Answer> userAnswers = answerRepository.findAllByUser_Id(userId);
 
-        Map<VoteOption, Integer> voteOptionCounts = new HashMap<>();
-        voteOptionCounts.put(VoteOption.CORRECT_UNIQUE, 0);
-        voteOptionCounts.put(VoteOption.CORRECT_NOT_UNIQUE, 0);
-        voteOptionCounts.put(VoteOption.WRONG, 0);
+        Map<ScorePoint, Integer> answerTypeCounts = new HashMap<>();
+        answerTypeCounts.put(ScorePoint.CORRECT_UNIQUE, 0);
+        answerTypeCounts.put(ScorePoint.CORRECT_NOT_UNIQUE, 0);
+        answerTypeCounts.put(ScorePoint.INCORRECT, 0);
 
         for (Answer answer : userAnswers) {
             List<Vote> votesForAnswer = voteRepository.findByAnswer(answer);
 
+            Map<VoteOption, Integer> voteCounts = new HashMap<>();
+            voteCounts.put(VoteOption.CORRECT_UNIQUE, 0);
+            voteCounts.put(VoteOption.CORRECT_NOT_UNIQUE, 0);
+            voteCounts.put(VoteOption.WRONG, 0);
+
             for (Vote vote : votesForAnswer) {
                 VoteOption voteOption = vote.getVotedOption();
-                voteOptionCounts.put(voteOption, voteOptionCounts.get(voteOption) + 1);
+                voteCounts.put(voteOption, voteCounts.get(voteOption) + 1);
             }
+
+            ScorePoint answerType;
+            if ((voteCounts.get(VoteOption.CORRECT_UNIQUE) + voteCounts.get(VoteOption.CORRECT_NOT_UNIQUE)) >= voteCounts.get(VoteOption.WRONG)) {
+                answerType = voteCounts.get(VoteOption.CORRECT_UNIQUE) >= voteCounts.get(VoteOption.CORRECT_NOT_UNIQUE) ? ScorePoint.CORRECT_UNIQUE : ScorePoint.CORRECT_NOT_UNIQUE;
+            } else {
+                answerType = ScorePoint.INCORRECT;
+            }
+
+            answerTypeCounts.put(answerType, answerTypeCounts.get(answerType) + 1);
         }
 
-        return voteOptionCounts;
+        return answerTypeCounts;
     }
 
     /*
