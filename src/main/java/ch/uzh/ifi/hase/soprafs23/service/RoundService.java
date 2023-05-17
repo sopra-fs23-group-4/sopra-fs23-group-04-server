@@ -224,7 +224,7 @@
                 };
 
                 // Schedule votingTimerTask to run every 5 seconds
-                resultTimer.schedule(resultTimerTask, 1500,1000);
+                resultTimer.schedule(resultTimerTask, 750,1000);
             }
 
             void goToScoreBoardorWinnerPage(int gamePin) {
@@ -352,7 +352,7 @@
                 skipManager.userWantsToSkip(user);
             }
 
-            private static void cleanUpSkipForNextRound(int gamePin) {
+             static void cleanUpSkipForNextRound(int gamePin) {
                 SkipManager skipManager = SkipRepository.findByGameId(gamePin);
                 skipManager.cleanUp();
             }

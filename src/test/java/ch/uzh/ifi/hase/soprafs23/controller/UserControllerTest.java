@@ -158,8 +158,8 @@ class UserControllerTest {
         user.setUsername("testUsername");
 
         UserPutDTO userPutDTO = new UserPutDTO();
-        userPutDTO.setUsername("username");
-        userPutDTO.setPassword("password");
+
+        userPutDTO.setQuote("I am the best");
 
         given(userService.editUser(Mockito.anyInt(),Mockito.any())).willReturn(user);
 
