@@ -237,30 +237,35 @@ public class AdvancedStatisticService {
     Statistics: Total CorrectAndUnique, CorrectAndNotUnique, Wrong answers
      */
     private int getTotalCorrectAndUniqueAnswers(int userId) {
-        return getTotalCountOfGivenVoteOption(userId, VoteOption.CORRECT_UNIQUE);
+        return getTotalCountsOfVoteOptions(userId).get(VoteOption.CORRECT_UNIQUE);
     }
 
     private int getTotalCorrectAndNotUniqueAnswers(int userId) {
-        return getTotalCountOfGivenVoteOption(userId, VoteOption.CORRECT_NOT_UNIQUE);
+        return getTotalCountsOfVoteOptions(userId).get(VoteOption.CORRECT_NOT_UNIQUE);
     }
 
     private int getTotalWrongAnswers(int userId) {
-        return getTotalCountOfGivenVoteOption(userId, VoteOption.WRONG);
+        return getTotalCountsOfVoteOptions(userId).get(VoteOption.WRONG);
     }
 
-    private int getTotalCountOfGivenVoteOption(int userId, VoteOption voteOption) {
+    private Map<VoteOption, Integer> getTotalCountsOfVoteOptions(int userId) {
         List<Answer> userAnswers = answerRepository.findAllByUser_Id(userId);
 
-        int voteOptionCount = 0;
+        Map<VoteOption, Integer> voteOptionCounts = new HashMap<>();
+        voteOptionCounts.put(VoteOption.CORRECT_UNIQUE, 0);
+        voteOptionCounts.put(VoteOption.CORRECT_NOT_UNIQUE, 0);
+        voteOptionCounts.put(VoteOption.WRONG, 0);
+
         for (Answer answer : userAnswers) {
             List<Vote> votesForAnswer = voteRepository.findByAnswer(answer);
+
             for (Vote vote : votesForAnswer) {
-                if (vote.getVotedOption().equals(voteOption)) {
-                    voteOptionCount++;
-                }
+                VoteOption voteOption = vote.getVotedOption();
+                voteOptionCounts.put(voteOption, voteOptionCounts.get(voteOption) + 1);
             }
         }
-        return voteOptionCount;
+
+        return voteOptionCounts;
     }
 
     /*

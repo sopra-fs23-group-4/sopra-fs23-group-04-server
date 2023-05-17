@@ -16,11 +16,12 @@ public interface GameRepository extends JpaRepository<Game, Integer> {
     Game findByGameId(int gameId);
     Game findByGamePin(int gamePin);
     List<Game> findByStatus(GameStatus status);
-    @Query("SELECT g FROM Game g JOIN g.users u WHERE u.id = :userId")
+
+    @Query("SELECT gp.game FROM GameParticipant gp WHERE gp.user.id = :userId")
     List<Game> findAllGamesByUserId(@Param("userId") int userId);
 
-    @Query("SELECT g.users FROM Game g WHERE g.gamePin = :gamePin")
-    List<User> findAllUsersByGamePin(@Param("gamePin") int gamePin);
+    @Query("SELECT gp.user FROM GameParticipant gp WHERE gp.game.gamePin = :gamePin")
+    List<User> findAllParticipantsByGamePin(@Param("gamePin") int gamePin);
 
 
 }

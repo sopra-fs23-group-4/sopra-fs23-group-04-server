@@ -189,7 +189,7 @@ class GameServiceIntegrationTest {
 
         Game testGame = gameRepository.findByGamePin(gamePin);
 
-        int userAmountTestGame = testGame.getUsers().size();
+        int userAmountTestGame = testGame.getActiveUsers().size();
 
         assertEquals(user2Id, game.getHostId());
         assertEquals(1, userAmountTestGame);

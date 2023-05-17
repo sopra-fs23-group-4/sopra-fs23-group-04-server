@@ -6,7 +6,6 @@ import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.*;
 import ch.uzh.ifi.hase.soprafs23.repository.*;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.VoteGetDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.game.VoteOptionsGetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -95,7 +94,7 @@ public class VoteService {
         checkIfUserExists(requestUser);
         checkIfUserIsInGame(game, requestUser);
 
-        List<User> users = game.getUsers();
+        List<User> users = game.getActiveUsers();
 
         return getVoteGetDTOList(round, category, users);
 
