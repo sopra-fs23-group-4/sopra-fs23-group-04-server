@@ -66,17 +66,34 @@ public class AdvancedStatisticService {
         // Get the leaderboard
         List<LeaderboardGetDTO> leaderboard = gameService.getLeaderboard();
 
+        // Initialize variables to keep track of current rank and score
+        int rank = 1;
+        int sameScoreCount = 0;
+        int lastScore = -1; // Assuming scores are non-negative
+
         // Find the rank of the specified user
-        for (int i = 0; i < leaderboard.size(); i++) {
-            if (leaderboard.get(i).getUsername().equals(user.getUsername())) {
-                return i + 1; // Rank is index + 1 because index starts at 0
+        for (LeaderboardGetDTO entry : leaderboard) {
+            int currentScore = entry.getAccumulatedScore();
+
+            // If score is same as previous, increment same score count
+            if (currentScore == lastScore) {
+                sameScoreCount++;
+            } else {
+                // If score is different, increment rank by number of users with the same score, and reset same score count
+                rank += sameScoreCount;
+                sameScoreCount = 1;
+                lastScore = currentScore;
+            }
+
+            // If the current entry is the specified user, return the rank
+            if (entry.getUsername().equals(user.getUsername())) {
+                return rank;
             }
         }
 
         // If the user is not found in the leaderboard, return -1
         return -1;
     }
-
 
     /*
     Statistics: Total Winner or Total Loser
@@ -194,7 +211,7 @@ public class AdvancedStatisticService {
         int totalPoints = 0;
         for (Game game : allUserGames) {
             Map<User, Integer> userScores = scoreCalculationService.calculateUserScores(game.getGamePin());
-            User user = userRepository.findById(userId).orElse(null); // Assuming you have UserRepository
+            User user = userRepository.findById(userId).orElse(null);
 
             if(userScores.containsKey(user)) {
                 totalPoints += userScores.get(user);
