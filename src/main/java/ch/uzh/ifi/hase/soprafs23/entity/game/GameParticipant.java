@@ -30,7 +30,7 @@ public class GameParticipant {
     private User user;
 
     @Column
-    private ParticipantStatus participantStatus;  // ACTIVE, LEFT
+    private ParticipantStatus participantStatus;  // INGAME, LEFT
 
 
     public int getId() {

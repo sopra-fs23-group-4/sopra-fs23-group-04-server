@@ -94,7 +94,7 @@ public class VoteService {
         checkIfUserExists(requestUser);
         checkIfUserIsInGame(game, requestUser);
 
-        List<User> users = game.getUsers();
+        List<User> users = game.getActiveUsers();
 
         return getVoteGetDTOList(round, category, users);
 
