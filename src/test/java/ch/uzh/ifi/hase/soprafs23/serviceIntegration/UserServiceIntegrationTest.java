@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.serviceIntegration;
 
-import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs23.service.QuoteService;
