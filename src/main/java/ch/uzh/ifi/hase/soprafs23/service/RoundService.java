@@ -171,7 +171,7 @@
                 roundEndDTO.setRounded(fill);
                 webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, roundEndDTO);
                 roundTimer.cancel();
-                voteTimeControl(gamePin);
+                //ignore this voteTimeControl(gamePin);
             }
 
             void voteTimeControl(int gamePin){
