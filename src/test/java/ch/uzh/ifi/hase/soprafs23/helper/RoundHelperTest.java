@@ -11,7 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-public class RoundHelperTest {
+class RoundHelperTest {
     @Mock
     Round round;
 
@@ -21,35 +21,35 @@ public class RoundHelperTest {
     }
 
     @Test
-    public void checkIfRoundExists_RoundExists_NoExceptionThrown() {
+    void checkIfRoundExists_RoundExists_NoExceptionThrown() {
         RoundHelper.checkIfRoundExists(round);
     }
 
     @Test
-    public void checkIfRoundExists_RoundDoesNotExist_ExceptionThrown() {
+    void checkIfRoundExists_RoundDoesNotExist_ExceptionThrown() {
         assertThrows(ResponseStatusException.class, () -> RoundHelper.checkIfRoundExists(null));
     }
 
     @Test
-    public void checkIfRoundIsFinished_RoundIsFinished_NoExceptionThrown() {
+    void checkIfRoundIsFinished_RoundIsFinished_NoExceptionThrown() {
         when(round.getStatus()).thenReturn(RoundStatus.FINISHED);
         RoundHelper.checkIfRoundIsFinished(round);
     }
 
     @Test
-    public void checkIfRoundIsFinished_RoundIsNotFinished_ExceptionThrown() {
+    void checkIfRoundIsFinished_RoundIsNotFinished_ExceptionThrown() {
         when(round.getStatus()).thenReturn(RoundStatus.RUNNING);
         assertThrows(ResponseStatusException.class, () -> RoundHelper.checkIfRoundIsFinished(round));
     }
 
     @Test
-    public void checkIfRoundIsRunning_RoundIsRunning_NoExceptionThrown() {
+    void checkIfRoundIsRunning_RoundIsRunning_NoExceptionThrown() {
         when(round.getStatus()).thenReturn(RoundStatus.RUNNING);
         RoundHelper.checkIfRoundIsRunning(round);
     }
 
     @Test
-    public void checkIfRoundIsRunning_RoundIsNotRunning_ExceptionThrown() {
+    void checkIfRoundIsRunning_RoundIsNotRunning_ExceptionThrown() {
         when(round.getStatus()).thenReturn(RoundStatus.FINISHED);
         assertThrows(ResponseStatusException.class, () -> RoundHelper.checkIfRoundIsRunning(round));
     }
