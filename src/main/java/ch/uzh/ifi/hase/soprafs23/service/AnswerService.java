@@ -15,7 +15,7 @@ import java.util.*;
 
 import static ch.uzh.ifi.hase.soprafs23.helper.GameHelper.*;
 import static ch.uzh.ifi.hase.soprafs23.helper.RoundHelper.*;
-import static ch.uzh.ifi.hase.soprafs23.helper.CategoryHelper.*;
+import static ch.uzh.ifi.hase.soprafs23.service.CategoryService.*;
 import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 
 @Service

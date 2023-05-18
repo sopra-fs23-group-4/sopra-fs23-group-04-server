@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs23.helper;
+package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.AdditionalCategory;
 import ch.uzh.ifi.hase.soprafs23.constant.GameCategory;
@@ -8,15 +8,17 @@ import ch.uzh.ifi.hase.soprafs23.rest.dto.game.CategoryGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GameCategoriesDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-public class CategoryHelper {
+@Service
+public class CategoryService {
 
     public static CategoryRepository categoryRepository;
 
     @Autowired
-    private CategoryHelper(CategoryRepository categoryRepository) {
-        CategoryHelper.categoryRepository = categoryRepository;
+    private CategoryService(CategoryRepository categoryRepository) {
+        CategoryService.categoryRepository = categoryRepository;
     }
 
     public static void checkIfCategoryExists(Category category) {

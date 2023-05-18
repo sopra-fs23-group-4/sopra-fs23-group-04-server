@@ -12,7 +12,7 @@ import org.mapstruct.factory.Mappers;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ch.uzh.ifi.hase.soprafs23.helper.CategoryHelper.categoryRepository;
+import static ch.uzh.ifi.hase.soprafs23.service.CategoryService.categoryRepository;
 
 @Mapper
 public interface GameDTOMapper {

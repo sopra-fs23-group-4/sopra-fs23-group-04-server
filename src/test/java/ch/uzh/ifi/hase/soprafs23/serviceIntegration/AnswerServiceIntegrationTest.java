@@ -12,21 +12,17 @@ import ch.uzh.ifi.hase.soprafs23.repository.*;
 import ch.uzh.ifi.hase.soprafs23.service.AnswerService;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.UserService;
-import net.minidev.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-        import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.sql.SQLOutput;
-import java.time.LocalDate;
 import java.util.*;
 
-import static ch.uzh.ifi.hase.soprafs23.helper.AnswerHelper.checkIfAnswerExists;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
@@ -120,7 +116,6 @@ class AnswerServiceIntegrationTest {
         assertDoesNotThrow(() -> answerService.saveAnswers(gamePin, user1Token, 1, answers));
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
                 () -> answerService.saveAnswers(gamePin, user1Token, 1, answers));
-
 
         assertEquals(HttpStatus.CONFLICT, exception.getStatus());
         assertEquals("These Answers have already been saved.", exception.getReason());
