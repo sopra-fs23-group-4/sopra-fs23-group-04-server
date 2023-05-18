@@ -20,8 +20,12 @@ public class UserHelper {
         }
     }
     public static void checkIfQuoteValid(String quote){
-        if (quote.length()> Constant.QUOTE_MAX_LENGTH){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The quote you are trying to add is to long");
+        if (quote ==null || quote.strip().length() == 0)
+            {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The quote can not be empty or only spaces");
+        }
+        if (quote.length()> Constant.QUOTE_MAX_LENGTH) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The quote that you are trying to add is to long");
         }
     }
 }

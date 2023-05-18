@@ -80,11 +80,12 @@ public class UserController {
 
     @PutMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void editUser(@PathVariable("userId") int userId, @RequestBody UserPutDTO userPutDTO){
+    public void editUser(@PathVariable("userId") int userId, @RequestBody UserPutDTO userPutDTO,@RequestHeader("Authorization") String userToken){
 
         User userCredentials = UserDTOMapper.INSTANCE.convertUserPutDTOToEntity(userPutDTO);
 
-        userService.editUser(userId, userCredentials);
+        userService.editUserQuote(userId, userCredentials, userToken);
+        logger.info("Updated quote from user: " + userToken);
 
     }
 

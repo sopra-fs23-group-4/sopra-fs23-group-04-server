@@ -90,17 +90,15 @@ public class UserService {
         return user;
     }
 
-    public synchronized User editUser (int userId, User editedUser) {
+    public synchronized User editUserQuote(int userId, User editedUser, String userToken) {
 
         User userDB = userRepository.findById(userId).orElse(null);
 
-        String notExist = "The user doesn't exist!";
         String wrongPassword = "You are not authorized to edit this profile!";
 
-        if (userDB == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, notExist);
-        }
-        if (!userDB.getToken().equals(editedUser.getToken())){
+        UserHelper.checkIfUserExists(userDB);
+
+        if (!userDB.getToken().equals(userToken)){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,wrongPassword);
         }
         changeProfile(userDB, editedUser);
@@ -139,22 +137,11 @@ public class UserService {
     }
 
     private void changeProfile(User userDB, User editedUser) {
-        String newUsername = editedUser.getUsername();
-        String newPassword = editedUser.getPassword();
         String newQuote = editedUser.getQuote();
-        // Byte[] newPic = editedUser.getP
-        if (!Objects.equals(newUsername, null)) {
-            checkIfUsernameAlreadyExists(editedUser);
-            checkIfUsernameValid(editedUser);
-            userDB.setUsername(newUsername);
-        }
-        if (!Objects.equals(newQuote, null)) {
-            UserHelper.checkIfQuoteValid(newQuote);
-            userDB.setQuote(newQuote);
-        }
-        if (!Objects.equals(newPassword, null)) {
-            userDB.setPassword(newPassword);
-        }
-        userRepository.save(userDB);
+
+        UserHelper.checkIfQuoteValid(newQuote);
+        userDB.setQuote(newQuote);
+
+        userRepository.saveAndFlush(userDB);
     }
 }

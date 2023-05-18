@@ -97,20 +97,12 @@ class UserServiceTest {
 
         when(userRepository.findById(1)).thenReturn(Optional.of(testUser));
         User editedUser = new User();
-        editedUser.setId(1);
-        editedUser.setUsername("new-username");
-        editedUser.setPassword("new-password");
-        editedUser.setToken("valid-token");
         editedUser.setQuote("new-quote"); // Add a new quote for the edited user
 
         // When
-        User resultUser = userService.editUser(1, editedUser);
+        User resultUser = userService.editUserQuote(1, editedUser, "valid-token");
 
         // Then
-        assertEquals(editedUser.getId(), resultUser.getId());
-        assertEquals(editedUser.getUsername(), resultUser.getUsername());
-        assertEquals(editedUser.getPassword(), resultUser.getPassword());
-        assertEquals(editedUser.getToken(), resultUser.getToken());
         assertEquals(editedUser.getQuote(), resultUser.getQuote()); // Verify that the saved user has the new quote
     }
 
@@ -119,13 +111,10 @@ class UserServiceTest {
         // Given
         when(userRepository.findById(1)).thenReturn(Optional.empty());
         User editedUser = new User();
-        editedUser.setId(1);
-        editedUser.setUsername("new-username");
-        editedUser.setPassword("new-password");
-        editedUser.setToken("valid-token");
+        editedUser.setQuote("quote");
 
         // Then (expect exception)
-        assertThrows(ResponseStatusException.class, () -> userService.editUser(1, editedUser));
+        assertThrows(ResponseStatusException.class, () -> userService.editUserQuote(1, editedUser, "blabla"));
     }
 
     @Test
@@ -134,12 +123,10 @@ class UserServiceTest {
         when(userRepository.findById(1)).thenReturn(Optional.of(testUser));
         User editedUser = new User();
         editedUser.setId(1);
-        editedUser.setUsername("new-username");
-        editedUser.setPassword("new-password");
         editedUser.setToken("invalid-token");
 
         // Then (expect exception)
-        assertThrows(ResponseStatusException.class, () -> userService.editUser(1, editedUser));
+        assertThrows(ResponseStatusException.class, () -> userService.editUserQuote(1, editedUser, "invalid-token"));
     }
 
     @Test

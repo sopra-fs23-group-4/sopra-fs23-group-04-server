@@ -56,26 +56,11 @@ class DTOMapperTest {
         assertEquals(user.getUsername(), userGetDTO.getUsername());
     }
 
-    @Test
-    void testCreateUser_fromUserPutDTO_toUser_success() {
-        // create UserPostDTO
-        UserPutDTO userPutDTO = new UserPutDTO();
-        userPutDTO.setUsername("username");
-        userPutDTO.setPassword("password");
 
-        // MAP -> Create user
-        User user = UserDTOMapper.INSTANCE.convertUserPutDTOToEntity(userPutDTO);
-
-        // check content
-        assertEquals(userPutDTO.getUsername(), user.getUsername());
-        assertEquals(userPutDTO.getPassword(), user.getPassword());
-    }
     @Test
     void testCreateUser_fromUserPutDTOToEntity_success() {
         // create UserPutDTO
         UserPutDTO userPutDTO = new UserPutDTO();
-        userPutDTO.setUsername("username");
-        userPutDTO.setPassword("password");
         userPutDTO.setQuote("quote");
 
 
@@ -83,8 +68,6 @@ class DTOMapperTest {
         User user = UserDTOMapper.INSTANCE.convertUserPutDTOToEntity(userPutDTO);
 
         // check content
-        assertEquals(userPutDTO.getUsername(), user.getUsername());
-        assertEquals(userPutDTO.getPassword(), user.getPassword());
         assertEquals(userPutDTO.getQuote(), user.getQuote());
 
     }

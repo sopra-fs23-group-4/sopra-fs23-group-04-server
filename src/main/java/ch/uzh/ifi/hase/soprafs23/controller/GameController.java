@@ -37,7 +37,7 @@ public class GameController {
         return game.getGamePin();
     }
 
-    @PostMapping("/games/{gamePin}/start")
+    @PutMapping("/games/{gamePin}/start")
     public void gameStart(@PathVariable("gamePin") int gamePin) {
 
         gameService.setUpGameForStart(gamePin);

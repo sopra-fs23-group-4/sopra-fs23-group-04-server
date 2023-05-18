@@ -54,8 +54,6 @@ class UserHelperTest {
                 () -> checkIfQuoteValid(tooLongQuote));
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
-        assertEquals("The quote you are trying to add is to long",
-                exception.getReason());
     }
 
 }

@@ -48,10 +48,8 @@ public interface UserDTOMapper {
     @Mapping(source = "quote", target="quote")
     UserGetDTO convertEntityToUserGetDTO(User user);
 
-    @Mapping(source = "username", target = "username")
-    @Mapping(source = "password", target = "password")
+
     @Mapping(source = "quote", target = "quote")
-    @Mapping(source = "token", target = "token")
     User convertUserPutDTOToEntity(UserPutDTO userPutDTO);
 
     @Mapping(source = "quote", target = "quote")
