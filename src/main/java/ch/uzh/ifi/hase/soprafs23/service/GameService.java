@@ -177,7 +177,11 @@ public class GameService {
     public CategoryGetDTO getRandomCategory() {
 
         CategoryGetDTO categoryGetDTO = new CategoryGetDTO();
-        categoryGetDTO.setCategoryName(AdditionalCategory.getRandomCategoryName());
+        String randomCategoryName = AdditionalCategory.getRandomCategoryName();
+        while(randomCategoryName.length() > 18) {
+            randomCategoryName = AdditionalCategory.getRandomCategoryName();
+        }
+        categoryGetDTO.setCategoryName(randomCategoryName);
 
         return categoryGetDTO;
     }
