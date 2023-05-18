@@ -166,26 +166,6 @@ public class GameService {
 
     }
 
-    public GameCategoriesDTO getStandardCategories() {
-
-        GameCategoriesDTO gameCategoriesDTO = new GameCategoriesDTO();
-        gameCategoriesDTO.setCategories(GameCategory.getCategories());
-
-        return gameCategoriesDTO;
-    }
-
-    public CategoryGetDTO getRandomCategory() {
-
-        CategoryGetDTO categoryGetDTO = new CategoryGetDTO();
-        String randomCategoryName = AdditionalCategory.getRandomCategoryName();
-        while(randomCategoryName.length() > 18) {
-            randomCategoryName = AdditionalCategory.getRandomCategoryName();
-        }
-        categoryGetDTO.setCategoryName(randomCategoryName);
-
-        return categoryGetDTO;
-    }
-
     public GameCategoriesDTO getGameCategoriesByGamePin(int gamePin) {
         Game game = getGameByGamePin(gamePin);
 
@@ -230,14 +210,6 @@ public class GameService {
         openOrRunningGames.addAll(getRunningGames());
 
         return openOrRunningGames;
-    }
-
-    private static List<Integer> getGameUsersId(Game game) {
-        List<Integer> usersId = new ArrayList<>();
-        for (User user : game.getActiveUsers()) {
-            usersId.add(user.getId());
-        }
-        return usersId;
     }
 
     private void checkIfHostIsEligible(int hostId) {

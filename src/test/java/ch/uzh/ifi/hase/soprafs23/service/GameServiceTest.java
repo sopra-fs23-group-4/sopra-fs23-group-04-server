@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.service;
 
 import ch.uzh.ifi.hase.soprafs23.constant.AdditionalCategory;
 import ch.uzh.ifi.hase.soprafs23.constant.GameCategory;
+import ch.uzh.ifi.hase.soprafs23.helper.CategoryHelper;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GameCategoriesDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ class GameServiceTest {
 
         AtomicReference<GameCategoriesDTO> gameCategoriesDTO = new AtomicReference<>();
 
-        assertDoesNotThrow(() -> gameCategoriesDTO.set(gameService.getStandardCategories()));
+        assertDoesNotThrow(() -> gameCategoriesDTO.set(CategoryHelper.getStandardCategories()));
 
         assertEquals(GameCategory.getCategories(), gameCategoriesDTO.get().getCategories());
 
@@ -33,7 +34,7 @@ class GameServiceTest {
 
         AtomicReference<String> categoryName = new AtomicReference<>();
 
-        assertDoesNotThrow(() -> categoryName.set(gameService.getRandomCategory().getCategoryName()));
+        assertDoesNotThrow(() -> categoryName.set(CategoryHelper.getRandomCategory().getCategoryName()));
 
         assertTrue(doesEnumExist(categoryName.get()));
 
