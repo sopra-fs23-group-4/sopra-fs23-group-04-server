@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 public class RoundEndDTOTest {
     @Test
-    public void getType_shouldReturnCorrectType() {
+    void getType_shouldReturnCorrectType() {
         Assertions.assertEquals("roundEnd", RoundEndDTO.TYPE);
     }
 

@@ -7,25 +7,25 @@ import org.junit.jupiter.api.Test;
 public class WebSocketDTOCreatorTest {
 
     @Test
-    public void testResultWinnerType() {
+    void testResultWinnerType() {
         WebSocketDTO webSocketDTO = WebSocketDTOCreator.resultWinner();
         Assertions.assertEquals("resultWinner", webSocketDTO.getType());
     }
 
     @Test
-    public void testResultScoreBoardType() {
+    void testResultScoreBoardType() {
         WebSocketDTO webSocketDTO = WebSocketDTOCreator.resultScoreBoard();
         Assertions.assertEquals("resultScoreboard", webSocketDTO.getType());
     }
 
     @Test
-    public void testResultNextVoteType() {
+    void testResultNextVoteType() {
         WebSocketDTO webSocketDTO = WebSocketDTOCreator.resultNextVote();
         Assertions.assertEquals("resultNextVote", webSocketDTO.getType());
     }
 
     @Test
-    public void testVotingEndType() {
+    void testVotingEndType() {
         WebSocketDTO webSocketDTO = WebSocketDTOCreator.votingEnd();
         Assertions.assertEquals("votingEnd", webSocketDTO.getType());
     }

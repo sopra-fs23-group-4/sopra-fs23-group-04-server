@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test;
 
 public class ScoreBoardTimerDTOTest {
     @Test
-    public void getType_shouldReturnCorrectType() {
+    void getType_shouldReturnCorrectType() {
         Assertions.assertEquals("scoreboardTimer", ScoreboardTimerDTO.TYPE);
     }
 
     @Test
-    public void getTimeRemaining_shouldReturnCorrectTimeRemaining() {
+    void getTimeRemaining_shouldReturnCorrectTimeRemaining() {
         ScoreboardTimerDTO scoreboardTimerDTO = new ScoreboardTimerDTO();
         scoreboardTimerDTO.setTimeRemaining(10);
 

@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test;
 
 public class LetterDTOTest {
     @Test
-    public void getType_shouldReturnCorrectType() {
+    void getType_shouldReturnCorrectType() {
         Assertions.assertEquals("roundStart", LetterDTO.type);
     }
 
     @Test
-    public void getRound_shouldReturnCorrectRound() {
+    void getRound_shouldReturnCorrectRound() {
         LetterDTO letterDTO = new LetterDTO();
         letterDTO.setRound(1);
 
@@ -19,7 +19,7 @@ public class LetterDTOTest {
     }
 
     @Test
-    public void getLetter_shouldReturnCorrectLetter() {
+    void getLetter_shouldReturnCorrectLetter() {
         LetterDTO letterDTO = new LetterDTO();
         letterDTO.setLetter('A');
 

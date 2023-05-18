@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 public class WebSocketDTOTest {
     @Test
-    public void getType_shouldReturnCorrectType() {
+    void getType_shouldReturnCorrectType() {
         WebSocketDTO webSocketDTO = new WebSocketDTO();
         webSocketDTO.setType("testType");
 
