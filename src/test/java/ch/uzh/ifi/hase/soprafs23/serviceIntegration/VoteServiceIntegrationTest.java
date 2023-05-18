@@ -70,7 +70,7 @@ class VoteServiceIntegrationTest {
         user3 = createUserForTesting();
         user4 = createUserForTesting();
 
-        game = createGameForTesting(user1.getToken());
+        game = createGameForTesting();
 
     }
 
@@ -102,8 +102,10 @@ class VoteServiceIntegrationTest {
         Map<Integer, String> votingOfUser1 = Map.of(1, "CORRECT_NOT_UNIQUE");
         Map<Integer, String> votingOfUser2 = Map.of(2, "CORRECT_UNIQUE");
 
-        assertDoesNotThrow(() -> voteService.saveVote(gamePin, categoryNames.get(0), user1Token, votingOfUser1));
-        assertDoesNotThrow(() -> voteService.saveVote(gamePin, categoryNames.get(0), user2Token, votingOfUser2));
+        String categoryName = categoryNames.get(0);
+
+        assertDoesNotThrow(() -> voteService.saveVote(gamePin, categoryName, user1Token, votingOfUser1));
+        assertDoesNotThrow(() -> voteService.saveVote(gamePin, categoryName, user2Token, votingOfUser2));
 
     }
 
@@ -167,8 +169,10 @@ class VoteServiceIntegrationTest {
 
         Map<Integer, String> votingOfUser1 = Map.of(1, "CORRECT_NOT_WRONG");
 
+        String categoryName = categoryNames.get(0);
+
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> voteService.saveVote(gamePin, categoryNames.get(0), user1Token, votingOfUser1));
+                () -> voteService.saveVote(gamePin, categoryName, user1Token, votingOfUser1));
 
         assertEquals(HttpStatus.CONFLICT, exception.getStatus());
         assertEquals("At least one of the votes is invalid!", exception.getReason());
@@ -232,8 +236,10 @@ class VoteServiceIntegrationTest {
         voteService.saveVote(gamePin, categoryNames.get(0), user3Token, votingOfUser3);
         voteService.saveVote(gamePin, categoryNames.get(0), user4Token, votingOfUser4);
 
+        String categoryName = categoryNames.get(0);
+
         AtomicReference<List<VoteGetDTO>> voteGetDTOList = new AtomicReference<>();
-        voteGetDTOList.set(voteService.getVotes(gamePin, 1, categoryNames.get(0), user1Token));
+        voteGetDTOList.set(voteService.getVotes(gamePin, 1, categoryName, user1Token));
 
         assertEquals(4, voteGetDTOList.get().size());
 
@@ -281,7 +287,7 @@ class VoteServiceIntegrationTest {
         return userService.createAndReturnUser(userForCreation);
     }
 
-    private Game createGameForTesting(String userToken) {
+    private Game createGameForTesting() {
 
         Game gameForCreation = new Game();
         gameForCreation.setRounds(1);
