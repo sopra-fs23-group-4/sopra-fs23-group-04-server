@@ -36,10 +36,24 @@ class GameHelperTest {
     }
 
     @Test
-    void test_CheckIfGameIsOpen_gameIsNotOpen() {
+    void test_CheckIfGameIsOpen_gameIsRunning() {
 
         Game game = new Game();
         game.setStatus(GameStatus.RUNNING);
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> checkIfGameIsOpen(game));
+
+        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
+        assertEquals("Game is not open. Please try again with a different pin!",
+                exception.getReason());
+
+    }
+
+    @Test
+    void test_CheckIfGameIsOpen_gameIsClosed() {
+
+        Game game = new Game();
+        game.setStatus(GameStatus.CLOSED);
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> checkIfGameIsOpen(game));
 
@@ -106,7 +120,7 @@ class GameHelperTest {
         assertDoesNotThrow(() -> checkIfUserIsInGame(game, user));
     }
     @Test
-    public void checkIfNotToManyCategoriesTest() {
+    void checkIfNotToManyCategoriesTest() {
         // Create a list of 11 mocked categories
         List<Category> categories = new ArrayList<>();
         for (int i = 0; i < 11; i++) {
@@ -126,7 +140,7 @@ class GameHelperTest {
     }
 
     @Test
-    public void checkCategoryNamesTest() {
+    void checkCategoryNamesTest() {
         // Create a list of categories with one having a name longer than MAX_STRING_LENGTH_OF_CATEGORY
         List<Category> categories = new ArrayList<>();
         for (int i = 0; i < 9; i++) {

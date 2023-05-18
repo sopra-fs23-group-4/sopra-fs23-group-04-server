@@ -107,13 +107,14 @@ public class VoteService {
         for (User user : users) {
 
             Answer answer = answerRepository.findByRoundAndCategoryAndUser(round, category, user);
-            checkIfAnswerExists(answer);
+            if (answer !=null) {
 
             List<User> allUsersFiltered = new ArrayList<>(users);
             allUsersFiltered.remove(user);
 
             VoteGetDTO newVoteGetDTO = createVoteGetDTO(user.getUsername(), allUsersFiltered, answer);
             voteGetDTOList.add(newVoteGetDTO);
+            }
         }
 
         return voteGetDTOList;

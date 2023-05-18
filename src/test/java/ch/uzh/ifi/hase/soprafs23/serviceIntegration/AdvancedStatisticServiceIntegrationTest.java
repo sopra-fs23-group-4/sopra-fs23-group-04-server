@@ -144,7 +144,6 @@ class AdvancedStatisticServiceIntegrationTest {
 
     }
 
-
     private int userNameSuffix = 1;
     private User createUserForTesting() {
         User userForCreation = new User();

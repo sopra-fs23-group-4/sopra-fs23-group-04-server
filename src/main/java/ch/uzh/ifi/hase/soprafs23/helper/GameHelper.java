@@ -37,11 +37,6 @@ public class GameHelper {
             throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
         }
 
-        String closedMessage = "Game is closed and cannot be joined.";
-
-        if (game.getStatus().equals(GameStatus.CLOSED)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, closedMessage);
-        }
     }
 
     public static void checkIfGameIsRunning(Game game) {
