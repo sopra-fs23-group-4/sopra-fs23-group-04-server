@@ -60,11 +60,11 @@
 
 23.05.2023
 
-| Person                | Last Week                    | Description                                                                                                                                     |
-|-----------------------|------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| Alexandre Bacmann     | #183,#184,#185,#186,#199     |                                                                                                                                                 |
-| Valentin Meyer        | #212, #217, #252, #262, #266 | added random categories in backend, fixed sonarcloud issues, refactored CategoryService, added an integration test for AdvancedStatisticService |
-| Christopher Narayanan | #236, #211, #245             |                                                                                                                                                 |
-| Lennart Töllke        | #68, #63, #59, #57, #57      |                                                                                                                                                 |
-| Remo Wiget            | #19, #217, #219, #234        | added random categories in frontend                                                                                                             |
+| Person                | Last Week                          | Description                                                                                                                                                                          |
+|-----------------------|------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Alexandre Bacmann     | #183,#184,#185,#186,#199           |                                                                                                                                                                                      |
+| Valentin Meyer        | #212, #217, #252, #262, #266, #269 | added random categories in backend, fixed sonarcloud issues, refactored CategoryService, added an integration test for AdvancedStatisticService, added more tests for helper classes |
+| Christopher Narayanan | #236, #211, #245                   |                                                                                                                                                                                      |
+| Lennart Töllke        | #68, #63, #59, #57, #57            |                                                                                                                                                                                      |
+| Remo Wiget            | #19, #217, #219, #234              | added random categories in frontend                                                                                                                                                  |
 
