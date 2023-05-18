@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import static ch.uzh.ifi.hase.soprafs23.helper.GameHelper.checkIfGameIsOpen;
 import static ch.uzh.ifi.hase.soprafs23.helper.UserHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,4 +29,33 @@ class UserHelperTest {
 
         assertDoesNotThrow(() -> checkIfUserExists(user));
     }
+
+    @Test
+    void test_checkIfQuoteValid_quoteValid() {
+
+        String tooLongQuote = "This quote is good!";
+
+        assertDoesNotThrow(() -> checkIfQuoteValid(tooLongQuote));
+
+    }
+
+    @Test
+    void test_checkIfQuoteValid_quoteTooLong() {
+
+        String tooLongQuote =
+                        "This quote is way, way, way, way, way, way, way, way, way, way, " +
+                        "way, way, way, way, way, way, way, way, way, way, way, way, way, " +
+                        "way, way, way, way, way, way, way, way, way, way, way, way, way, " +
+                        "way, way, way, way, way, way, way, way, way, way, way, way, way, " +
+                        "way, way, way, way, way, way, way, way, way, way, way, way, way, " +
+                        "waaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaay too long!";
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> checkIfQuoteValid(tooLongQuote));
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+        assertEquals("The quote you are trying to add is to long",
+                exception.getReason());
+    }
+
 }

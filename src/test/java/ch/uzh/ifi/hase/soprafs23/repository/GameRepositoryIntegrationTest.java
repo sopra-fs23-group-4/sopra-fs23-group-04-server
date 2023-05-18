@@ -169,7 +169,7 @@ class GameRepositoryIntegrationTest {
         entityManager.persist(testGame);
         entityManager.flush();
         // Execute the method being tested
-        List<User> users = gameRepository.findAllUsersByGamePin(testGame.getGamePin());
+        List<User> users = gameRepository.findAllParticipantsByGamePin(testGame.getGamePin());
 
         // Validate the resul
         assertThat(users.get(0).getUsername()).isEqualTo("TestUser");

@@ -169,22 +169,6 @@ public class GameService {
 
     }
 
-    public GameCategoriesDTO getStandardCategories() {
-
-        GameCategoriesDTO gameCategoriesDTO = new GameCategoriesDTO();
-        gameCategoriesDTO.setCategories(GameCategory.getCategories());
-
-        return gameCategoriesDTO;
-    }
-
-    public CategoryGetDTO getRandomCategory() {
-
-        CategoryGetDTO categoryGetDTO = new CategoryGetDTO();
-        categoryGetDTO.setCategoryName(AdditionalCategory.getRandomCategoryName());
-
-        return categoryGetDTO;
-    }
-
     public GameCategoriesDTO getGameCategoriesByGamePin(int gamePin) {
         Game game = getGameByGamePin(gamePin);
 
@@ -231,14 +215,6 @@ public class GameService {
         return openOrRunningGames;
     }
 
-    private static List<Integer> getGameUsersId(Game game) {
-        List<Integer> usersId = new ArrayList<>();
-        for (User user : game.getUsers()) {
-            usersId.add(user.getId());
-        }
-        return usersId;
-    }
-
     private void checkIfHostIsEligible(int hostId) {
         List<Game> openOrRunningGames = getOpenOrRunningGames();
 
@@ -270,7 +246,7 @@ public class GameService {
     }
 
     private void setNewHost(Game game) {
-        List<User> users = game.getUsers();
+        List<User> users = game.getActiveUsers();
         // Check if there are users left in the game.
         if (!users.isEmpty()) {
             User hostCandidate = users.get(rand.nextInt(users.size()));
@@ -283,7 +259,7 @@ public class GameService {
 
         User host = userRepository.findById(gameToJoin.getHostId()).orElse(null);
 
-        List<User> users = gameToJoin.getUsers();
+        List<User> users = gameToJoin.getActiveUsers();
         List<String> usernames = new ArrayList<>();
 
         for (User user : users) {

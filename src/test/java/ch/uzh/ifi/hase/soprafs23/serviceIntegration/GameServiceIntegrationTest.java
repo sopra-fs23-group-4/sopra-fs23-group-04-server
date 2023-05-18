@@ -72,7 +72,7 @@ class GameServiceIntegrationTest {
         user3 = createUserForTesting();
         user4 = createUserForTesting();
 
-        game = createGameForTesting(user1.getToken());
+        game = createGameForTesting();
 
     }
 
@@ -189,7 +189,7 @@ class GameServiceIntegrationTest {
 
         Game testGame = gameRepository.findByGamePin(gamePin);
 
-        int userAmountTestGame = testGame.getUsers().size();
+        int userAmountTestGame = testGame.getActiveUsers().size();
 
         assertEquals(user2Id, game.getHostId());
         assertEquals(1, userAmountTestGame);
@@ -205,8 +205,6 @@ class GameServiceIntegrationTest {
         int gamePin = game.getGamePin();
 
         assertDoesNotThrow(() -> gameService.setUpGameForStart(gamePin));
-
-        Game testGame = gameRepository.findByGamePin(gamePin);
 
         assertEquals(GameStatus.RUNNING, game.getStatus());
 
@@ -257,7 +255,6 @@ class GameServiceIntegrationTest {
         String user1Token = user1.getToken();
 
         assertDoesNotThrow(() -> game = gameService.createAndReturnGame(game, user1Token));
-        int gamePin = game.getGamePin();
 
         AtomicReference<List<String>> gameCategoryNames = new AtomicReference<>();
 
@@ -436,7 +433,7 @@ class GameServiceIntegrationTest {
         return userService.createAndReturnUser(userForCreation);
     }
 
-    private Game createGameForTesting(String userToken) {
+    private Game createGameForTesting() {
 
         Game gameForCreation = new Game();
         gameForCreation.setRounds(1);

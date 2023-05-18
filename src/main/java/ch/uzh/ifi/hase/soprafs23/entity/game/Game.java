@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.entity.game;
 
+import ch.uzh.ifi.hase.soprafs23.constant.ParticipantStatus;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundLength;
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
@@ -9,6 +10,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "GAME")
@@ -55,13 +57,8 @@ public class Game implements Serializable {
     )
     private List<Category> categories;
 
-    @ManyToMany
-    @JoinTable(
-            name = "GAME_USER",
-            joinColumns = @JoinColumn(name = "game_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> users = new ArrayList<>();
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GameParticipant> gameParticipants = new ArrayList<>();
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Round> rounds = new ArrayList<>();
@@ -132,8 +129,18 @@ public class Game implements Serializable {
         this.categories = categories;
     }
 
+    public List<User> getActiveUsers() {
+        return gameParticipants.stream()
+                .filter(gp -> gp.getParticipantStatus() == ParticipantStatus.INGAME)
+                .map(GameParticipant::getUser)
+                .collect(Collectors.toList());
+    }
+
     public List<User> getUsers() {
-        return users;
+        return gameParticipants.stream()
+                .map(GameParticipant::getUser)
+                .collect(Collectors.toList());
+
     }
 
     public int getCurrentRound() {
@@ -145,11 +152,18 @@ public class Game implements Serializable {
     }
 
     public void addPlayer(User user) {
-        this.users.add(user);
+        GameParticipant gameParticipant = new GameParticipant(this, user, ParticipantStatus.INGAME);
+        gameParticipants.add(gameParticipant);
+        user.getGameParticipants().add(gameParticipant);
     }
 
     public void removePlayer(User user) {
-        this.users.remove(user);
+        for (GameParticipant gameParticipant : gameParticipants) {
+            if (gameParticipant.getUser().equals(user)) {
+                gameParticipant.setParticipantStatus((ParticipantStatus.LEFT));
+                break;
+            }
+        }
     }
 
     public void addRound(Round round) {

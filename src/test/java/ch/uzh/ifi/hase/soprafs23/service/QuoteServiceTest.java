@@ -58,7 +58,7 @@ class QuoteServiceTest {
     @Test
     void testFactApi(){
         FactHolder factHolder=quoteService.generateFact();
-        System.out.println(factHolder.getFact());
+        assertNotNull(factHolder);
     }
 
 

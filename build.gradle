@@ -56,6 +56,8 @@ bootJar {
 }
 
 sonarqube {
+    tasks.sonarqube.dependsOn(test)
+    tasks.sonarqube.dependsOn(jacocoTestReport)
     properties {
         property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
         property "sonar.projectKey", "sopra-fs23-group-4_sopra-fs23-group-04-server"
@@ -66,6 +68,7 @@ sonarqube {
 }
 
 jacocoTestReport {
+    tasks.sonarqube.dependsOn(test)
     reports {
         xml.enabled true
     }

@@ -37,11 +37,6 @@ public class GameHelper {
             throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
         }
 
-        String closedMessage = "Game is closed and cannot be joined.";
-
-        if (game.getStatus().equals(GameStatus.CLOSED)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, closedMessage);
-        }
     }
 
     public static void checkIfGameIsRunning(Game game) {
@@ -53,7 +48,7 @@ public class GameHelper {
     }
 
     public static void checkIfUserIsInGame(Game game, User user) {
-        List<User> users = game.getUsers();
+        List<User> users = game.getActiveUsers();
 
         String errorMessage = "User is not part of this game.";
 
@@ -86,7 +81,7 @@ public class GameHelper {
     }
 
     public static Boolean checkIfGameHasUsers(Game game) {
-        List<User> users = game.getUsers();
+        List<User> users = game.getActiveUsers();
         return !users.isEmpty();
     }
 
@@ -123,7 +118,7 @@ public class GameHelper {
 
      public static List<Integer> getGameUsersId(Game game) {
         List<Integer> usersId = new ArrayList<>();
-        for (User user : game.getUsers()) {
+        for (User user : game.getActiveUsers()) {
             usersId.add(user.getId());
         }
         return usersId;

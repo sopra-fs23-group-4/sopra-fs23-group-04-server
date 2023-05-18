@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
-import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.user.UserLoginDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.user.UserPostDTO;
@@ -158,8 +157,8 @@ class UserControllerTest {
         user.setUsername("testUsername");
 
         UserPutDTO userPutDTO = new UserPutDTO();
-        userPutDTO.setUsername("username");
-        userPutDTO.setPassword("password");
+
+        userPutDTO.setQuote("I am the best");
 
         given(userService.editUser(Mockito.anyInt(),Mockito.any())).willReturn(user);
 

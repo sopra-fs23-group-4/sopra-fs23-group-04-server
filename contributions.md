@@ -52,8 +52,19 @@
 
 | Person                | Last Week           | Next Week                  | Description                                                                       |
 |-----------------------|---------------------|----------------------------|-----------------------------------------------------------------------------------|
-| Alexandre Bacmann     | #46,#48,#200,#242,#243|#183,#184,#185,#186,#199  | testing, Advanced statistics (service, controller and DTO class).                                                                                
+| Alexandre Bacmann     | #46,#48,#200,#242,#243|#183,#184,#185,#186,#199  | testing, Advanced statistics (service, controller and DTO class).                 |
 | Valentin Meyer        | #160, #163          | #212, #217                 | added integration tests for GameService and AnswerService                         |
 | Christopher Narayanan | #208, #197, #223    | #236, #211, #245           | adding functionality that if users want they can skip round, changing how quotes are sent,      |
 | Lennart Töllke        | #16, #56, #43, #199 | #68, #63, #59, #57, #57    | added User page with advanced stats, managed uncontrolled leaving behaviour and single player  |
 | Remo Wiget            | #198, #50, #51, #65 | #19, #219, #234            | VotingResult optimized for mobile, Voting loader, timers, manual continue, beautify error msg, ui |
+
+23.05.2023
+
+| Person                | Last Week                          | Description                                                                                                                                                                          |
+|-----------------------|------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Alexandre Bacmann     | #183,#184,#185,#186,#199           |                                                                                                                                                                                      |
+| Valentin Meyer        | #212, #217, #252, #262, #266, #269 | added random categories in backend, fixed sonarcloud issues, refactored CategoryService, added an integration test for AdvancedStatisticService, added more tests for helper classes |
+| Christopher Narayanan | #236, #211, #245                   |                                                                                                                                                                                      |
+| Lennart Töllke        | #68, #63, #59, #57, #57            |                                                                                                                                                                                      |
+| Remo Wiget            | #19, #217, #219, #234              | added random categories in frontend                                                                                                                                                  |
+
