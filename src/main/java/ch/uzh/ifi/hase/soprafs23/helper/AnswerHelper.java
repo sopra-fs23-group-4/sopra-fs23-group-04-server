@@ -23,6 +23,7 @@ public class AnswerHelper {
                     String.format(errorMessage));
         }
     }
+
     public static List<Map<Integer, String>> filterAnswersByDeletingUser(List<Answer> answers, User user) {
 
         List<Map<Integer, String>> filteredAnswers = new ArrayList<>();

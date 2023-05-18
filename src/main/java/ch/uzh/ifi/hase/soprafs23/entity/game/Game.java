@@ -152,9 +152,23 @@ public class Game implements Serializable {
     }
 
     public void addPlayer(User user) {
-        GameParticipant gameParticipant = new GameParticipant(this, user, ParticipantStatus.INGAME);
-        gameParticipants.add(gameParticipant);
-        user.getGameParticipants().add(gameParticipant);
+        GameParticipant gameParticipant = findExistingParticipant(user);
+        if (gameParticipant == null) {
+            gameParticipant = new GameParticipant(this, user, ParticipantStatus.INGAME);
+            gameParticipants.add(gameParticipant);
+            user.getGameParticipants().add(gameParticipant);
+        } else if(gameParticipant.getParticipantStatus().equals(ParticipantStatus.LEFT)) {
+            gameParticipant.setParticipantStatus(ParticipantStatus.INGAME);
+        }
+    }
+
+    private GameParticipant findExistingParticipant(User user) {
+        for (GameParticipant gameParticipant : gameParticipants) {
+            if (gameParticipant.getUser().equals(user)) {
+                return gameParticipant;
+            }
+        }
+        return null;
     }
 
     public void removePlayer(User user) {
@@ -177,7 +191,5 @@ public class Game implements Serializable {
         this.currentRound+=1;
         return currentRound;
     }
-
-
 
 }
