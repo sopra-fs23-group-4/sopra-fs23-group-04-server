@@ -23,8 +23,9 @@
         import org.springframework.transaction.annotation.Transactional;
 
         import java.util.List;
-        import java.util.Timer;
-        import java.util.TimerTask;
+        import java.util.concurrent.Executors;
+        import java.util.concurrent.ScheduledExecutorService;
+        import java.util.concurrent.TimeUnit;
         import java.util.concurrent.atomic.AtomicInteger;
 
         import static ch.uzh.ifi.hase.soprafs23.constant.RoundStatus.NOT_STARTED;
@@ -113,7 +114,7 @@
             }
 
 
-            public void startRoundTime(int gamePin){
+            public void startRoundTime(int gamePin) {
                 logger.info("starting");
                 Game game = gameRepository.findByGamePin(gamePin);
                 Round round = roundRepository.findByGameAndRoundNumber(game, game.getCurrentRound());
@@ -124,34 +125,39 @@
 
                 AtomicInteger remainingTime = new AtomicInteger(roundLength);
 
-                Timer roundTimer = new Timer();
-                TimerTask roundTimerTask = new TimerTask() {
-
+                ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+                Runnable roundTimerTask = new Runnable() {
                     @Override
                     public void run() {
                         int timeLeft = remainingTime.addAndGet(-1);
 
-                        if (isRoundFinished(gamePin)){
+                        if (isRoundFinished(gamePin)) {
                             String logInfo = String.format("Time stopped so standard timer stopped in game: %d.", gamePin);
                             logger.info(logInfo);
-                            roundTimer.cancel();
-
-                        }
-                        else if (noMoreTimeRemaining(timeLeft)) {
-                            //finish round
-                            finishRoundNoTimeLeft(timeLeft, round, gamePin, roundTimer);
-
-                        }
-
-                        else {
+                            executor.shutdown(); // Stop the executor
+                        } else if (noMoreTimeRemaining(timeLeft)) {
+                            // Finish round
+                            finishRoundNoTimeLeft(timeLeft, round, gamePin, executor);
+                        } else {
                             timeLeftUpdate(timeLeft, round, gamePin);
                         }
                     }
                 };
 
-                roundTimer.scheduleAtFixedRate(roundTimerTask,5000, 1000); // Schedule the task to run every 1 seconds (1000 ms)
+                executor.scheduleAtFixedRate(roundTimerTask, 5000, 1000, TimeUnit.MILLISECONDS);
             }
 
+            public void skipRequest(int gamePin, String userToken){
+
+                User user = userRepository.findByToken(userToken);
+                Game game = gameRepository.findByGamePin(gamePin);
+
+                checkIfUserExists(user);
+                checkIfUserIsInGame(game, user);
+
+                SkipManager skipManager = SkipRepository.findByGameId(gamePin);
+                skipManager.userWantsToSkip(user);
+            }
             void timeLeftUpdate(int timeLeft, Round round, int gamePin) {
                 String logInfo = String.format("timeLeft: %d, current round status: %s", timeLeft, round.getStatus());
                 logger.info(logInfo);
@@ -161,16 +167,16 @@
                 webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, roundTimerDTO);
             }
 
-            void finishRoundNoTimeLeft(int timeLeft, Round round, int gamePin, Timer roundTimer) {
+            void finishRoundNoTimeLeft(int timeLeft, Round round, int gamePin, ScheduledExecutorService executor) {
                 round.setStatus(RoundStatus.FINISHED);
                 roundRepository.saveAndFlush(round);
                 String logInfo = String.format("timeLeft: %d.", timeLeft);
                 logger.info(logInfo);
-                String fill="roundEnd";
+                String fill = "roundEnd";
                 RoundEndDTO roundEndDTO = new RoundEndDTO();
                 roundEndDTO.setRounded(fill);
                 webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, roundEndDTO);
-                roundTimer.cancel();
+                executor.shutdown(); // Stop the executor
                 voteTimeControl(gamePin);
             }
 
@@ -189,45 +195,44 @@
             void votingScoreOverviewTimer(int gamePin, int currentVotingRound) {
                 logger.info("started");
 
-                Timer resultTimer = new Timer();
-
+                ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
                 AtomicInteger remainingTime = new AtomicInteger(15);
-                TimerTask resultTimerTask = new TimerTask() {
 
+                Runnable resultTimerTask = new Runnable() {
                     @Override
                     public void run() {
                         int timeLeft = remainingTime.addAndGet(-1);
-                        SkipManager skipManager=SkipRepository.findByGameId(gamePin);
-                        if (noMoreTimeRemaining(timeLeft)  ||skipManager.allPlayersWantToContinue()) {
-                            resultTimer.cancel();
+                        SkipManager skipManager = SkipRepository.findByGameId(gamePin);
+
+                        if (noMoreTimeRemaining(timeLeft) || skipManager.allPlayersWantToContinue()) {
+                            executor.shutdown(); // Stop the executor
                             cleanUpSkipForNextRound(gamePin);
 
-                            if (isLastCategory(gamePin,currentVotingRound)){
-
-                                goToScoreBoardorWinnerPage(gamePin);
-                            }
-
-                            else {
+                            if (isLastCategory(gamePin, currentVotingRound)) {
+                                goToScoreBoardOrWinnerPage(gamePin);
+                            } else {
                                 WebSocketDTO webSocketDTO = WebSocketDTOCreator.resultNextVote();
-                                webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,webSocketDTO);
-                                int currentVotingRoundIncremented = currentVotingRound+1;
-                                votingTimer(gamePin,currentVotingRoundIncremented);
-
+                                webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, webSocketDTO);
+                                int currentVotingRoundIncremented = currentVotingRound + 1;
+                                votingTimer(gamePin, currentVotingRoundIncremented);
                             }
-                        }
-                        else {
-                            ResultTimerDTO resultTimerDTO= new ResultTimerDTO();
-                            resultTimerDTO.setTimeRemaining(timeLeft);
-                            webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,resultTimerDTO);
+                        } else {
+                            updateResultOverviewTimer(timeLeft, gamePin);
                         }
                     }
                 };
 
-                // Schedule votingTimerTask to run every 5 seconds
-                resultTimer.schedule(resultTimerTask, 750,1000);
+                // Schedule resultTimerTask to run every 1 second after an initial delay of 750 milliseconds
+                executor.scheduleAtFixedRate(resultTimerTask, 750, 1000, TimeUnit.MILLISECONDS);
             }
 
-            void goToScoreBoardorWinnerPage(int gamePin) {
+            private void updateResultOverviewTimer(int timeLeft, int gamePin) {
+                ResultTimerDTO resultTimerDTO= new ResultTimerDTO();
+                resultTimerDTO.setTimeRemaining(timeLeft);
+                webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,resultTimerDTO);
+            }
+
+            void goToScoreBoardOrWinnerPage(int gamePin) {
                 if (isFinalRound(gamePin)){
                     WebSocketDTO webSocketDTO = WebSocketDTOCreator.resultWinner();
                     webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,webSocketDTO);
@@ -245,72 +250,77 @@
             }
 
             void votingTimer(int gamePin, int currentVotingRound) {
-                Timer votingTimer = new Timer();
-                TimerTask votingTimerTask = new TimerTask() {
+                ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+                Runnable votingTimerTask = new Runnable() {
                     int timeRemaining = 30;
                     // Time remaining in seconds
 
                     @Override
                     public void run() {
                         timeRemaining -= 1;
-                        SkipManager skipManager=SkipRepository.findByGameId(gamePin);
+                        SkipManager skipManager = SkipRepository.findByGameId(gamePin);
 
-                        if (noMoreTimeRemaining(timeRemaining) || skipManager.allPlayersWantToContinue() ) {
+
+                        if (noMoreTimeRemaining(timeRemaining) || skipManager.allPlayersWantToContinue()) {
                             cleanUpSkipForNextRound(gamePin);
-                            votingTimer.cancel();
+                            executor.shutdown(); // Stop the executor
 
                             WebSocketDTO webSocketDTO = WebSocketDTOCreator.votingEnd();
-                            webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,webSocketDTO);
+                            webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, webSocketDTO);
                             logger.info("Voting ended, the users see voting results now.");
-                            votingScoreOverviewTimer(gamePin,currentVotingRound);
-                        }
-                        else {
+                            votingScoreOverviewTimer(gamePin, currentVotingRound);
+                        } else {
                             remaingingVotingTimeUpdate();
                         }
-
                     }
 
-                     void remaingingVotingTimeUpdate() {
-                        VotingTimerDTO votingTimerDTO=new VotingTimerDTO();
+                    void remaingingVotingTimeUpdate() {
+                        VotingTimerDTO votingTimerDTO = new VotingTimerDTO();
                         votingTimerDTO.setTimeRemaining(timeRemaining);
-                        webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,votingTimerDTO);
+                        webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, votingTimerDTO);
                         String logInfo = String.format("Time remaining for voting: %d", timeRemaining);
                         logger.info(logInfo);
                     }
                 };
-                votingTimer.schedule(votingTimerTask, 2000, 1000);
+
+                executor.scheduleAtFixedRate(votingTimerTask, 2000, 1000, TimeUnit.MILLISECONDS);
             }
             void scheduleNextRound(int gamePin) {
-                Timer timer = new Timer();
+                ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+                AtomicInteger timeRemaining = new AtomicInteger(11);
 
-                TimerTask task = new TimerTask() {
-                    int timeRemaining = 11;
-                    boolean factSent = false;
+
+                Runnable task = new Runnable() {
+                    boolean isFactSent=false;
                     @Override
                     public void run() {
-                        timeRemaining-=1;
-
-                        if (!factSent) {
+                        int remainingTime = timeRemaining.getAndDecrement();
+                        if (!isFactSent) {
                             sendFact(gamePin);
-                            factSent = true;
+                            isFactSent =true;
                         }
 
-                        if (noMoreTimeRemaining(timeRemaining)){
-                            timer.cancel();
+                        if (isGameFinished(gamePin)) {
+                            //because to few players remaining
+                            executor.shutdown();
+                            logger.info("Game closed: " + gamePin);
+                        }
+                        else if (noMoreTimeRemaining(remainingTime)) {
+                            executor.shutdown(); // Stop the executor
                             nextRound(gamePin);
-                            startRoundTime(gamePin);}
-                        else {
-
+                            startRoundTime(gamePin);
+                        } else {
                             ScoreboardTimerDTO scoreboardTimerDTO = new ScoreboardTimerDTO();
-                            scoreboardTimerDTO.setTimeRemaining(timeRemaining);
-                            webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION+gamePin,scoreboardTimerDTO);
+                            scoreboardTimerDTO.setTimeRemaining(remainingTime);
+                            webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, scoreboardTimerDTO);
                         }
                     }
                 };
 
-                // Schedule the task to run after the specified delay
-                timer.schedule(task, 1500,1000);
+                // Schedule the task to run after the specified delay, and repeat every 1 second
+                executor.scheduleAtFixedRate(task, 700, 1000, TimeUnit.MILLISECONDS);
             }
+
 
             private void sendFact(int gamePin) {
                 FactHolder factHolder = quoteService.generateFact();
@@ -328,6 +338,11 @@
                 Game game=gameRepository.findByGamePin(gamePin);
                 return currentVotingRound==game.getNumberOfCategories();
             }
+            boolean isGameFinished(int gamePin) {
+                //because all users left the game
+                Game game = gameRepository.findByGamePin(gamePin);
+                return game.getStatus()==GameStatus.CLOSED;
+            }
             boolean isRoundFinished(int gamePin){
                 Game game = gameRepository.findByGamePin(gamePin);
                 Round round = roundRepository.findByGameAndRoundNumber(game, game.getCurrentRound());
@@ -340,17 +355,7 @@
                 gameRepository.saveAndFlush(game);
             }
 
-            public void skipRequest(int gamePin, String userToken){
 
-                User user = userRepository.findByToken(userToken);
-                Game game = gameRepository.findByGamePin(gamePin);
-
-                checkIfUserExists(user);
-                checkIfUserIsInGame(game, user);
-
-                SkipManager skipManager = SkipRepository.findByGameId(gamePin);
-                skipManager.userWantsToSkip(user);
-            }
 
              static void cleanUpSkipForNextRound(int gamePin) {
                 SkipManager skipManager = SkipRepository.findByGameId(gamePin);
