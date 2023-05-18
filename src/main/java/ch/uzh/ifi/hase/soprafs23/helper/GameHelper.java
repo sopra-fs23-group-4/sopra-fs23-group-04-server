@@ -33,7 +33,7 @@ public class GameHelper {
 
         String errorMessage = "Game is not open. Please try again with a different pin!";
 
-        if (game.getStatus().equals(GameStatus.OPEN)) {
+        if (!game.getStatus().equals(GameStatus.OPEN)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
         }
 
