@@ -98,13 +98,11 @@ class UserServiceTest {
         when(userRepository.findById(1)).thenReturn(Optional.of(testUser));
         User editedUser = new User();
         editedUser.setId(1);
-        editedUser.setUsername("new-username");
-        editedUser.setPassword("new-password");
-        editedUser.setToken("valid-token");
+
         editedUser.setQuote("new-quote"); // Add a new quote for the edited user
 
         // When
-        User resultUser = userService.editUser(1, editedUser);
+        User resultUser = userService.editUser(1, editedUser,"valid-token");
 
         // Then
         assertEquals(editedUser.getId(), resultUser.getId());
@@ -125,7 +123,7 @@ class UserServiceTest {
         editedUser.setToken("valid-token");
 
         // Then (expect exception)
-        assertThrows(ResponseStatusException.class, () -> userService.editUser(1, editedUser));
+        assertThrows(ResponseStatusException.class, () -> userService.editUser(1, editedUser,"valid-token"));
     }
 
     @Test
@@ -134,12 +132,12 @@ class UserServiceTest {
         when(userRepository.findById(1)).thenReturn(Optional.of(testUser));
         User editedUser = new User();
         editedUser.setId(1);
-        editedUser.setUsername("new-username");
-        editedUser.setPassword("new-password");
+        editedUser.setToken("j");
+
         editedUser.setToken("invalid-token");
 
         // Then (expect exception)
-        assertThrows(ResponseStatusException.class, () -> userService.editUser(1, editedUser));
+        assertThrows(ResponseStatusException.class, () -> userService.editUser(1, editedUser,"invalid-token"));
     }
 
     @Test
