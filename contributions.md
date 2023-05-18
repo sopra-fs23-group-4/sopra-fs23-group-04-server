@@ -58,13 +58,13 @@
 | Lennart Töllke        | #16, #56, #43, #199 | #68, #63, #59, #57, #57    | added User page with advanced stats, managed uncontrolled leaving behaviour and single player  |
 | Remo Wiget            | #198, #50, #51, #65 | #19, #219, #234            | VotingResult optimized for mobile, Voting loader, timers, manual continue, beautify error msg, ui |
 
-16.05.2023
+23.05.2023
 
-| Person                | Last Week                  | Description                                                                       |
-|-----------------------|----------------------------|-----------------------------------------------------------------------------------|
-| Alexandre Bacmann     | #183,#184,#185,#186,#199   |                                                                                   |
-| Valentin Meyer        | #212, #217, #252           | added random categories in backend, fixed sonarcloud issues                       |
-| Christopher Narayanan | #236, #211, #245           |                                                                                   |
-| Lennart Töllke        | #68, #63, #59, #57, #57    |                                                                                   |
-| Remo Wiget            | #19, #217, #219, #234      | added random categories in frontend                                               |
+| Person                | Last Week                    | Description                                                                                                                                     |
+|-----------------------|------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| Alexandre Bacmann     | #183,#184,#185,#186,#199     |                                                                                                                                                 |
+| Valentin Meyer        | #212, #217, #252, #262, #266 | added random categories in backend, fixed sonarcloud issues, refactored CategoryService, added an integration test for AdvancedStatisticService |
+| Christopher Narayanan | #236, #211, #245             |                                                                                                                                                 |
+| Lennart Töllke        | #68, #63, #59, #57, #57      |                                                                                                                                                 |
+| Remo Wiget            | #19, #217, #219, #234        | added random categories in frontend                                                                                                             |
 
