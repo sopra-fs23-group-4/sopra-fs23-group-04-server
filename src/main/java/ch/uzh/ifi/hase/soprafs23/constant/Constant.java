@@ -12,5 +12,6 @@ public class Constant {
     public static final int MAX_STRING_LENGTH_OF_CATEGORY=18;
 
     public static final int QUOTE_MAX_LENGTH =255;
+    public static final int MAX_ALLOWED_OF_PLAYERS = 10;
 
 }

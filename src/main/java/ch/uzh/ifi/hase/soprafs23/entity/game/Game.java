@@ -136,6 +136,7 @@ public class Game implements Serializable {
                 .collect(Collectors.toList());
     }
 
+
     public List<User> getUsers() {
         return gameParticipants.stream()
                 .map(GameParticipant::getUser)

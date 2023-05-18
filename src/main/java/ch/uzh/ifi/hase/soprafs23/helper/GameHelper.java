@@ -85,6 +85,13 @@ public class GameHelper {
         return !users.isEmpty();
     }
 
+    public static void checkIfGameIsFull(Game game) {
+        int numberOfPlayersInLobby = game.getActiveUsers().size();
+        if (Constant.MAX_NUMBER_OF_CATEGORIES <= numberOfPlayersInLobby){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "The lobby is full no more players can join");
+        }
+    }
+
     public static List<Character> generateRandomLetters(int numberOfRounds){
         List<Character> letters = new ArrayList<>();
 

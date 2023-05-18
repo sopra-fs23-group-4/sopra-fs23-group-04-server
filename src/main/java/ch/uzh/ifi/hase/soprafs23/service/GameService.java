@@ -103,6 +103,7 @@ public class GameService {
 
         GameHelper.checkIfGameExists(gameToJoin);
         GameHelper.checkIfGameIsOpen(gameToJoin);
+        GameHelper.checkIfGameIsFull(gameToJoin);
 
         gameToJoin.addPlayer(user);
 
