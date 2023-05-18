@@ -33,15 +33,10 @@ public class GameHelper {
 
         String errorMessage = "Game is not open. Please try again with a different pin!";
 
-        if (!game.getStatus().equals(GameStatus.OPEN)) {
+        if (game.getStatus().equals(GameStatus.OPEN)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, errorMessage);
         }
 
-        String closedMessage = "Game is closed and cannot be joined.";
-
-        if (game.getStatus().equals(GameStatus.CLOSED)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, closedMessage);
-        }
     }
 
     public static void checkIfGameIsRunning(Game game) {
