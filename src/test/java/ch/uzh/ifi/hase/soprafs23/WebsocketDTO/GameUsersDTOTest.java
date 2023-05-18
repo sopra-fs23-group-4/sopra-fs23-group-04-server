@@ -9,12 +9,12 @@ import java.util.List;
 
 public class GameUsersDTOTest {
     @Test
-    public void getType_shouldReturnCorrectType() {
+    void getType_shouldReturnCorrectType() {
         Assertions.assertEquals("gameUsers", GameUsersDTO.TYPE);
     }
 
     @Test
-    public void getHostUsername_shouldReturnCorrectHostUsername() {
+    void getHostUsername_shouldReturnCorrectHostUsername() {
         GameUsersDTO gameUsersDTO = new GameUsersDTO();
         gameUsersDTO.setHostUsername("host123");
 
@@ -22,7 +22,7 @@ public class GameUsersDTOTest {
     }
 
     @Test
-    public void getUsernames_shouldReturnCorrectUsernames() {
+    void getUsernames_shouldReturnCorrectUsernames() {
         GameUsersDTO gameUsersDTO = new GameUsersDTO();
         List<String> usernames = Arrays.asList("user1", "user2", "user3");
         gameUsersDTO.setUsernames(usernames);

@@ -7,12 +7,12 @@ import org.junit.jupiter.api.Test;
 public class FactDTOTest {
 
     @Test
-    public void getType_shouldReturnCorrectType() {
+    void getType_shouldReturnCorrectType() {
         Assertions.assertEquals("fact", FactDTO.TYPE);
     }
 
     @Test
-    public void getFact_shouldReturnCorrectFact() {
+    void getFact_shouldReturnCorrectFact() {
         FactDTO factDTO = new FactDTO();
         factDTO.setFact("Some fact");
 
