@@ -17,16 +17,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class AdvancedStatisticService {
 
     private final GameRepository gameRepository;
-    private final CategoryRepository categoryRepository;
     private final AnswerRepository answerRepository;
-    private final RoundRepository roundRepository;
     private final VoteRepository voteRepository;
     private final UserRepository userRepository;
     private final ScoreCalculationService scoreCalculationService;
@@ -34,27 +31,47 @@ public class AdvancedStatisticService {
 
     @Autowired
     public AdvancedStatisticService(@Qualifier("gameRepository")GameRepository gameRepository,
-                                    @Qualifier("categoryRepository")CategoryRepository categoryRepository,
                                     @Qualifier("answerRepository")AnswerRepository answerRepository,
-                                    @Qualifier("roundRepository")RoundRepository roundRepository,
                                     @Qualifier("voteRepository")VoteRepository voteRepository,
                                     @Qualifier("userRepository")UserRepository userRepository,
                                     ScoreCalculationService scoreCalculationService,
                                     GameService gameService) {
         this.gameRepository = gameRepository;
-        this.categoryRepository = categoryRepository;
         this.answerRepository = answerRepository;
-        this.roundRepository = roundRepository;
         this.voteRepository = voteRepository;
         this.userRepository = userRepository;
         this.scoreCalculationService = scoreCalculationService;
         this.gameService = gameService;
     }
 
+    public AdvancedStatisticGetDTO getAdvancedUserStatistic(int userId) {
+
+        AdvancedStatisticGetDTO advancedStatisticsGetDTO = new AdvancedStatisticGetDTO();
+
+        advancedStatisticsGetDTO.setRank(getRank(userId));
+        advancedStatisticsGetDTO.setTotalWins(getTotalWins(userId));
+        //advancedStatisticsGetDTO.setTotalLoss(getTotalLoss(userId));
+        //advancedStatisticsGetDTO.setPercentOfWins(getPercentageOfWin(userId));
+        //advancedStatisticsGetDTO.setPercentOfLoss(getPercentageOfLoss(userId));
+        advancedStatisticsGetDTO.setTotalPlayedGames(getTotalPlayedGames(userId));
+        //advancedStatisticsGetDTO.setTotalPlayedRounds(getTotalPlayedRounds(userId));
+        advancedStatisticsGetDTO.setTotalAnswersAnswered(getTotalAnswerAnswered(userId));
+        advancedStatisticsGetDTO.setTotalPointsOverall(getTotalPointsOverall(userId));
+        //advancedStatisticsGetDTO.setAvgPlayedRoundsPerGames(getAvgPlayedRoundsPerGame(userId));
+        advancedStatisticsGetDTO.setTotalCorrectAndUniqueAnswers(getTotalCorrectAndUniqueAnswers(userId));
+        //advancedStatisticsGetDTO.setTotalCorrectAndNotUniqueAnswers(getTotalCorrectAndNotUniqueAnswers(userId));
+        //advancedStatisticsGetDTO.setTotalWrongAnswers(getTotalWrongAnswers(userId));
+        //advancedStatisticsGetDTO.setPercentOfCorrectPerGame(getPercentOfCorrectPerGame(userId));
+        advancedStatisticsGetDTO.setMostPlayedCategory(getMostPlayedCategory(userId));
+
+
+        return advancedStatisticsGetDTO;
+    }
+
     /*
     Statistics: Rank of a player
      */
-    public int getRank(int userId) {
+    private int getRank(int userId) {
         // Get the user
         User user = userRepository.findById(userId).orElse(null);
 
@@ -281,6 +298,7 @@ public class AdvancedStatisticService {
             voteCounts.put(VoteOption.CORRECT_UNIQUE, 0);
             voteCounts.put(VoteOption.CORRECT_NOT_UNIQUE, 0);
             voteCounts.put(VoteOption.WRONG, 0);
+            voteCounts.put(VoteOption.NO_VOTE, 0);
 
             for (Vote vote : votesForAnswer) {
                 VoteOption voteOption = vote.getVotedOption();
@@ -343,31 +361,6 @@ public class AdvancedStatisticService {
             // If categoryCount is empty, return null or handle it in the way that is most suitable for your application.
             return null;
         }
-    }
-
-        public AdvancedStatisticGetDTO getAdvancedUserStatistic(int userId) {
-
-
-        AdvancedStatisticGetDTO advancedStatisticsGetDTO = new AdvancedStatisticGetDTO();
-
-        advancedStatisticsGetDTO.setRank(getRank(userId));
-        advancedStatisticsGetDTO.setTotalWins(getTotalWins(userId));
-        //advancedStatisticsGetDTO.setTotalLoss(getTotalLoss(userId));
-        //advancedStatisticsGetDTO.setPercentOfWins(getPercentageOfWin(userId));
-        //advancedStatisticsGetDTO.setPercentOfLoss(getPercentageOfLoss(userId));
-        advancedStatisticsGetDTO.setTotalPlayedGames(getTotalPlayedGames(userId));
-        //advancedStatisticsGetDTO.setTotalPlayedRounds(getTotalPlayedRounds(userId));
-        advancedStatisticsGetDTO.setTotalAnswersAnswered(getTotalAnswerAnswered(userId));
-        advancedStatisticsGetDTO.setTotalPointsOverall(getTotalPointsOverall(userId));
-        //advancedStatisticsGetDTO.setAvgPlayedRoundsPerGames(getAvgPlayedRoundsPerGame(userId));
-        advancedStatisticsGetDTO.setTotalCorrectAndUniqueAnswers(getTotalCorrectAndUniqueAnswers(userId));
-        //advancedStatisticsGetDTO.setTotalCorrectAndNotUniqueAnswers(getTotalCorrectAndNotUniqueAnswers(userId));
-        //advancedStatisticsGetDTO.setTotalWrongAnswers(getTotalWrongAnswers(userId));
-        //advancedStatisticsGetDTO.setPercentOfCorrectPerGame(getPercentOfCorrectPerGame(userId));
-        advancedStatisticsGetDTO.setMostPlayedCategory(getMostPlayedCategory(userId));
-
-
-        return advancedStatisticsGetDTO;
     }
 
 }
