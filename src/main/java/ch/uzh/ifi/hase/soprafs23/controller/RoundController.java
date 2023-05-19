@@ -52,16 +52,6 @@ public class RoundController {
                 gamePin, roundNumber);
         logger.info(logInfo1);
 
-        String fill="roundEnd";
-        RoundEndDTO roundEndDTO=new RoundEndDTO();
-        roundEndDTO.setRounded(fill);
-        webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, roundEndDTO);
-
-        String logInfo2 = String.format(
-                "Round ended -> gamePin: %d, roundNumber: %d.",
-                gamePin, roundNumber);
-        logger.info(logInfo2);
-
     }
 
     @PutMapping("/games/{gamePin}/skip")

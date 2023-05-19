@@ -1,5 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.controller;
 
+import ch.uzh.ifi.hase.soprafs23.entity.quote.FactHolder;
+import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteCategoriesHolder;
 import ch.uzh.ifi.hase.soprafs23.entity.quote.QuoteHolder;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.quote.QuoteGetDTO;
 import ch.uzh.ifi.hase.soprafs23.service.QuoteService;
@@ -16,6 +18,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.internal.bytebuddy.matcher.ElementMatchers.is;
 import static org.mockito.BDDMockito.given;
@@ -70,6 +75,48 @@ class QuoteControllerTest {
         mockMvc.perform(getRequest).andExpect(status().isNotFound());
 
     }
+    @Test
+    void testGetFact() throws Exception {
+        // Mock the behavior of the quoteService.generateFact() method
+        FactHolder mockFactHolder = new FactHolder();
+        mockFactHolder.setFact("This is a fact");
+        // Set up your mockFactHolder object as per your requirements
+
+        given(quoteService.generateFact()).willReturn(mockFactHolder);
+
+
+        MockHttpServletRequestBuilder getRequest = get("/facts")
+                .contentType(MediaType.APPLICATION_JSON);
+        // Perform the GET request
+        mockMvc.perform(getRequest).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.fact", Matchers.is(mockFactHolder.getFact())));
+        // Update the jsonPath assertion with the appropriate property of FactHolder class
+    }
+
+    @Test
+    void testGetQuoteCategories() throws Exception {
+        // Mock the behavior of the QuoteService.getCategories() method
+        QuoteCategoriesHolder quoteCategoriesHolder = new QuoteCategoriesHolder();
+
+        List<String> mockCategories = Arrays.asList("Category1", "Category2", "Category3");
+        quoteCategoriesHolder.setCategories(mockCategories);
+        // Set up your mockCategories list as per your requirements
+
+        given(quoteService.getCategories()).willReturn(quoteCategoriesHolder);
+
+        // Perform the GET request
+
+        MockHttpServletRequestBuilder getRequest = get("/quotes")
+                .contentType(MediaType.APPLICATION_JSON);
+        // Perform the GET request
+        mockMvc.perform(getRequest).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.categories").isArray())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.categories.length()").value(mockCategories.size()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.categories[0]").value(mockCategories.get(0)));
+        // Update the jsonPath assertions with the appropriate properties of QuoteCategoriesGetDTO class
+    }
+
+
+
+
 
 
 }

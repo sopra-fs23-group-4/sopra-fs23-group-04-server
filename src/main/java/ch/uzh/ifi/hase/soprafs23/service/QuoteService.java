@@ -61,7 +61,7 @@ public class QuoteService {
 
     }
 
-    public QuoteCategoriesHolder getCategories(){
+    public  QuoteCategoriesHolder getCategories(){
         List<String> categories=QuoteCategory.getAllCategoryNames();
 
         QuoteCategoriesHolder quoteCategoriesHolder= new QuoteCategoriesHolder();

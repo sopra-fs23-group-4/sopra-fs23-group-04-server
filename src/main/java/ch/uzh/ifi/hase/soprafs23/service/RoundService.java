@@ -93,6 +93,10 @@
                 round.setStatus(RoundStatus.FINISHED);
 
                 roundRepository.saveAndFlush(round);
+                String fill="roundEnd";
+                RoundEndDTO roundEndDTO=new RoundEndDTO();
+                roundEndDTO.setRounded(fill);
+                webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, roundEndDTO);
                 voteTimeControl(gamePin);
 
             }
