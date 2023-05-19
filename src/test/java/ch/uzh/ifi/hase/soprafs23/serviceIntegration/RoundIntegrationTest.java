@@ -1,15 +1,20 @@
 package ch.uzh.ifi.hase.soprafs23.serviceIntegration;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static ch.uzh.ifi.hase.soprafs23.constant.GameCategory.getCategories;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import ch.uzh.ifi.hase.soprafs23.constant.Constant;
 import ch.uzh.ifi.hase.soprafs23.constant.GameStatus;
+import ch.uzh.ifi.hase.soprafs23.constant.RoundLength;
 import ch.uzh.ifi.hase.soprafs23.constant.RoundStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
+import ch.uzh.ifi.hase.soprafs23.entity.game.Category;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Round;
+import ch.uzh.ifi.hase.soprafs23.entity.game.SkipManager;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
+import ch.uzh.ifi.hase.soprafs23.repository.SkipRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs23.service.QuoteService;
 import ch.uzh.ifi.hase.soprafs23.service.RoundService;
@@ -21,8 +26,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class RoundIntegrationTest {
 
@@ -44,17 +53,17 @@ public class RoundIntegrationTest {
     @Mock
     private QuoteService quoteService;
 
-    @Mock
-    private Game game;
+
 
     @Mock
     private User user;
 
     @Mock
     private Round round;
+    private final List<String> categoryNames = List.of("Stadt");
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
@@ -79,7 +88,7 @@ public class RoundIntegrationTest {
     }*/
 
     @Test
-    public void createAllRounds_createsRoundsSuccessfully() {
+    void createAllRounds_createsRoundsSuccessfully() {
         // Arrange
         Game game = new Game();
         game.setRoundLetters(Arrays.asList('a', 'b', 'c'));
@@ -92,7 +101,7 @@ public class RoundIntegrationTest {
         verify(roundRepository, times(1)).flush();
     }
     @Test
-    public void stopRoundTest() {
+    void stopRoundTest() {
         // Arrange
         Game game = new Game();
         User user = new User();
@@ -119,7 +128,7 @@ public class RoundIntegrationTest {
     }
 
     @Test
-    public void nextRoundTest() {
+    void nextRoundTest() {
         int nextRound=5;
         // Arrange
         Game game = new Game();
@@ -153,6 +162,85 @@ public class RoundIntegrationTest {
         assertEquals(expectedDestination, stringCaptor.getValue());
         // Add additional assertions for game incrementRound method and LetterDTO object
     }
+    @Test
+    void testSkipRequest_pass() {
+        // Arrange
+
+
+        String userToken = "abcde12345";
+
+        User user = new User();
+        user.setToken(userToken);
+        Game game = createGameForTesting();
+        game.addPlayer(user);
+        SkipManager skipManager = SkipRepository.addGame(game.getGamePin());
+        skipManager.addUser(user);
+        gameRepository.save(game);
+
+        // Mocking repository methods
+        when(userRepository.findByToken(userToken)).thenReturn(user);
+        when(gameRepository.findByGamePin(game.getGamePin())).thenReturn(game);
+
+        // Act
+        roundService.skipRequest(game.getGamePin(), userToken);
+
+        // Assert
+        verify(userRepository, times(1)).findByToken(userToken);
+        verify(gameRepository, times(1)).findByGamePin(game.getGamePin());
+
+        assertTrue(skipManager.allPlayersWantToContinue());
+    }
+
+    @Test
+    void testSkipRequest_fail() {
+        // Arrange
+
+
+        String userToken = "abcde12345";
+
+        User user = new User();
+        user.setToken(userToken);
+        Game game = createGameForTesting();
+        game.addPlayer(user);
+        SkipManager skipManager = SkipRepository.addGame(game.getGamePin());
+        skipManager.addUser(user);
+        gameRepository.save(game);
+
+        // Mocking repository methods
+        when(userRepository.findByToken(userToken)).thenReturn(user);
+        when(gameRepository.findByGamePin(game.getGamePin())).thenReturn(game);
+        roundService.skipRequest(game.getGamePin(),userToken);
+
+        // Act
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> roundService.skipRequest(game.getGamePin(), userToken));
+        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
+
+        // Assert
+    }
+    private Game createGameForTesting() {
+
+        Game gameForCreation = new Game();
+        gameForCreation.setRounds(1);
+        gameForCreation.setRoundLength(RoundLength.MEDIUM);
+        gameForCreation.setCategories(getCategories());
+
+        return gameForCreation;
+    }
+    private List<Category> getCategories() {
+
+        List<Category> mappedCategories = new ArrayList<>();
+
+        for (String categoryName : categoryNames) {
+            Category mappedCategory = new Category();
+            mappedCategory.setName(categoryName);
+            mappedCategories.add(mappedCategory);
+        }
+        return mappedCategories;
+    }
+
+
+
 
 
 }

@@ -27,7 +27,7 @@ public class SkipManager {
     public void userWantsToSkip(User user){
         Skip skip= userContinueMap.get(user);
         if (skip==Skip.WantsToSkip){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"You already want to skip");
+            throw new ResponseStatusException(HttpStatus.CONFLICT,"You have already sent a skip request");
         }
         userContinueMap.put(user,Skip.WantsToSkip);
     }

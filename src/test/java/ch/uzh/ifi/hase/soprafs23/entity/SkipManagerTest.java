@@ -1,9 +1,11 @@
 package ch.uzh.ifi.hase.soprafs23.entity;
 
 import ch.uzh.ifi.hase.soprafs23.entity.game.SkipManager;
+import ch.uzh.ifi.hase.soprafs23.repository.SkipRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -55,7 +57,9 @@ public class SkipManagerTest {
     public void testUserWantsToSkipAlreadyWantsToSkip() {
         skipManager.addUser(user);
         skipManager.userWantsToSkip(user);
-        assertThrows(ResponseStatusException.class, () -> skipManager.userWantsToSkip(user), "You already want to skip");
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> skipManager.userWantsToSkip(user));
+        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
     }
 
     @Test

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,13 +30,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
         @Test
         public void testFindByGameIdNotFound() {
-            assertThrows(ResponseStatusException.class, () -> SkipRepository.findByGameId(gamePin), "This lobby does not exist!");
+            ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                    () -> SkipRepository.findByGameId(gamePin));
+            assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+
         }
 
         @Test
         public void testRemoveSkipManager() {
             SkipRepository.addGame(gamePin);
             SkipRepository.removeSkipManager(gamePin);
-            assertThrows(ResponseStatusException.class, () -> SkipRepository.findByGameId(gamePin), "This lobby does not exist!");
+            ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                    () -> SkipRepository.findByGameId(gamePin));
+            assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
         }
 }
