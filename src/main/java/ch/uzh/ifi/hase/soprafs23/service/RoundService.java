@@ -204,13 +204,17 @@
                 AtomicInteger remainingTime = new AtomicInteger(15);
 
                 Runnable resultTimerTask = new Runnable() {
+                    boolean isQuoteSent = false;
                     @Override
                     public void run() {
                         int timeLeft = remainingTime.addAndGet(-1);
                         SkipManager skipManager = SkipRepository.findByGameId(gamePin);
+                        if (!isQuoteSent) {
+                            scheduleSendFact(gamePin);
+                            isQuoteSent = true;
+                        }
 
                         if (noMoreTimeRemaining(timeLeft) || skipManager.allPlayersWantToContinue()) {
-                            scheduleSendFact(gamePin);
                             executor.shutdown(); // Stop the executor
                             cleanUpSkipForNextRound(gamePin);
 
