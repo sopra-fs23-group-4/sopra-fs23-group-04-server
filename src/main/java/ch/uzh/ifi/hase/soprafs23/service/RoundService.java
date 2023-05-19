@@ -142,6 +142,7 @@
                         } else if (noMoreTimeRemaining(timeLeft)) {
                             // Finish round
                             finishRoundNoTimeLeft(timeLeft, round, gamePin, executor);
+                            executor.shutdown();
                         } else {
                             timeLeftUpdate(timeLeft, round, gamePin);
                         }
@@ -162,7 +163,7 @@
                 SkipManager skipManager = SkipRepository.findByGameId(gamePin);
                 skipManager.userWantsToSkip(user);
             }
-            void timeLeftUpdate(int timeLeft, Round round, int gamePin) {
+            public void timeLeftUpdate(int timeLeft, Round round, int gamePin) {
                 String logInfo = String.format("timeLeft: %d, current round status: %s", timeLeft, round.getStatus());
                 logger.info(logInfo);
 
@@ -209,6 +210,7 @@
                         SkipManager skipManager = SkipRepository.findByGameId(gamePin);
 
                         if (noMoreTimeRemaining(timeLeft) || skipManager.allPlayersWantToContinue()) {
+                            scheduleSendFact(gamePin);
                             executor.shutdown(); // Stop the executor
                             cleanUpSkipForNextRound(gamePin);
 
@@ -289,20 +291,17 @@
 
                 executor.scheduleAtFixedRate(votingTimerTask, 2000, 1000, TimeUnit.MILLISECONDS);
             }
+
+
             void scheduleNextRound(int gamePin) {
                 ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
                 AtomicInteger timeRemaining = new AtomicInteger(11);
 
 
                 Runnable task = new Runnable() {
-                    boolean isFactSent=false;
                     @Override
                     public void run() {
                         int remainingTime = timeRemaining.getAndDecrement();
-                        if (!isFactSent) {
-                            sendFact(gamePin);
-                            isFactSent =true;
-                        }
 
                         if (isGameFinished(gamePin)) {
                             //because to few players remaining
@@ -323,6 +322,11 @@
 
                 // Schedule the task to run after the specified delay, and repeat every 1 second
                 executor.scheduleAtFixedRate(task, 700, 1000, TimeUnit.MILLISECONDS);
+            }
+            public void scheduleSendFact(int gamePin) {
+                ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+                executor.schedule(() -> sendFact(gamePin), 0, TimeUnit.MILLISECONDS);
+                executor.shutdown();
             }
 
 
