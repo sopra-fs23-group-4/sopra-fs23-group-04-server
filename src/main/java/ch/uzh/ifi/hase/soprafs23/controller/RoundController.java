@@ -13,33 +13,17 @@ import org.springframework.web.bind.annotation.*;
 public class RoundController {
 
     private final RoundService roundService;
-    private final WebSocketService webSocketService;
 
 
     Logger logger = LoggerFactory.getLogger(RoundController.class);
 
-    RoundController(RoundService roundService,
-                    WebSocketService webSocketService) {
+    RoundController(RoundService roundService) {
         this.roundService = roundService;
-        this.webSocketService=webSocketService;
     }
 
-    /*@PutMapping("/games/{gamePin}/{roundNumber}/start")
-    public void gameStart(@PathVariable("gamePin") int gamePin,
-                          @PathVariable("roundNumber") int roundNumber) {
-
-        LetterDTO letterDTO = roundService.startRound(gamePin, roundNumber);
-
-        webSocketService.sendMessageToClients(Constant.defaultDestination+gamePin,letterDTO);
-
-        log.info("Round " + roundNumber + "started in lobby " + gamePin);
-
-        roundService.startRoundTime(gamePin);
-    }*/
 
     @PutMapping("/games/{gamePin}/{roundNumber}/end")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void endRound(@PathVariable("gamePin") int gamePin,
                          @PathVariable("roundNumber") int roundNumber,
                          @RequestHeader("Authorization") String userToken) {
@@ -55,7 +39,7 @@ public class RoundController {
     }
 
     @PutMapping("/games/{gamePin}/skip")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void userSkipRequest(@RequestHeader("Authorization") String userToken,
                                 @PathVariable("gamePin") int gamePin) {
 
