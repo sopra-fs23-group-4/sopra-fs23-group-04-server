@@ -55,7 +55,7 @@
 | Alexandre Bacmann     | #46,#48,#200,#242,#243|#183,#184,#185,#186,#199  | testing, Advanced statistics (service, controller and DTO class).                 |
 | Valentin Meyer        | #160, #163          | #212, #217                 | added integration tests for GameService and AnswerService                         |
 | Christopher Narayanan | #208, #197, #223, #276, (#240), #278    | #236, #211, #245, #80           | adding functionality that if users want they can skip round, changing how facts are sent,  adding animation for winnerquote, auto starting next round     |
-| Lennart Töllke        | #16, #56, #43, #199 | #68, #63, #59, #57, #57    | added User page with advanced stats, managed uncontrolled leaving behaviour and single player  |
+| Lennart Töllke        | #16, #56, #43, #199 | #68, #63, #57, #58, #59    | added User page with advanced stats, managed uncontrolled leaving behaviour and single player  |
 | Remo Wiget            | #198, #50, #51, #65 | #19, #219, #234            | VotingResult optimized for mobile, Voting loader, timers, manual continue, beautify error msg, ui |
 
 23.05.2023
@@ -65,6 +65,6 @@
 | Alexandre Bacmann     | #183,#184,#185,#186,#199           |                                                                                                                                                                                      |
 | Valentin Meyer        | #212, #217, #252, #262, #266, #269 | added random categories in backend, fixed sonarcloud issues, refactored CategoryService, added an integration test for AdvancedStatisticService, added more tests for helper classes |
 | Christopher Narayanan | #236, #211, #245, #81, #247, #189, #190, #240                   | countdown page works regardless of fixing many bugs, and doing tess                                                                                                                                                                                      |
-| Lennart Töllke        | #68, #63, #59, #57, #57            |                                                                                                                                                                                      |
+| Lennart Töllke        | #68, #63, #57, #58, #59, #76            | added pop up to leave button and progress bar on score page, InGameRouter, routing to User Page, fixed Bugs                                                                                                                                                                                  |
 | Remo Wiget            | #19, #217, #219, #234              | added random categories in frontend                                                                                                                                                  |
 
