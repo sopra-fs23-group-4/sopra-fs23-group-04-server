@@ -286,7 +286,7 @@
                             executor.shutdown(); // Stop the executor
 
                             VotingEndDTO votingEndDTO = new VotingEndDTO();
-                            votingEndDTO.setCategoryIndex(currentVotingRound);
+                            votingEndDTO.setCategoryIndex(currentVotingRound-1);
                             votingEndDTO.setRound(game.getCurrentRound());
 
                             webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, votingEndDTO);
