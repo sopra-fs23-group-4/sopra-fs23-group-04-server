@@ -1,28 +1,22 @@
-# SoPra Groupe 04 RESTful Service Template FS23
-abcthis is an uncessary change
+# SoPra Group 04 FS23 - STADT LAND **+**
 
-## Getting started with Spring Boot
--   Documentation: https://docs.spring.io/spring-boot/docs/current/reference/html/index.html
--   Guides: http://spring.io/guides
-    -   Building a RESTful Web Service: http://spring.io/guides/gs/rest-service/
-    -   Building REST services with Spring: https://spring.io/guides/tutorials/rest/
+Welcome to Stadt Land Plus! This project is the result of our Software Lab class at the University of Zurich, where we were tasked with the challenge of developing a software application. We decided to create a game, taking inspiration from the classic Swiss game, Stadt Land Fluss, also known as 'Categories' in English.
 
-## Setup this Template with your IDE of choice
-Download your IDE of choice (e.g., [IntelliJ](https://www.jetbrains.com/idea/download/), [Visual Studio Code](https://code.visualstudio.com/), or [Eclipse](http://www.eclipse.org/downloads/)). Make sure Java 17 is installed on your system (for Windows, please make sure your `JAVA_HOME` environment variable is set to the correct version of Java).
+## Introduction
+Embark on a thrilling journey with Stadt Land Plus, a captivating multiplayer word game! By brainstorming words within chosen categories and a surprise random letter, players are immersed in a realm of fast-paced learning and fun. The unique twist? A democratic voting system that brings a dash of unpredictability while guaranteeing fairness in validating answers. Get ready to ignite your mind!
+## Motivation
 
-### IntelliJ
-1. File -> Open... -> SoPra server template
-2. Accept to import the project as a `gradle project`
-3. To build right click the `build.gradle` file and choose `Run Build`
+Our motivation behind this game was to design a multiplayer experience that not only provides entertainment but also educational value. By choosing categories and brainstorming words, players can broaden their general knowledge and improve quick thinking skills.
 
-### VS Code
-The following extensions can help you get started more easily:
--   `vmware.vscode-spring-boot`
--   `vscjava.vscode-spring-initializr`
--   `vscjava.vscode-spring-boot-dashboard`
--   `vscjava.vscode-java-pack`
+## Technologies
 
-**Note:** You'll need to build the project first with Gradle, just click on the `build` command in the _Gradle Tasks_ extension. Then check the _Spring Boot Dashboard_ extension if it already shows `soprafs23` and hit the play button to start the server. If it doesn't show up, restart VS Code and check again.
+The back-end is written in Java and uses Spring Boot framework. We use JPA for persistence and the deployment is
+handled by Google Cloud. Communication between the server and the client is done with REST and websockets.
+
+
+## High-level components
+
+Stadt Land Plus revolves around three key components: [Controller](https://github.com/sopra-fs23-group-4/sopra-fs23-group-04-server/tree/main/src/main/java/ch/uzh/ifi/hase/soprafs23/controller) classes, [Service](https://github.com/sopra-fs23-group-4/sopra-fs23-group-04-server/tree/main/src/main/java/ch/uzh/ifi/hase/soprafs23/service) classes, and [Entity](https://github.com/sopra-fs23-group-4/sopra-fs23-group-04-server/tree/main/src/main/java/ch/uzh/ifi/hase/soprafs23/entity) classes. The Controller classes manage all REST calls and Websocket communications, acting as the bridge between client and server. The Service classes encapsulate the core game logic, responding to controller requests and managing game states. Lastly, the Entity classes define the main game objects and data structures, linking everything together. These components collectively ensure a seamless and engaging gaming experience.
 
 ## Building with Gradle
 You can use the local Gradle Wrapper to build the application.
@@ -52,36 +46,19 @@ You can verify that the server is running by visiting `localhost:8080` in your b
 ./gradlew test
 ```
 
-### Development Mode
-You can start the backend in development mode, this will automatically trigger a new build and reload the application
-once the content of a file has been changed.
+## Roadmap
 
-Start two terminal windows and run:
+- Death Mode: Player with the least points after a round is eliminated
+- Algorithm to check certain categories for correctness e.g. city and country to improve fairness
+- Possibility to play non-synchronized
 
-`./gradlew build --continuous`
 
-and in the other one:
+## Authors and acknowledgement
 
-`./gradlew bootRun`
+SoPra Group 04 2023 consists of [Valentin Meyer](https://github.com/VaLeoMe), [Remo Wiget](https://github.com/wigeto), [Christopher Narayanan](https://github.com/Queentaker), [Lennart Tölke](https://github.com/LexuTros) and [Alexandre Bacmann](https://github.com/ABacmann).
 
-If you want to avoid running all tests with every change, use the following command instead:
+We want to thank our teaching assistant [Hyeongkyun (Kaden) Kim](https://github.com/hk-kaden-kim) for his help and guidance during the project.
 
-`./gradlew build --continuous -xtest`
+## License
 
-## API Endpoint Testing with Postman
-We recommend using [Postman](https://www.getpostman.com) to test your API Endpoints.
-
-## Debugging
-If something is not working and/or you don't know what is going on. We recommend using a debugger and step-through the process step-by-step.
-
-To configure a debugger for SpringBoot's Tomcat servlet (i.e. the process you start with `./gradlew bootRun` command), do the following:
-
-1. Open Tab: **Run**/Edit Configurations
-2. Add a new Remote Configuration and name it properly
-3. Start the Server in Debug mode: `./gradlew bootRun --debug-jvm`
-4. Press `Shift + F9` or the use **Run**/Debug "Name of your task"
-5. Set breakpoints in the application where you need it
-6. Step through the process one step at a time
-
-## Testing
-Have a look here: https://www.baeldung.com/spring-boot-testing
+Licensed under [Apache License 2.0](https://github.com/sopra-fs23-group-4/sopra-fs23-group-04-server/blob/main/LICENSE)
