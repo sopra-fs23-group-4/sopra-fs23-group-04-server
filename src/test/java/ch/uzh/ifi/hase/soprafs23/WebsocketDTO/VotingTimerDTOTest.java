@@ -1,6 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.WebsocketDTO;
 
-import ch.uzh.ifi.hase.soprafs23.websocketDto.VotingTimerDTO;
+import ch.uzh.ifi.hase.soprafs23.websocketDto.TimerDto.VotingTimerDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

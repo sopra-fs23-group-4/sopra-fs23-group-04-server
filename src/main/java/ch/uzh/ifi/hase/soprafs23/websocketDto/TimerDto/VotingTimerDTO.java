@@ -1,7 +1,7 @@
-package ch.uzh.ifi.hase.soprafs23.websocketDto;
+package ch.uzh.ifi.hase.soprafs23.websocketDto.TimerDto;
 
-public class ScoreboardTimerDTO {
-    public static final String TYPE = "scoreboardTimer";
+public class VotingTimerDTO {
+    public static final String TYPE = "votingTimer";
 
     private int timeRemaining;
     public String getType(){

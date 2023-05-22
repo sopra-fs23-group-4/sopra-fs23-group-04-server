@@ -15,6 +15,9 @@
         import ch.uzh.ifi.hase.soprafs23.repository.SkipRepository;
         import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
         import ch.uzh.ifi.hase.soprafs23.websocketDto.*;
+        import ch.uzh.ifi.hase.soprafs23.websocketDto.TimerDto.ResultTimerDTO;
+        import ch.uzh.ifi.hase.soprafs23.websocketDto.TimerDto.ScoreboardTimerDTO;
+        import ch.uzh.ifi.hase.soprafs23.websocketDto.TimerDto.VotingTimerDTO;
         import org.slf4j.Logger;
         import org.slf4j.LoggerFactory;
         import org.springframework.beans.factory.annotation.Autowired;
@@ -93,9 +96,8 @@
                 round.setStatus(RoundStatus.FINISHED);
 
                 roundRepository.saveAndFlush(round);
-                String fill="roundEnd";
                 RoundEndDTO roundEndDTO=new RoundEndDTO();
-                roundEndDTO.setRounded(fill);
+                roundEndDTO.setRound(game.getCurrentRound());
                 webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, roundEndDTO);
                 voteTimeControl(gamePin);
 
@@ -141,7 +143,7 @@
                             executor.shutdown(); // Stop the executor
                         } else if (noMoreTimeRemaining(timeLeft)) {
                             // Finish round
-                            finishRoundNoTimeLeft(timeLeft, round, gamePin, executor);
+                            finishRoundNoTimeLeft(timeLeft, round, gamePin,game.getCurrentRound(), executor);
                             executor.shutdown();
                         } else {
                             timeLeftUpdate(timeLeft, round, gamePin);
@@ -172,14 +174,13 @@
                 webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, roundTimerDTO);
             }
 
-            void finishRoundNoTimeLeft(int timeLeft, Round round, int gamePin, ScheduledExecutorService executor) {
+            void finishRoundNoTimeLeft(int timeLeft, Round round, int gamePin,int currentRound, ScheduledExecutorService executor) {
                 round.setStatus(RoundStatus.FINISHED);
                 roundRepository.saveAndFlush(round);
                 String logInfo = String.format("timeLeft: %d.", timeLeft);
                 logger.info(logInfo);
-                String fill = "roundEnd";
                 RoundEndDTO roundEndDTO = new RoundEndDTO();
-                roundEndDTO.setRounded(fill);
+                roundEndDTO.setRound(currentRound);
                 webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, roundEndDTO);
                 executor.shutdown(); // Stop the executor
                 voteTimeControl(gamePin);
@@ -201,6 +202,7 @@
                 logger.info("started");
 
                 ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+                Game game = gameRepository.findByGamePin(gamePin);
                 AtomicInteger remainingTime = new AtomicInteger(15);
 
                 Runnable resultTimerTask = new Runnable() {
@@ -219,11 +221,15 @@
                             cleanUpSkipForNextRound(gamePin);
 
                             if (isLastCategory(gamePin, currentVotingRound)) {
-                                goToScoreBoardOrWinnerPage(gamePin);
+                                goToScoreBoardOrWinnerPage(gamePin, game.getCurrentRound());
                             } else {
-                                WebSocketDTO webSocketDTO = WebSocketDTOCreator.resultNextVote();
-                                webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, webSocketDTO);
+                                ResultNextVoteDTO resultNextVote = new ResultNextVoteDTO();
                                 int currentVotingRoundIncremented = currentVotingRound + 1;
+
+                                resultNextVote.setRound(game.getCurrentRound());
+                                resultNextVote.setCategoryIndex(currentVotingRound);
+                                webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, resultNextVote);
+
                                 votingTimer(gamePin, currentVotingRoundIncremented);
                             }
                         } else {
@@ -242,15 +248,16 @@
                 webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,resultTimerDTO);
             }
 
-            void goToScoreBoardOrWinnerPage(int gamePin) {
+            void goToScoreBoardOrWinnerPage(int gamePin, int currentRound) {
                 if (isFinalRound(gamePin)){
-                    WebSocketDTO webSocketDTO = WebSocketDTOCreator.resultWinner();
-                    webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,webSocketDTO);
+                    WebSocketDTO resultWinnerDTO = WebSocketDTOCreator.resultWinner();
+                    webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,resultWinnerDTO);
                     endGame(gamePin);
                 }
                 else{
-                    WebSocketDTO webSocketDTO = WebSocketDTOCreator.resultScoreBoard();
-                    webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,webSocketDTO);
+                    ResultScoreBoardDTO resultScoreBoardDTO = new ResultScoreBoardDTO();
+                    resultScoreBoardDTO.setRound(currentRound);
+                    webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin,resultScoreBoardDTO);
                     scheduleNextRound(gamePin);
                 }
             }
@@ -261,6 +268,7 @@
 
             void votingTimer(int gamePin, int currentVotingRound) {
                 ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+                Game game = gameRepository.findByGamePin(gamePin);
                 Runnable votingTimerTask = new Runnable() {
                     int timeRemaining = 30;
                     // Time remaining in seconds
@@ -275,8 +283,11 @@
                             cleanUpSkipForNextRound(gamePin);
                             executor.shutdown(); // Stop the executor
 
-                            WebSocketDTO webSocketDTO = WebSocketDTOCreator.votingEnd();
-                            webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, webSocketDTO);
+                            VotingEndDTO votingEndDTO = new VotingEndDTO();
+                            votingEndDTO.setCategoryIndex(currentVotingRound);
+                            votingEndDTO.setRound(game.getCurrentRound());
+
+                            webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, votingEndDTO);
                             logger.info("Voting ended, the users see voting results now.");
                             votingScoreOverviewTimer(gamePin, currentVotingRound);
                         } else {
