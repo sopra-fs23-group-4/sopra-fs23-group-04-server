@@ -50,7 +50,7 @@ public class UserService {
         checkIfUsernameAlreadyExists(newUser);
         checkIfUsernameValid(newUser);
         newUser.setCreationDate((LocalDate.now()));
-        newUser.setQuote("No Quote");
+        newUser.setQuote("no quote");
 
         // saves the given entity but data is only persisted in the database once
         // flush() is called
