@@ -92,9 +92,9 @@ public class GameHelper {
         }
     }
 
-    public static boolean checkIfGameStillHasEnoughPlayers(Game game){
+    public static boolean gameHasToFewPlayers(Game game){
         int numberOfPlayersInGame = game.getActiveUsers().size();
-        return numberOfPlayersInGame > 1;
+        return numberOfPlayersInGame < 2;
     }
 
     public static List<Character> generateRandomLetters(int numberOfRounds){

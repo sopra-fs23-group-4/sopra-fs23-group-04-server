@@ -152,7 +152,6 @@ public class GameService {
         else if (game.getStatus() == GameStatus.OPEN) {
             leaveStrategyInLobby(gamePin, userToken, gameUsersDTO);
         }
-        gameRepository.save(game);
         removePlayerSkipManager(gamePin,user);
     }
 
@@ -169,10 +168,11 @@ public class GameService {
         logger.info("Player " + userLeaving.getToken() + " left the lobby " + gamePin);
 
 
-        if (GameHelper.checkIfGameStillHasEnoughPlayers(game) && game.getStatus() ==GameStatus.RUNNING) {
+        if (GameHelper.gameHasToFewPlayers(game)) {
             WebSocketDTO tooFewPlayersDTO = WebSocketDTOCreator.tooFewPlayers();
             webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION+ gamePin, tooFewPlayersDTO);
             game.setStatus(GameStatus.CLOSED);
+            gameRepository.save(game);
 
         }
 
