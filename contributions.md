@@ -34,7 +34,7 @@
 |-----------------------|---------------|---------------------|--------------------------------------------------------|
 | Alexandre Bacmann     |#179,#180,#181 | #33,#37,#38,#39,#40 | backend Leaderboard, testing                          |
 | Valentin Meyer        | #161, #162    | #158, #159          | improved voting and enabled starting and ending rounds |
-| Christopher Narayanan |# 120, #145, #108,              | #123, #201                 |websocket working on a page, testing repositories                                           |
+| Christopher Narayanan |# 120, #145, #108, #119              | #123, #201                 |websocket working on a page, testing repositories                                           |
 | Lennart Töllke        | #17, #18      | #27, #28            | lobby page, settings page, game creation               |
 | Remo Wiget            | #22, #24      | #26                 | pages: Letter, Voting                                  |
 
@@ -54,7 +54,7 @@
 |-----------------------|---------------------|----------------------------|-----------------------------------------------------------------------------------|
 | Alexandre Bacmann     | #46,#48,#200,#242,#243|#183,#184,#185,#186,#199  | testing, Advanced statistics (service, controller and DTO class).                 |
 | Valentin Meyer        | #160, #163          | #212, #217                 | added integration tests for GameService and AnswerService                         |
-| Christopher Narayanan | #208, #197, #223, #276, (#240), #278    | #236, #211, #245, #80           | adding functionality that if users want they can skip round, changing how facts are sent,  adding animation for winnerquote, auto starting next round     |
+| Christopher Narayanan | #208, #197, #223, #276, (#240), #278, #80   | #244, #211,        | adding functionality that if users want they can skip round, changing how facts are sent,  adding animation for winnerquote, auto starting next round     |
 | Lennart Töllke        | #16, #56, #43, #199 | #68, #63, #57, #58, #59    | added User page with advanced stats, managed uncontrolled leaving behaviour and single player  |
 | Remo Wiget            | #198, #50, #51, #65 | #19, #219, #234            | VotingResult optimized for mobile, Voting loader, timers, manual continue, beautify error msg, ui |
 
@@ -64,7 +64,7 @@
 |-----------------------|------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Alexandre Bacmann     | #183,#184,#185,#186,#199           |                                                                                                                                                                                      |
 | Valentin Meyer        | #212, #217, #252, #262, #266, #269 | added random categories in backend, fixed sonarcloud issues, refactored CategoryService, added an integration test for AdvancedStatisticService, added more tests for helper classes |
-| Christopher Narayanan | #236, #211, #245, #81, #247, #189, #190, #240                   | countdown page works regardless of fixing many bugs, and doing tess                                                                                                                  |
+| Christopher Narayanan |  #80, #81, #189, 190, #213, #219, #234, #244, #254, #259, #263, #265, #271, #272, #274, #275, #280, #281, #282                    | countdown page works regardless of fixing many bugs, and constraints to the number of players/categorylength, etc.,  informing frontend when too few players are in the game and if a player leaves during the game,   doing testing for quote and timecontroller,  refactor roundservice for performance,  changign dtos so that frontend recieves more information, performance related fixes ...   many small issues                                                                                                             |
 | Lennart Töllke        | #68, #63, #57, #58, #59, #76            | added pop up to leave button and progress bar on score page, InGameRouter, routing to User Page, fixed Bugs, made leaderboard fancy                                                  |
 | Remo Wiget            | #19, #217, #219, #234              | added random categories, countdown page, refactor quote and remove context, limit length categories & username, change UI to small letters, fixed bugs                               |
 
