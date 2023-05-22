@@ -18,6 +18,8 @@
         import ch.uzh.ifi.hase.soprafs23.websocketDto.TimerDto.ResultTimerDTO;
         import ch.uzh.ifi.hase.soprafs23.websocketDto.TimerDto.ScoreboardTimerDTO;
         import ch.uzh.ifi.hase.soprafs23.websocketDto.TimerDto.VotingTimerDTO;
+        import ch.uzh.ifi.hase.soprafs23.websocketDto.votingDto.ResultNextVoteDTO;
+        import ch.uzh.ifi.hase.soprafs23.websocketDto.votingDto.VotingEndDTO;
         import org.slf4j.Logger;
         import org.slf4j.LoggerFactory;
         import org.springframework.beans.factory.annotation.Autowired;

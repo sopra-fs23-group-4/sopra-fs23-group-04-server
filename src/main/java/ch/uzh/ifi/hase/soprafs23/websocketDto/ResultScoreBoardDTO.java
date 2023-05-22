@@ -1,7 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.websocketDto;
 
 public class ResultScoreBoardDTO {
-    public static final String type = "roundStart";
+    public static final String type = "resultScoreBoard";
 
     public String getType(){
         return type;

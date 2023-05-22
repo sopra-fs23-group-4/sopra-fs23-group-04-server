@@ -1,7 +1,11 @@
-package ch.uzh.ifi.hase.soprafs23.websocketDto;
+package ch.uzh.ifi.hase.soprafs23.websocketDto.votingDto;
 
 public class VotingEndDTO {
     public static final String type ="votingEnd";
+
+    public String getType(){
+        return type;
+    }
 
     private int round;
     private int categoryIndex;
