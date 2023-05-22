@@ -365,6 +365,7 @@
                 Game game=gameRepository.findByGamePin(gamePin);
                 game.setStatus(GameStatus.CLOSED);
                 gameRepository.saveAndFlush(game);
+                SkipRepository.removeSkipManager(gamePin);
             }
 
 

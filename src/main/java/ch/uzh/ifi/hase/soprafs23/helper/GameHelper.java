@@ -92,6 +92,11 @@ public class GameHelper {
         }
     }
 
+    public static boolean checkIfGameStillHasEnoughPlayers(Game game){
+        int numberOfPlayersInGame = game.getActiveUsers().size();
+        return numberOfPlayersInGame > 1;
+    }
+
     public static List<Character> generateRandomLetters(int numberOfRounds){
         List<Character> letters = new ArrayList<>();
 

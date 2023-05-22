@@ -5,12 +5,15 @@ import ch.uzh.ifi.hase.soprafs23.entity.game.*;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
 import ch.uzh.ifi.hase.soprafs23.helper.UserHelper;
+import ch.uzh.ifi.hase.soprafs23.helper.WebSocketDTOCreator;
 import ch.uzh.ifi.hase.soprafs23.repository.*;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GameCategoriesDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.LeaderboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.WinnerGetDTO;
 import ch.uzh.ifi.hase.soprafs23.websocketDto.GameUsersDTO;
+import ch.uzh.ifi.hase.soprafs23.websocketDto.PlayerLeftDTO;
+import ch.uzh.ifi.hase.soprafs23.websocketDto.WebSocketDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +25,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static ch.uzh.ifi.hase.soprafs23.helper.GameHelper.*;
 
 @Service
 @Transactional
@@ -137,7 +138,7 @@ public class GameService {
 
         if (Boolean.FALSE.equals(gameHasUsers)) {
             game.setStatus(GameStatus.CLOSED);
-            gameRepository.save(game); // update the game status to CLOSED
+            gameRepository.save(game);// update the game status to CLOSED
         } else {
             if (Boolean.TRUE.equals(userIsHost)) {
                 setNewHost(game);
@@ -145,16 +146,44 @@ public class GameService {
             gameUsersDTO = getHostAndAllUserNamesOfGame(game);
         }
 
-        try {
-            checkIfGameExists(getGameByGamePin(gamePin));
-            webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, gameUsersDTO);
-            logger.info("Player " + userToken + " left the lobby " + gamePin);
+        if (game.getStatus() == GameStatus.RUNNING) {
+            leaveStrategyRunningGame(gamePin,game,user);
         }
-        catch (ResponseStatusException ignored) {
-            logger.debug("Something went wrong while leaving the game.");
+        else if (game.getStatus() == GameStatus.OPEN) {
+            leaveStrategyInLobby(gamePin, userToken, gameUsersDTO);
         }
+        gameRepository.save(game);
+        removePlayerSkipManager(gamePin,user);
+    }
+
+    private void leaveStrategyInLobby(int gamePin, String userToken, GameUsersDTO gameUsersDTO) {
+        webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, gameUsersDTO);
+        logger.info("Player " + userToken + " left the lobby " + gamePin);
+    }
+
+
+    private void leaveStrategyRunningGame(int gamePin, Game game, User userLeaving){
+        PlayerLeftDTO playerLeftDTO = new PlayerLeftDTO();
+        playerLeftDTO.setUsername(userLeaving.getUsername());
+        webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION+gamePin,playerLeftDTO);
+        logger.info("Player " + userLeaving.getToken() + " left the lobby " + gamePin);
+
+
+        if (GameHelper.checkIfGameStillHasEnoughPlayers(game) && game.getStatus() ==GameStatus.RUNNING) {
+            WebSocketDTO tooFewPlayersDTO = WebSocketDTOCreator.tooFewPlayers();
+            webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION+ gamePin, tooFewPlayersDTO);
+            game.setStatus(GameStatus.CLOSED);
+
+        }
+
+    }
+
+    private void removePlayerSkipManager(int gamePin, User user) {
         SkipManager skipManager = SkipRepository.findByGameId(gamePin);
         skipManager.removeUser(user);
+        if (!skipManager.stillHasPlayers()) {
+            SkipRepository.removeSkipManager(gamePin);
+        }
     }
 
     public void setUpGameForStart(int gamePin){

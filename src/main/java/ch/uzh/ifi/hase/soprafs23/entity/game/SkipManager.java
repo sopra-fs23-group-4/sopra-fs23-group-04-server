@@ -41,4 +41,8 @@ public class SkipManager {
         }
     }
 
+    public boolean stillHasPlayers(){
+        return !userContinueMap.isEmpty();
+    }
+
 }

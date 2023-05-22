@@ -26,6 +26,12 @@ public class WebSocketDTOCreator {
         return webSocketDTO;
     }
 
+    public static WebSocketDTO tooFewPlayers() {
+        WebSocketDTO webSocketDTO = new WebSocketDTO();
+        webSocketDTO.setType("tooFewPlayers");
+        return webSocketDTO;
+    }
+
 
 
 }
