@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 public class RoundTimerDTOTest {
     @Test
     void getType_shouldReturnCorrectType() {
-        Assertions.assertEquals("roundTimer", RoundTimerDTO.TYPE);
+        Assertions.assertEquals("roundTimer", RoundTimerDTO.type);
     }
 
     @Test
