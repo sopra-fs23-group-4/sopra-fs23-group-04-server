@@ -11,10 +11,13 @@ import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.AnswerRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.GameRepository;
 import ch.uzh.ifi.hase.soprafs23.repository.RoundRepository;
+import ch.uzh.ifi.hase.soprafs23.repository.UserRepository;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.LeaderboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.WinnerGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GameCategoriesDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.rejoin.RejoinPossibleDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.rejoin.RejoinRequestDTO;
 import ch.uzh.ifi.hase.soprafs23.service.*;
 import ch.uzh.ifi.hase.soprafs23.websocketDto.GameUsersDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +33,7 @@ import javax.transaction.Transactional;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.assertj.core.api.BDDAssumptions.given;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -53,6 +57,9 @@ class GameServiceIntegrationTest {
     private VoteService voteService;
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     private User user1;
     private User user2;
@@ -417,6 +424,67 @@ class GameServiceIntegrationTest {
 
         assertEquals(4, leaderboardGetDTOList.get().size());
         assertEquals(expectedLeaderboard, actualLeaderboard);
+
+    }
+
+    @Test
+    void givenUserToken_whenCheckIfUserIsRejoinEligible_thenReturnRejoinPossibleDTO() {
+        // given
+        String user1Token = user1.getToken();
+
+        assertDoesNotThrow(() -> game = gameService.createAndReturnGame(game, user1Token));
+        int gamePin = game.getGamePin();
+        RejoinPossibleDTO rejoinPossibleDTO = gameService.checkIfUserIsRejoinEligable(user1Token);
+
+
+        // then
+        assertTrue(rejoinPossibleDTO.isRejoinPossible());
+        assertEquals(gamePin, rejoinPossibleDTO.getGamePin());
+    }
+    @Test
+    void givenUserToken_whenCheckIfUserIsRejoinEligible_thenReturnNotAbleToJoin() {
+        // given
+        String user1Token = user1.getToken();
+
+        RejoinPossibleDTO rejoinPossibleDTO = gameService.checkIfUserIsRejoinEligable(user1Token);
+
+
+        // then
+        assertFalse(rejoinPossibleDTO.isRejoinPossible());
+        assertEquals(-1, rejoinPossibleDTO.getGamePin());
+    }
+    @Test
+    void givenUserToken_whenCheckIfUserIsRejoinEligible_if_correct_round_returned_when_joining() {
+        // given
+        String user1Token = user1.getToken();
+
+        assertDoesNotThrow(() -> game = gameService.createAndReturnGame(game, user1Token));
+        int gamePin = game.getGamePin();
+
+
+        RejoinRequestDTO rejoinRequestDTO = gameService.rejoinRequestDTO(user1Token,gamePin);
+
+        assertEquals(0,rejoinRequestDTO.getRound());
+    }
+
+    @Test
+    void join_button_shown_not_able_to_join() {
+        String user1Token = user1.getToken();
+
+        assertDoesNotThrow(() -> game = gameService.createAndReturnGame(game, user1Token));
+        int gamePin = game.getGamePin();
+        RejoinPossibleDTO rejoinPossibleDTO = gameService.checkIfUserIsRejoinEligable(user1Token);
+
+
+        // then
+        assertTrue(rejoinPossibleDTO.isRejoinPossible());
+        assertEquals(gamePin, rejoinPossibleDTO.getGamePin());
+
+        game.setStatus(GameStatus.CLOSED);
+        gameRepository.save(game);
+
+        assertThrows(ResponseStatusException.class,
+                () -> gameService.rejoinRequestDTO(user1Token,gamePin));
 
     }
 

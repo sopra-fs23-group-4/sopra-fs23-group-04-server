@@ -112,7 +112,7 @@
                 Round round = roundRepository.findByGameAndRoundNumber(game,currentRound);
 
                 round.setStatus(RoundStatus.RUNNING);
-                roundRepository.save(round);
+                roundRepository.saveAndFlush(round);
                 gameRepository.saveAndFlush(game);
 
                 LetterDTO letterDTO = new LetterDTO();

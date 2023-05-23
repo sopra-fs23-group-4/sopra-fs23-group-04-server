@@ -140,7 +140,7 @@ public class GameService {
 
         if (Boolean.FALSE.equals(gameHasUsers)) {
             game.setStatus(GameStatus.CLOSED);
-            gameRepository.save(game);// update the game status to CLOSED
+            gameRepository.saveAndFlush(game);// update the game status to CLOSED
         } else {
             if (Boolean.TRUE.equals(userIsHost)) {
                 setNewHost(game);
@@ -174,7 +174,7 @@ public class GameService {
             WebSocketDTO tooFewPlayersDTO = WebSocketDTOCreator.tooFewPlayers();
             webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION+ gamePin, tooFewPlayersDTO);
             game.setStatus(GameStatus.CLOSED);
-            gameRepository.save(game);
+            gameRepository.saveAndFlush(game);
 
         }
 
