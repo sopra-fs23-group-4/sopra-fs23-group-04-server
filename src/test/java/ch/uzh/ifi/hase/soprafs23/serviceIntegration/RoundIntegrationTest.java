@@ -152,7 +152,7 @@ public class RoundIntegrationTest {
         roundService.nextRound(game.getGamePin());
 
         // Assert
-        verify(roundRepository, times(1)).save(round);
+        verify(roundRepository, times(1)).saveAndFlush(round);
         verify(gameRepository, times(1)).saveAndFlush(game);
         verify(gameRepository, times(1)).findByGamePin(game.getGamePin());
         verify(roundRepository, times(1)).findByGameAndRoundNumber(game, 5);
