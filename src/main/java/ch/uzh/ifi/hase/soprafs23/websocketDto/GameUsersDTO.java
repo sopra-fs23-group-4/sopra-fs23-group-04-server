@@ -5,11 +5,11 @@ import java.util.List;
 public class GameUsersDTO {
     public static final String TYPE = "gameUsers";
 
+    private String hostUsername;
+    private List<String> usernames;
     public String getType(){
         return TYPE;
     }
-    private String hostUsername;
-    private List<String> usernames;
 
     public String getHostUsername() {
         return hostUsername;
