@@ -14,7 +14,7 @@
 |-----------------------|----------------------|---------------|---------------------------------------------------------------|
 | Alexandre Bacmann     | #107, #112           | #123, #124    | create lettergenerator, setting endpoint, categories endpoint |
 | Valentin Meyer        | #101, #102           | #114, #118    | added game creation and joining functionality                 |
-| Christopher Narayanan | #103, (#108),#275           | #119, #120,     | struggelingwebsockets , adding functionality to get standard categories                                              |
+| Christopher Narayanan | (#103), (#108),#275           | #119, #120,#103, #108     | struggelingwebsockets , adding functionality to get standard categories                                              |
 | Lennart Töllke        | (#10, #13, #15, #16) | #17, #18      | task management                                               |
 | Remo Wiget            | #11, #12, #14        | #17, #20, #22 | RestApi, pages: Game, Quote                                   |
 
@@ -24,7 +24,7 @@
 |-----------------------|-----------------|-------------|------------------------------------------------------------------------------|
 | Alexandre Bacmann     | #123, #124      |#179,#180,#181| websocket scorebaord, last round, quote for winner                           |
 | Valentin Meyer        | #114, #118      | #161, #162  | added the answer and voting functionality                                    |
-| Christopher Narayanan | (#119) , (#120)      |  #120, #119           | struggeling with websocket                                                                    |
+| Christopher Narayanan | (#119) , (#120),#103      |  #120, #119           | struggeling with websocket                                                                    |
 | Lennart Töllke        | #42, (#17, #18) | #17, #18    | struggle with websockets/sse for lobby, started with Settings and Lobby page |
 | Remo Wiget            | #17, #20, #23   | #22, #24    | storageManager, pages: Categories, Board, Answer                             |
 
@@ -34,7 +34,7 @@
 |-----------------------|---------------|---------------------|--------------------------------------------------------|
 | Alexandre Bacmann     |#179,#180,#181 | #33,#37,#38,#39,#40 | backend Leaderboard, testing                          |
 | Valentin Meyer        | #161, #162    | #158, #159          | improved voting and enabled starting and ending rounds |
-| Christopher Narayanan |# 120, #145, #108, #119              | #123, #201                 |websocket working on a page, testing repositories                                           |
+| Christopher Narayanan |# 120, #145, (#108), #119              | #123, #201, #108                 |websocket working on a page, testing repositories                                           |
 | Lennart Töllke        | #17, #18      | #27, #28            | lobby page, settings page, game creation               |
 | Remo Wiget            | #22, #24      | #26                 | pages: Letter, Voting                                  |
 
@@ -44,7 +44,7 @@
 |-----------------------|---------------------|----------------------------|-----------------------------------------------------------------------------------|
 | Alexandre Bacmann     | #33,#37,#38,#39,#40,#174|#46,#48,#200,#242,#243 | Rules page, Front leaderboard, testing                                          |
 | Valentin Meyer        | #158, #159          | #160, #163                 | create utility classes and handled exceptional calls, plus other trouble shooting |
-| Christopher Narayanan | #123  #201, #66, #120, #119, #277         |  #208, #197, #223, #276          | implementing fact api, websocket working locally, timer implementedn              |
+| Christopher Narayanan | #123  #201, #66, #120, #119, #277, #108         |  #208, #197, #223, #276          | implementing fact api, websocket working locally, timer implementedn              |
 | Lennart Töllke        | #27, #28            | #16, #56, #199             | Score page, Winner page, improved lobby and settings page                         |
 | Remo Wiget            | #26, #5             | #198, #50                  | VotingResults page, add custom Category, redesign Dashboard, ws, fix bug Answer   |
 
