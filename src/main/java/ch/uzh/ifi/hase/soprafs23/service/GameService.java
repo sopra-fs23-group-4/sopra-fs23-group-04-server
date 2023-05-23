@@ -285,7 +285,7 @@ public class GameService {
         int gamePin = -1;
         for (Game game : openOrRunningGames) {
             List<Integer> userIds = GameHelper.getGameUsersId(game);
-            if (userIds.contains(user.getId()) && game.getStatus() == GameStatus.RUNNING) {
+            if (userIds.contains(user.getId())) {
                 isInGame = true;
                 gamePin = game.getGamePin();
             }
