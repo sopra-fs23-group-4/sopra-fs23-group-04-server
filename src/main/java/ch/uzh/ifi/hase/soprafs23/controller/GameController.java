@@ -2,6 +2,7 @@ package ch.uzh.ifi.hase.soprafs23.controller;
 
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.rejoin.RejoinPossibleDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.rejoin.RejoinRequestDTO;
 import ch.uzh.ifi.hase.soprafs23.service.CategoryService;
 import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.*;
@@ -145,6 +146,14 @@ public class GameController {
 
         RejoinPossibleDTO rejoinPossibleDTO = gameService.checkIfUserIsRejoinEligable(userToken);
         return rejoinPossibleDTO;
+    }
+
+    @GetMapping("/games/lobbies/{gamePin}/rejoin")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public RejoinRequestDTO rejoinAttempt(@RequestHeader("Authorization") String userToken, @PathVariable("gamePin") int gamePin){
+        return gameService.rejoinRequestDTO(userToken,gamePin);
+
     }
 
 }

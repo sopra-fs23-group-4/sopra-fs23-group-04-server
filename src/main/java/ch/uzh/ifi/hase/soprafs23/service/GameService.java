@@ -12,6 +12,7 @@ import ch.uzh.ifi.hase.soprafs23.rest.dto.game.LeaderboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.WinnerGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.rejoin.RejoinPossibleDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.rejoin.RejoinRequestDTO;
 import ch.uzh.ifi.hase.soprafs23.websocketDto.GameUsersDTO;
 import ch.uzh.ifi.hase.soprafs23.websocketDto.PlayerLeftDTO;
 import ch.uzh.ifi.hase.soprafs23.websocketDto.WebSocketDTO;
@@ -284,7 +285,7 @@ public class GameService {
         int gamePin = -1;
         for (Game game : openOrRunningGames) {
             List<Integer> userIds = GameHelper.getGameUsersId(game);
-            if (userIds.contains(user.getId())) {
+            if (userIds.contains(user.getId()) && game.getStatus() == GameStatus.RUNNING) {
                 isInGame = true;
                 gamePin = game.getGamePin();
             }
@@ -293,6 +294,22 @@ public class GameService {
         rejoinPossibleDTO.setGamePin(gamePin);
         rejoinPossibleDTO.setRejoinPossible(isInGame);
         return rejoinPossibleDTO;
+    }
+
+    public RejoinRequestDTO rejoinRequestDTO (String userToken, int gamePin) {
+        User user = getUserByToken(userToken);
+        UserHelper.checkIfUserExists(user);
+        Game game = gameRepository.findByGamePin(gamePin);
+        List<Integer> userIds = GameHelper.getGameUsersId(game);
+        if (!userIds.contains(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, " You are not a part of this game anymore");
+        }
+        if (game.getStatus() == GameStatus.CLOSED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "The game has already finished, you can join or create a game now ");
+        }
+        RejoinRequestDTO rejoinRequestDTO = new RejoinRequestDTO();
+        rejoinRequestDTO.setRound(game.getCurrentRound());
+        return rejoinRequestDTO;
     }
 
     private void setNewHost(Game game) {

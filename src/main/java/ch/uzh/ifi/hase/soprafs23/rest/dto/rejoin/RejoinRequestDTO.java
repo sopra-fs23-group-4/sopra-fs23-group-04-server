@@ -1,6 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.rest.dto.rejoin;
 
-public class Rejoin {
+public class RejoinRequestDTO {
     private int round;
 
     public int getRound() {
