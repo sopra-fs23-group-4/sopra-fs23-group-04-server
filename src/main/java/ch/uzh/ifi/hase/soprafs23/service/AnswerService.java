@@ -117,6 +117,9 @@ public class AnswerService {
             if (answerString == null) {
                 answerString = "-";
             }
+            else if (AnswerHelper.isAnswerTooLong(answerString)) {
+                answerString = AnswerHelper.shortenTooLongAnswer(answerString);
+            }
 
             Answer newAnswer = new Answer();
 

@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.helper;
 
+import ch.uzh.ifi.hase.soprafs23.constant.Constant;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Answer;
 import org.springframework.http.HttpStatus;
@@ -36,5 +37,12 @@ public class AnswerHelper {
             }
         }
         return filteredAnswers;
+    }
+
+    public static boolean isAnswerTooLong(String answer) {
+        return answer.length()> Constant.ANSWER_MAX_LENGTH;
+    }
+    public static String shortenTooLongAnswer(String answer) {
+        return answer.substring(0, Constant.ANSWER_MAX_LENGTH);
     }
 }
