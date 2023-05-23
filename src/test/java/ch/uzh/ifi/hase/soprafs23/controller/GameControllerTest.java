@@ -4,12 +4,12 @@ import ch.uzh.ifi.hase.soprafs23.constant.RoundLength;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Game;
 import ch.uzh.ifi.hase.soprafs23.helper.GameHelper;
 import ch.uzh.ifi.hase.soprafs23.repository.CategoryRepository;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.game.CategoryGetDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GameCategoriesDTO;
-import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GamePostDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.game.*;
 import ch.uzh.ifi.hase.soprafs23.service.CategoryService;
 import ch.uzh.ifi.hase.soprafs23.service.GameService;
 import ch.uzh.ifi.hase.soprafs23.service.RoundService;
+import ch.uzh.ifi.hase.soprafs23.service.VoteService;
+import ch.uzh.ifi.hase.soprafs23.websocketDto.GameUsersDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -20,17 +20,21 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.put;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
@@ -55,6 +59,9 @@ public class GameControllerTest {
 
     @MockBean
     private CategoryService categoryService;
+
+    @MockBean
+    private VoteService voteService;
 
     /*@Test
     void givenGamePostDTOAndUserToken_whenCreateGame_thenReturnGamePin() throws Exception {
@@ -147,4 +154,129 @@ public class GameControllerTest {
                     String.format("The request body could not be created.%s", e.toString()));
         }
     }
+
+    @Test
+    void whenGetGameUsersByGamePin_givenGamePin_thenInvokeServiceMethodAndReturnDto() throws Exception {
+        // given
+        int gamePin = 1234;
+        GameUsersDTO expectedDto = new GameUsersDTO();
+        // populate expectedDto with some sample data...
+
+        when(gameService.getGameUsersByGamePin(gamePin)).thenReturn(expectedDto);
+
+        // when
+        MockHttpServletRequestBuilder getRequest = MockMvcRequestBuilders.get("/games/{gamePin}/users", gamePin)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(getRequest)
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));
+
+        // then
+        verify(gameService).getGameUsersByGamePin(gamePin);
+    }
+
+    @Test
+    void whenLeaveGame_givenGamePinAndUserToken_thenInvokeServiceMethod() throws Exception {
+        // given
+        int gamePin = 1234;
+        String userToken = "testUserToken";
+
+        // no return expected, service method is void
+
+        // when
+        MockHttpServletRequestBuilder putRequest = MockMvcRequestBuilders.put("/games/lobbies/{gamePin}/leave", gamePin)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", userToken);
+
+        mockMvc.perform(putRequest)
+                .andExpect(status().isNoContent()); // expect HTTP 204 (NO CONTENT)
+
+        // then
+        verify(gameService).leaveGame(gamePin, userToken);
+    }
+    @Test
+    void whenJoinGame_givenGamePinAndUserToken_thenInvokeServiceMethod() throws Exception {
+        // given
+        int gamePin = 1234;
+        String userToken = "testUserToken";
+
+        // no return expected, service method is void
+
+        // when
+        MockHttpServletRequestBuilder putRequest = MockMvcRequestBuilders.put("/games/lobbies/{gamePin}/join", gamePin)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", userToken);
+
+        mockMvc.perform(putRequest)
+                .andExpect(status().isNoContent()); // expect HTTP 204 (NO CONTENT)
+
+        // then
+        verify(gameService).joinGame(gamePin, userToken);
+    }
+
+
+    @Test
+    void whenGetWinner_givenGamePin_thenInvokeServiceMethod() throws Exception {
+        // given
+        int gamePin = 1234;
+        List<WinnerGetDTO> winners = new ArrayList<>();
+        WinnerGetDTO winnerGetDTO = new WinnerGetDTO(); // Assume WinnerGetDTO has a default constructor.
+        winners.add(winnerGetDTO);
+        when(gameService.getWinner(gamePin)).thenReturn(winners);
+
+        // when
+        MockHttpServletRequestBuilder getRequest = MockMvcRequestBuilders.get("/games/lobbies/{gamePin}/winner", gamePin)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(getRequest)
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(new ObjectMapper().writeValueAsString(winners)));
+
+        // then
+        verify(gameService).getWinner(gamePin);
+    }
+
+    @Test
+    void whenGetScoreboard_givenGamePin_thenInvokeServiceMethod() throws Exception {
+        // given
+        int gamePin = 1234;
+        List<ScoreboardGetDTO> scoreboard = new ArrayList<>();
+        ScoreboardGetDTO scoreboardGetDTO = new ScoreboardGetDTO(); // Assume ScoreboardGetDTO has a default constructor.
+        scoreboard.add(scoreboardGetDTO);
+        when(gameService.getScoreboard(gamePin)).thenReturn(scoreboard);
+
+        // when
+        MockHttpServletRequestBuilder getRequest = MockMvcRequestBuilders.get("/games/lobbies/{gamePin}/scoreboard", gamePin)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(getRequest)
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(new ObjectMapper().writeValueAsString(scoreboard)));
+
+        // then
+        verify(gameService).getScoreboard(gamePin);
+    }
+
+
+    @Test
+    void whenGetLeaderboard_thenInvokeServiceMethod() throws Exception {
+        // given
+        List<LeaderboardGetDTO> leaderboard = new ArrayList<>();
+        LeaderboardGetDTO leaderboardGetDTO = new LeaderboardGetDTO(); // Assume LeaderboardGetDTO has a default constructor.
+        leaderboard.add(leaderboardGetDTO);
+        when(gameService.getLeaderboard()).thenReturn(leaderboard);
+
+        // when
+        MockHttpServletRequestBuilder getRequest = MockMvcRequestBuilders.get("/games/lobbies/leaderboard")
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(getRequest)
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(new ObjectMapper().writeValueAsString(leaderboard)));
+
+        // then
+        verify(gameService).getLeaderboard();
+    }
+
 }
