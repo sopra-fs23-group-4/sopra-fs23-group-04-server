@@ -98,7 +98,9 @@ public class GameService {
 
         UserHelper.checkIfUserExists(user);
 
-        checkIfUserCanJoin(user.getId());
+        //checkIfUserCanJoin(user.getId());
+
+        leavePreviousGamesIfAny(userToken);
 
         Game gameToJoin = gameRepository.findByGamePin(gamePin);
 
@@ -153,6 +155,19 @@ public class GameService {
             leaveStrategyInLobby(gamePin, userToken, gameUsersDTO);
         }
         removePlayerSkipManager(gamePin,user);
+
+    }
+
+    private void leavePreviousGamesIfAny(String userToken){
+
+        User user = userRepository.findByToken(userToken);
+
+        for (GameParticipant gameParticipants: user.getGameParticipants()){
+            if (gameParticipants.getParticipantStatus().equals(ParticipantStatus.INGAME)){
+                gameParticipants.setParticipantStatus(ParticipantStatus.LEFT);
+                //removePlayerSkipManager(gameParticipants.getGame().getGamePin(), gameParticipants.getUser());
+            }
+        }
     }
 
     private void leaveStrategyInLobby(int gamePin, String userToken, GameUsersDTO gameUsersDTO) {

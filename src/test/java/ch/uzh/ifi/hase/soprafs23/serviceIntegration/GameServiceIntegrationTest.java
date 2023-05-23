@@ -121,25 +121,25 @@ class GameServiceIntegrationTest {
 
     }
 
-    @Test
-    void joinGame_invalidInput_gameJoinedTwice() {
+   //@Test
+   //void joinGame_invalidInput_gameJoinedTwice() {
 
-        String user1Token = user1.getToken();
+   //    String user1Token = user1.getToken();
 
-        assertDoesNotThrow(() -> game = gameService.createAndReturnGame(game, user1Token));
-        int gamePin = game.getGamePin();
+   //    assertDoesNotThrow(() -> game = gameService.createAndReturnGame(game, user1Token));
+   //    int gamePin = game.getGamePin();
 
-        WebSocketService mockWebSocketService = Mockito.mock(WebSocketService.class);
-        doNothing().when(mockWebSocketService).sendMessageToClients(anyString(), any());
+   //    WebSocketService mockWebSocketService = Mockito.mock(WebSocketService.class);
+   //    doNothing().when(mockWebSocketService).sendMessageToClients(anyString(), any());
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> gameService.joinGame(gamePin, user1Token));
+   //    ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+   //            () -> gameService.joinGame(gamePin, user1Token));
 
-        assertEquals(HttpStatus.CONFLICT, exception.getStatus());
-        assertEquals("You are already part of a game. " +
-                "You cannot join another game!", exception.getReason());
+   //    assertEquals(HttpStatus.CONFLICT, exception.getStatus());
+   //    assertEquals("You are already part of a game. " +
+   //            "You cannot join another game!", exception.getReason());
 
-    }
+   //}
 
     @Test
     void joinGame_invalidInput_gameDoesNotExist() {
