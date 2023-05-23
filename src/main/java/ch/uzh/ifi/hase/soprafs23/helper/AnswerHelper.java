@@ -39,6 +39,7 @@ public class AnswerHelper {
         return filteredAnswers;
     }
 
+
     public static boolean isAnswerTooLong(String answer) {
         return answer.length()> Constant.ANSWER_MAX_LENGTH;
     }

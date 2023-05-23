@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs23.helper;
 
+import ch.uzh.ifi.hase.soprafs23.constant.Constant;
 import ch.uzh.ifi.hase.soprafs23.entity.game.Answer;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,24 @@ class AnswerHelperTest {
         Answer answer = new Answer();
 
         assertDoesNotThrow(() -> checkIfAnswerExists(answer));
+    }
+    @Test
+    void test_checkIfAnswerIsTooLong_true() {
+        String answer ="jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj";
+        assertTrue(AnswerHelper.isAnswerTooLong(answer));
+    }
+
+    @Test
+    void test_checkIfAnswerIsTooLong_false() {
+        String answer="Hello! How are you today?";
+        assertFalse(AnswerHelper.isAnswerTooLong(answer));
+    }
+
+    @Test
+    void test_shortensTooLongAnswer() {
+        String answer ="jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj";
+        String shortendAnswer=AnswerHelper.shortenTooLongAnswer(answer);
+        assertEquals(Constant.ANSWER_MAX_LENGTH,shortendAnswer.length());
     }
 
 }
