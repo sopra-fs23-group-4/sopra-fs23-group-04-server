@@ -52,7 +52,7 @@
 
 | Person                | Last Week           | Next Week                  | Description                                                                       |
 |-----------------------|---------------------|----------------------------|-----------------------------------------------------------------------------------|
-| Alexandre Bacmann     | #46,#48,#200,#242,#243|#183,#184,#185,#186,#199  | testing, Advanced statistics (service, controller and DTO class).                 |
+| Alexandre Bacmann     | #46,#48,#68,#200,#242,#243|#183,#184,#185,#186,#199  | testing, Advanced statistics (service, controller and DTO class).                 |
 | Valentin Meyer        | #160, #163          | #212, #217                 | added integration tests for GameService and AnswerService                         |
 | Christopher Narayanan | #208, #197, #223, #276, (#240), #278, #80   | #244, #211,        | adding functionality that if users want they can skip round, changing how facts are sent,  adding animation for winnerquote, auto starting next round     |
 | Lennart Töllke        | #16, #56, #43, #199 | #68, #63, #57, #58, #59    | added User page with advanced stats, managed uncontrolled leaving behaviour and single player  |
@@ -61,8 +61,8 @@
 23.05.2023
 
 | Person                | Last Week                          | Description                                                                                                                                                                          |
-|-----------------------|------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Alexandre Bacmann     | #183,#184,#185,#186,#199           |                                                                                                                                                                                      |
+|-----------------------|------------------------------------|----------------------------------------------------------------------------------------------------------
+| Alexandre Bacmann     | #183,#184,#185,#186,#199,#279          |  unit test service class, Readme, fix issue: leaving game                                                                                                                                                                                    |
 | Valentin Meyer        | #212, #217, #252, #262, #266, #269 | added random categories in backend, fixed sonarcloud issues, refactored CategoryService, added an integration test for AdvancedStatisticService, added more tests for helper classes |
 | Christopher Narayanan |  #80, #81, #189, 190, #213, #219, #234, #244, #254, #259, #263, #265, #271, #272, #274, #275, #280, #281, #282                    | countdown page works regardless of fixing many bugs, and constraints to the number of players/categorylength, etc.,  informing frontend when too few players are in the game and if a player leaves during the game,   doing testing for quote and timecontroller,  refactor roundservice for performance,  changign dtos so that frontend recieves more information, performance related fixes ...   many small issues                                                                                                             |
 | Lennart Töllke        | #68, #63, #57, #58, #59, #76            | added pop up to leave button and progress bar on score page, InGameRouter, routing to User Page, fixed Bugs, made leaderboard fancy                                                  |
