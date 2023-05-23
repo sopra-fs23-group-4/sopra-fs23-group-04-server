@@ -78,6 +78,7 @@ class UserServiceIntegrationTest {
     // change the name but forget about the username
 
     testUser2.setUsername("user1");
+    testUser2.setPassword("jadslkföa");
 
     // check that an error is thrown
     assertThrows(ResponseStatusException.class, () -> userService.createAndReturnUser(testUser2));
