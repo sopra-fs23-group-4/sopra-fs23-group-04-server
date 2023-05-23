@@ -11,6 +11,7 @@ import ch.uzh.ifi.hase.soprafs23.rest.dto.game.GameCategoriesDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.LeaderboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.ScoreboardGetDTO;
 import ch.uzh.ifi.hase.soprafs23.rest.dto.game.WinnerGetDTO;
+import ch.uzh.ifi.hase.soprafs23.rest.dto.rejoin.RejoinPossibleDTO;
 import ch.uzh.ifi.hase.soprafs23.websocketDto.GameUsersDTO;
 import ch.uzh.ifi.hase.soprafs23.websocketDto.PlayerLeftDTO;
 import ch.uzh.ifi.hase.soprafs23.websocketDto.WebSocketDTO;
@@ -273,6 +274,25 @@ public class GameService {
                         String.format(errorMessage));
             }
         }
+    }
+
+    public RejoinPossibleDTO checkIfUserIsRejoinEligable(String userToken){
+        User user = userRepository.findByToken(userToken);
+        UserHelper.checkIfUserExists(user);
+        List<Game> openOrRunningGames = getOpenOrRunningGames();
+        boolean isInGame =false;
+        int gamePin = -1;
+        for (Game game : openOrRunningGames) {
+            List<Integer> userIds = GameHelper.getGameUsersId(game);
+            if (userIds.contains(user.getId())) {
+                isInGame = true;
+                gamePin = game.getGamePin();
+            }
+        }
+        RejoinPossibleDTO rejoinPossibleDTO = new RejoinPossibleDTO();
+        rejoinPossibleDTO.setGamePin(gamePin);
+        rejoinPossibleDTO.setRejoinPossible(isInGame);
+        return rejoinPossibleDTO;
     }
 
     private void setNewHost(Game game) {
