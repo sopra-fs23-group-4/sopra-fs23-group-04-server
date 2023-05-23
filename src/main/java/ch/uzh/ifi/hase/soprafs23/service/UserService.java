@@ -44,7 +44,10 @@ public class UserService {
 
     public synchronized User createAndReturnUser(User newUser) {
         if (newUser.getUsername().length()>10) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"You're username exceeds 10 character");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Your username exceeds 10 character");
+        }
+        if (newUser.getPassword().length()>255) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Your password is too long");
         }
         newUser.setToken(UUID.randomUUID().toString());
         checkIfUsernameAlreadyExists(newUser);
