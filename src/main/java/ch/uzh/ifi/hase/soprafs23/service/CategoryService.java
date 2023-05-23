@@ -17,7 +17,7 @@ public class CategoryService {
     public static CategoryRepository categoryRepository;
 
     @Autowired
-    private CategoryService(CategoryRepository categoryRepository) {
+    public void setCategoryRepository(CategoryRepository categoryRepository) {
         CategoryService.categoryRepository = categoryRepository;
     }
 
