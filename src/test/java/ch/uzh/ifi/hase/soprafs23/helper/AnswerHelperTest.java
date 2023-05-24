@@ -36,7 +36,7 @@ class AnswerHelperTest {
 
     @Test
     void test_checkIfAnswerIsTooLong_false() {
-        String answer="Hello! How are you today?";
+        String answer="Hello! How are yo";
         assertFalse(AnswerHelper.isAnswerTooLong(answer));
     }
 

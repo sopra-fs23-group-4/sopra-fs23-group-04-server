@@ -13,6 +13,6 @@ public class Constant {
 
     public static final int QUOTE_MAX_LENGTH =255;
     public static final int MAX_ALLOWED_OF_PLAYERS = 10;
-    public static final int ANSWER_MAX_LENGTH =25;
+    public static final int ANSWER_MAX_LENGTH =18;
 
 }

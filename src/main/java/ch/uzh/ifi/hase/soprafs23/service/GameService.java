@@ -302,7 +302,7 @@ public class GameService {
         Game game = gameRepository.findByGamePin(gamePin);
         List<Integer> userIds = GameHelper.getGameUsersId(game);
         if (!userIds.contains(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, " You are not a part of this game anymore");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, " You are not a part of this game anymore, press leave");
         }
         if (game.getStatus() == GameStatus.CLOSED) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "The game has already finished, press the leave button");
