@@ -305,7 +305,7 @@ public class GameService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, " You are not a part of this game anymore");
         }
         if (game.getStatus() == GameStatus.CLOSED) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "The game has already finished, you can join or create a game now ");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "The game has already finished, press the leave button");
         }
         RejoinRequestDTO rejoinRequestDTO = new RejoinRequestDTO();
         rejoinRequestDTO.setRound(game.getCurrentRound());
