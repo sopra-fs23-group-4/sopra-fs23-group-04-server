@@ -68,7 +68,7 @@ public class UserService {
     public User logIn(User userLogin){
         User userByUsername = userRepository.findByUsername(userLogin.getUsername());
         String notExist = "This username doesn't exist";
-        String wrongPassword = "The password you entered is incorrect";
+        String wrongPassword = "The password you entered is incorrect.";
 
         if (userByUsername == null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,notExist);

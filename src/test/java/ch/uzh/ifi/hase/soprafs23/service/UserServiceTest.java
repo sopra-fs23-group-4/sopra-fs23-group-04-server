@@ -167,7 +167,7 @@ class UserServiceTest {
         // Then
         ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> userService.logIn(userWithIncorrectPassword));
         assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatus());
-        assertTrue(exception.getReason().contains("The password you tipped in is incorrect"));
+        assertTrue(exception.getReason().contains("The password you entered is incorrect."));
     }
 
 
