@@ -1,3 +1,8 @@
+<div align="center">
+<a href="(https://github.com/sopra-fs23-group-4/sopra-fs23-group-04-client/tree/main/ReadMePictures)"><img src="/ReadMePictures/Logo.png" alt="logo" width="240"></a>
+</div>
+
+
 # SoPra Group 04 FS23 - STADT LAND **+**
 
 Welcome to Stadt Land Plus! This project is the result of our Software Lab class at the University of Zurich, where we were tasked with the challenge of developing a software application. We decided to create a game, taking inspiration from the classic Swiss game, Stadt Land Fluss, also known as 'Categories' in English.
