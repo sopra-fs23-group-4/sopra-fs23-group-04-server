@@ -1,5 +1,5 @@
 <div align="center">
-<a href="(https://github.com/sopra-fs23-group-4/sopra-fs23-group-04-client/tree/main/ReadMePictures)"><img src="/ReadMePictures/Logo.png" alt="logo" width="240"></a>
+<a href="(https://github.com/sopra-fs23-group-4/sopra-fs23-group-04-server/blob/main/SL+Logo/Logo.png)"><img src="/ReadMePictures/Logo.png" alt="logo" width="240"></a>
 </div>
 
 
