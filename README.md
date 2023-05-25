@@ -48,8 +48,8 @@ You can verify that the server is running by visiting `localhost:8080` in your b
 
 ## Roadmap
 
-- Death Mode: Player with the least points after a round is eliminated
-- Algorithm to check certain categories for correctness e.g. city and country to improve fairness
+- Sudden Death Mode: Player with the least points after a round is eliminated
+- Heartbeat method for the Websocket to handle failing internet connection
 - Possibility to play non-synchronized
 
 
