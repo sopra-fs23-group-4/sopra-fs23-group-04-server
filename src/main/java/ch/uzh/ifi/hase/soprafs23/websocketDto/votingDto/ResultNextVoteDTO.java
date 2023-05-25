@@ -6,6 +6,16 @@ public class ResultNextVoteDTO {
     private int round;
     private int categoryIndex;
 
+    private Character letter;
+
+    public Character getLetter() {
+        return letter;
+    }
+
+    public void setLetter(Character letter) {
+        this.letter = letter;
+    }
+
     public int getCategoryIndex() {
         return categoryIndex;
     }

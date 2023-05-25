@@ -205,7 +205,9 @@
 
                 ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
                 Game game = gameRepository.findByGamePin(gamePin);
+                Round round = roundRepository.findByGameAndRoundNumber(game,game.getCurrentRound());
                 AtomicInteger remainingTime = new AtomicInteger(15);
+
 
                 Runnable resultTimerTask = new Runnable() {
                     boolean isQuoteSent = false;
@@ -230,6 +232,7 @@
 
                                 resultNextVote.setRound(game.getCurrentRound());
                                 resultNextVote.setCategoryIndex(currentVotingRound);
+                                resultNextVote.setLetter(round.getLetter());
                                 webSocketService.sendMessageToClients(Constant.DEFAULT_DESTINATION + gamePin, resultNextVote);
 
                                 votingTimer(gamePin, currentVotingRoundIncremented);
