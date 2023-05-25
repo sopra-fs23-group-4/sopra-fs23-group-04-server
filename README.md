@@ -55,7 +55,7 @@ You can verify that the server is running by visiting `localhost:8080` in your b
 
 ## Authors and acknowledgement
 
-SoPra Group 04 2023 consists of [Valentin Meyer](https://github.com/VaLeoMe), [Remo Wiget](https://github.com/wigeto), [Christopher Narayanan](https://github.com/Queentaker), [Lennart Tölke](https://github.com/LexuTros) and [Alexandre Bacmann](https://github.com/ABacmann).
+SoPra Group 04 2023 consists of [Valentin Meyer](https://github.com/VaLeoMe), [Remo Wiget](https://github.com/wigeto), [Christopher Narayanan](https://github.com/Queentaker), [Lennart Töllke](https://github.com/LexuTros) and [Alexandre Bacmann](https://github.com/ABacmann).
 
 We want to thank our teaching assistant [Hyeongkyun (Kaden) Kim](https://github.com/hk-kaden-kim) for his help and guidance during the project.
 
