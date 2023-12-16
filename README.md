@@ -5,7 +5,7 @@
 
 # SoPra Group 04 FS23 - STADT LAND **+**
 
-Welcome to Stadt Land Plus! This project is the result of our Software Lab class at the University of Zurich, where we were tasked with the challenge of developing a software application. We decided to create a game, taking inspiration from the classic Swiss game, Stadt Land Fluss, also known as 'Categories' in English.
+Welcome to Stadt Land Plus! This project is the result of our Software Lab class at the University of Zurich, where we were tasked with the challenge of developing a software application. We decided to create a game, taking inspiration from the classic Swiss game, Stadt Land Fluss, also known as 'Categories' in English. This is the repository of the back-end part of our implementation, you will find the front-end part [here](https://github.com/sopra-fs23-group-4/sopra-fs23-group-04-client/). 
 
 ## Introduction
 Embark on a thrilling journey with Stadt Land Plus, a captivating multiplayer word game! By brainstorming words within chosen categories and a surprise random letter, players are immersed in a realm of fast-paced learning and fun. The unique twist? A democratic voting system that brings a dash of unpredictability while guaranteeing fairness in validating answers. Get ready to ignite your mind!
